@@ -18,39 +18,31 @@ jobs:
           node-version: "20.9.0" # Next.js requires Node >= 20.9.0
           cache: "npm"
 
+      - name: Cache dependencies and Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .next/cache
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
       - name: Install dependencies
-        run: npm ci mkdir -p /domains/afrizahanif.com/public_html
+        run: npm ci
 
       - name: Build
         run: npm run build
 
-      - name: (Diagnostic) list remote root and _next (before deploy)
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y lftp
-          echo "---- remote root listing (before) ----"
-          # Attempt to list remote root; disable cert verification to avoid FTPS CN mismatch in CI
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; set ssl:check-hostname no; cls -la / || cls -la || echo 'root not found or no access'; quit"
-          echo "---- remote _next listing (before) ----"
-          # Attempt to list remote _next; don't fail the job if it errors
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; set ssl:check-hostname no; cls -la public_html/_next || echo '_next not found or no access'; quit"
-        continue-on-error: true
-
-      - name: Deploy via lftp mirror to Hostinger
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y lftp
-          echo "Starting lftp mirror upload..."
-          # Mirror upload: reverse (local -> remote), delete remote files not present locally, exclude _next
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; set ssl:check-hostname no; mirror -R --verbose --parallel=2 --delete -x '^_next($|/)' out /domains/afrizahanif.com/public_html; quit"
-          echo "lftp mirror finished."
-
-      - name: (Diagnostic) list remote public_html and _next (after deploy)
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y lftp
-          echo "---- remote public_html listing (after) ----"
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; set ssl:check-hostname no; cls -la /domains/afrizahanif.com/public_html || echo 'public_html not found or no access'; quit"
-          echo "---- remote _next listing (after) ----"
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "set ssl:verify-certificate no; set ssl:check-hostname no; cls -la /domains/afrizahanif.com/public_html/_next || echo '_next not found or no access'; quit"
-        continue-on-error: true
+      - name: Deploy via FTP to Hostinger
+        # Use the stable v4 tag to avoid referencing a non-existent patch version
+        uses: SamKirkland/FTP-Deploy-Action@4.2.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: out/
+          server-dir: /domains/afrizahanif.com/public_html/
+          # git-ftp-args: --insecure
+          # If this still errors, you can:
+          # 1) pin to a specific released version like `@4.2.0`, or
+          # 2) replace this step with an SFTP/FTP upload using curl/lftp or another action.
