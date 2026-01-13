@@ -24,7 +24,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Diagnostic: list remote _next (before deploy)
+      - name: (Diagnostic) list remote _next (before deploy)
         run: |
           sudo apt-get update -y
           sudo apt-get install -y lftp
@@ -48,7 +48,7 @@ jobs:
           # 1) pin to a specific released version like `@4.2.0`, or
           # 2) replace this step with an SFTP/FTP upload using curl/lftp or another action.
 
-      - name: Diagnostic: list remote _next (after deploy)
+      - name: (Diagnostic) list remote _next (after deploy)
         run: |
           sudo apt-get update -y
           sudo apt-get install -y lftp
