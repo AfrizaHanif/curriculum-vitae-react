@@ -33,16 +33,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy via FTP to Hostinger
-        # Use the stable v4 tag to avoid referencing a non-existent patch version
-        uses: SamKirkland/FTP-Deploy-Action@4.2.0
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: out/
-          server-dir: /domains/afrizahanif.com/public_html/
-          # git-ftp-args: --insecure
-          # If this still errors, you can:
-          # 1) pin to a specific released version like `@4.2.0`, or
-          # 2) replace this step with an SFTP/FTP upload using curl/lftp or another action.
+      - name: Deploy via lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+          # Mirror out/ to the server directory. 
+          # --delete removes files on server that are not in out/ (clean sync)
+          # --parallel uploads multiple files at once for speed
+          # set ssl:verify-certificate no avoids issues with shared hosting SSL certs
+          lftp -e "set ftp:ssl-auto true; set ssl:verify-certificate no; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST }}; mirror -R --verbose --delete --parallel=5 out/ /domains/afrizahanif.com/public_html/; quit"
