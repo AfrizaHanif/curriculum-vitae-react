@@ -1,0 +1,1 @@
+Customs folder contains modified default bootstrap from .tsx. You need to copy / duplicate into Customs folder and rename function's name by add name 'Custom' from beginning of the name (For example: Feature -> CustomFeature)
