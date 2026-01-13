@@ -16,21 +16,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.9.0" # Next.js requires Node >= 20.9.0
-
-      - name: Cache dependencies and Next.js build cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .next/cache
-            ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci mkdir -p /domains/afrizahanif.com/public_html
 
       - name: Build
         run: npm run build
+
+      - name: Ensure remote directory exists
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y lftp
+          # Print remote working dir and listing for diagnostics
+          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "pwd; ls -la; quit"
+          # Ensure the absolute domain public_html exists (will create if permitted)
+          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "mkdir -p /domains/afrizahanif.com/public_html; quit"
 
       - name: Deploy via FTP to Hostinger
         # Use the stable v4 tag to avoid referencing a non-existent patch version
@@ -40,7 +41,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: out/
-          server-dir: public_html/
+          server-dir: /domains/afrizahanif.com/public_html/
           # git-ftp-args: --insecure
           # If this still errors, you can:
           # 1) pin to a specific released version like `@4.2.0`, or
