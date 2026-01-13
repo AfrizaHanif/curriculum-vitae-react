@@ -33,6 +33,10 @@ export default function Testimony() {
           </div>
         </div>
       </Jumbotron>
+      {/* Alert (Temporary) */}
+      <Alert color={"warning"}>
+        Halaman ini masih dalam tahap pengembangan
+      </Alert>
       {/* Cards of Testimony */}
       {testimonyItems.length > 0 ? (
         <CardGroup cardPerRow={2}>
