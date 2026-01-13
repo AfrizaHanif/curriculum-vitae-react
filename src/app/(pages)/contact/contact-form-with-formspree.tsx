@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, ChangeEvent } from "react";
-import dynamic from "next/dynamic";
+import { useForm, ValidationError } from "@formspree/react";
 import ReCAPTCHA from "react-google-recaptcha";
 import Form from "@/components/ui/form";
 import FormInput from "@/components/ui/form/form-input";
@@ -10,62 +10,13 @@ import { CheckItem, SelectItem } from "@/lib/bootstrap-types";
 import FormCheck from "@/components/ui/form/form-check";
 import Toast from "@/components/ui/bootstrap/toast";
 
-// Dynamically import the form that uses Formspree so it never runs during SSR
-const ContactFormWithFormspree = dynamic(
-  () => import("./contact-form-with-formspree"),
-  {
-    ssr: false,
-  }
-);
-
-export default function ContactForm() {
-  // Initialize from env but allow runtime override via /site-config.json
-  const [siteKey, setSiteKey] = useState<string>(
-    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""
-  );
-  const initialFormId =
-    (process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID || "").split("/").pop() || "";
-  const [formId, setFormId] = useState<string>(initialFormId);
-
-  useEffect(() => {
-    // Only load runtime config in production to avoid overriding dev envs
-    if (process.env.NODE_ENV !== "production") {
-      return;
-    }
-
-    fetch("/site-config.json")
-      .then((res) => {
-        if (!res.ok) throw new Error("no site config");
-        return res.json();
-      })
-      .then((data) => {
-        if (data && data.siteKey) {
-          setSiteKey(data.siteKey);
-        }
-        if (data && data.formId) {
-          setFormId((data.formId || "").split("/").pop() || initialFormId);
-        }
-      })
-      .catch(() => {
-        /* ignore */
-      });
-  }, [initialFormId]);
-
-  // Render the Formspree-backed form only on the client and only when we have a formId
-  if (typeof window === "undefined") {
-    // During SSR return a lightweight placeholder to avoid calling Formspree hooks
-    return <div style={{ minHeight: "10rem" }} />;
-  }
-
-  if (!formId) {
-    // If no form ID is configured, render a local fallback form that doesn't call Formspree
-    return <ContactFormFallback siteKey={siteKey} />;
-  }
-
-  return <ContactFormWithFormspree siteKey={siteKey} formId={formId} />;
+interface Props {
+  siteKey: string;
+  formId: string;
 }
 
-function ContactFormFallback({ siteKey }: { siteKey: string }) {
+export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
+  const [state, handleSubmit] = useForm(formId);
   const [recaptchaToken, setRecaptchaToken] = useState<string>("");
   const [messageLength, setMessageLength] = useState<number>(0);
   const [showToast, setShowToast] = useState<boolean>(false);
@@ -100,12 +51,15 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
     setOtherSubject("");
   }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Show a toast explaining the form isn't wired in this build
-    setShowToast(true);
-    handleReset();
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (state.succeeded) {
+        setShowToast(true);
+        handleReset();
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [state.succeeded, handleReset]);
 
   return (
     <>
@@ -113,8 +67,11 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
         ref={formRef}
         labelSubmit="Submit"
         onSubmit={handleSubmit}
-        submitting={false}
-        disabled={!!siteKey && !recaptchaToken}
+        submitting={state.submitting}
+        disabled={
+          (!!siteKey && !recaptchaToken) ||
+          (subject === "Lainnya" && !otherSubject)
+        }
         onReset={handleReset}
         labelReset="Reset"
       >
@@ -123,13 +80,26 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
             <FormInput id="name" name="name" type="text" required>
               Nama Lengkap
             </FormInput>
+            <ValidationError
+              prefix="Name"
+              field="name"
+              errors={state.errors}
+              className="text-danger small"
+            />
           </div>
           <div className="col">
             <FormInput id="email" name="email" type="email" required>
               E-Mail
             </FormInput>
+            <ValidationError
+              prefix="Email"
+              field="email"
+              errors={state.errors}
+              className="text-danger small"
+            />
           </div>
         </div>
+
         <div className="row">
           <div className="col">
             <FormSelect
@@ -165,9 +135,27 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
                   {otherSubject.length} / 100
                 </span>
               </FormInput>
+              <ValidationError
+                prefix="Other Subject"
+                field="otherSubject"
+                errors={state.errors}
+                className="text-danger small"
+              />
             </div>
           )}
         </div>
+
+        <input
+          type="hidden"
+          name="_subject"
+          value={subject === "Lainnya" ? otherSubject : subject}
+        />
+        <ValidationError
+          prefix="Subject"
+          field="subject"
+          errors={state.errors}
+          className="text-danger small"
+        />
 
         <FormInput id="url" name="url" type="url">
           Link Terkait (Optional)
@@ -188,7 +176,15 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
           </span>
         </FormInput>
 
+        <ValidationError
+          prefix="Message"
+          field="message"
+          errors={state.errors}
+          className="text-danger small"
+        />
+
         <FormCheck id={"confirm"} type={"checkbox"} items={checkItems} />
+
         {siteKey && (
           <div className="mb-3 mt-3">
             <ReCAPTCHA
@@ -204,12 +200,12 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         <Toast
           id="success-toast"
-          title="Perhatian"
+          title="Terima kasih!"
           show={showToast}
           onClose={() => setShowToast(false)}
         >
-          Form ini belum dikonfigurasi di build saat ini. Silakan periksa
-          konfigurasi `NEXT_PUBLIC_FORMSPREE_FORM_ID` atau `site-config.json`.
+          Pesan Anda telah berhasil terkirim. Saya akan segera menghubungi Anda
+          kembali.
         </Toast>
       </div>
     </>
