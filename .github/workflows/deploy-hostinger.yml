@@ -24,15 +24,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Ensure remote directory exists
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y lftp
-          # Print remote working dir and listing for diagnostics
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "pwd; ls -la; quit"
-          # Ensure the absolute domain public_html exists (will create if permitted)
-          lftp -u "${{ secrets.FTP_USERNAME }}","${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "mkdir -p /domains/afrizahanif.com/public_html; quit"
-
       - name: Deploy via FTP to Hostinger
         # Use the stable v4 tag to avoid referencing a non-existent patch version
         uses: SamKirkland/FTP-Deploy-Action@4.2.0
