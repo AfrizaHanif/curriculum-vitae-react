@@ -41,4 +41,4 @@ jobs:
           # --delete removes files on server that are not in out/ (clean sync)
           # --parallel uploads multiple files at once for speed
           # set ssl:verify-certificate no avoids issues with shared hosting SSL certs
-          lftp -e "set ftp:ssl-auto true; set ssl:verify-certificate no; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST }}; mirror -R --verbose --delete --parallel=5 out/ /domains/afrizahanif.com/public_html/; quit"
+          lftp -e "set ssl:verify-certificate no; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST }}; mirror -R --verbose --delete --parallel=5 out/ /domains/afrizahanif.com/public_html/; quit"
