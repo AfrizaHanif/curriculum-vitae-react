@@ -46,6 +46,7 @@ export default function NavTab({
               aria-controls={`v-pills-${item.id}`}
               aria-selected={activeTabId === item.id}
               disabled={item.disabled}
+              tabIndex={activeTabId === item.id ? 0 : -1}
             >
               {item.title}
             </button>
@@ -87,6 +88,7 @@ export default function NavTab({
                 aria-controls={`${item.id}-tab-pane`}
                 aria-selected={activeTabId === item.id}
                 disabled={item.disabled}
+                tabIndex={activeTabId === item.id ? 0 : -1}
               >
                 {item.title}
               </button>

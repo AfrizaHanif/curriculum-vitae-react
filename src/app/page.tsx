@@ -4,7 +4,7 @@ import AppLayout from "@/components/layouts/layout";
 import Alert from "@/components/ui/bootstrap/alert";
 import NextImage from "@/components/ui/react/next-image";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import myPhoto from "@/assets/images/profile.jpg";
 import { portfolioItems } from "@/lib/data/portfolioData";
 import Link from "next/link";
@@ -20,11 +20,16 @@ const userProfile = profileItem[0];
 
 export default function Home() {
   // State to hold the randomly selected portfolio item
-  const [featuredPortfolio] = useState(() => {
-    // Initialize state with a random portfolio item
-    const randomIndex = Math.floor(Math.random() * portfolioItems.length);
-    return portfolioItems[randomIndex];
-  }); // Empty dependency array ensures this runs only once on mount
+  const [featuredPortfolio, setFeaturedPortfolio] = useState(portfolioItems[0]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFeaturedPortfolio(
+        portfolioItems[Math.floor(Math.random() * portfolioItems.length)]
+      );
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Get latest education data
   const latestEducation = educationItems
