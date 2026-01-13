@@ -33,6 +33,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: out/
           server-dir: /domains/afrizahanif.com/public_html/
+          # git-ftp-args: --exclude "_next/*"
           # git-ftp-args: --insecure
           # If this still errors, you can:
           # 1) pin to a specific released version like `@4.2.0`, or
