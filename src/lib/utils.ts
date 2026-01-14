@@ -8,20 +8,21 @@
  */
 export function formatDateRange(
   startDate: string | Date,
-  finishDate?: string | Date | null
+  finishDate?: string | Date | null,
+  locale: string = "id-ID"
 ): string {
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "long",
   };
 
-  const start = new Date(startDate).toLocaleDateString("id-ID", options);
+  const start = new Date(startDate).toLocaleDateString(locale, options);
 
   if (!finishDate) {
     return `${start} - Sekarang`;
   }
 
-  const finish = new Date(finishDate).toLocaleDateString("id-ID", options);
+  const finish = new Date(finishDate).toLocaleDateString(locale, options);
   return `${start} - ${finish}`;
 }
 
@@ -62,3 +63,11 @@ export const isActiveLink = (pathname: string, href?: string) => {
   if (!href) return false;
   return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 };
+
+export function formatMonthYear(date: string | Date, locale: string = "id-ID") {
+  const dateObj = new Date(date);
+  return dateObj.toLocaleDateString(locale, {
+    month: "short",
+    year: "numeric",
+  });
+}

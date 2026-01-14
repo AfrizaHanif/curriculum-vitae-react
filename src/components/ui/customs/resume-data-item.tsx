@@ -1,11 +1,16 @@
 import React from "react";
 import { DataFeatureItem } from "@/lib/data-types";
+import { formatMonthYear } from "@/lib/utils";
 
 interface ResumeDataItemProps {
   dataItem: DataFeatureItem;
+  locale?: string;
 }
 
-const ResumeDataItem: React.FC<ResumeDataItemProps> = ({ dataItem }) => {
+const ResumeDataItem: React.FC<ResumeDataItemProps> = ({
+  dataItem,
+  locale = "id-ID",
+}) => {
   // Helper function to handle multiple status conditions
   const getStatusBadgeClass = (status?: string) => {
     if (status === "Ongoing") {
@@ -44,9 +49,9 @@ const ResumeDataItem: React.FC<ResumeDataItemProps> = ({ dataItem }) => {
       )}
       <p className="mb-1">
         <small className="text-body-secondary">
-          {dataItem.start_period.getFullYear()} -{" "}
+          {formatMonthYear(dataItem.start_period, locale)} -{" "}
           {dataItem.finish_period
-            ? dataItem.finish_period.getFullYear()
+            ? formatMonthYear(dataItem.finish_period, locale)
             : "Sekarang"}
         </small>
       </p>

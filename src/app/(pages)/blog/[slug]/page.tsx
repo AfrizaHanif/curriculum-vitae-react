@@ -9,9 +9,7 @@ import SanitizedContent from "@/components/ui/react/sanitized-content";
 import Link from "next/link";
 import Button from "@/components/ui/bootstrap/button";
 import ButtonGroup from "@/components/ui/bootstrap/button-group";
-import CardBlank from "@/components/ui/bootstrap/card-blank";
-import ShareButton from "@/components/ui/customs/share-button";
-import { formatDate } from "@/lib/utils";
+import DetailItem from "@/components/ui/customs/detail-item";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
@@ -153,36 +151,7 @@ export default async function SelectedPost({
             </div>
           </div>
           {/* Details */}
-          <CardBlank className="p-3">
-            <h5 className="card-title mb-3">Detail Post</h5>
-            <dl className="row">
-              <dt className="col-4 mb-2 text-body-secondary">Penulis</dt>
-              <dd className="col-8">{item.author}</dd>
-              <dt className="col-4 mb-2 text-body-secondary">Tanggal Rilis</dt>
-              <dd className="col-8">{formatDate(item.date)}</dd>
-              {item.tags && item.tags.length > 0 && (
-                <>
-                  <dt className="col-12 mb-2 text-body-secondary">Tags</dt>
-                  <dd className="col-12 d-flex flex-wrap gap-1">
-                    {item.tags.map((tag) => (
-                      <span key={tag} className="badge text-bg-secondary">
-                        {tag}
-                      </span>
-                    ))}
-                  </dd>
-                </>
-              )}
-            </dl>
-            <div className="d-grid gap-1">
-              <ShareButton
-                title={item.title}
-                text={`Check out this project: ${item.title}`}
-              >
-                <i className="bi bi-share-fill me-2"></i>
-                Bagikan
-              </ShareButton>
-            </div>
-          </CardBlank>
+          <DetailItem type={"Blog"} item={item} />
         </div>
       </div>
     </AppLayout>

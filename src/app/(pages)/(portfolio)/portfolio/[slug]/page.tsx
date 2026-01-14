@@ -1,18 +1,15 @@
 import AppLayout from "@/components/layouts/layout";
 import Button from "@/components/ui/bootstrap/button";
-import CardBlank from "@/components/ui/bootstrap/card-blank";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
-import ShareButton from "@/components/ui/customs/share-button";
 import { portfolioItems, repositoryItems } from "@/lib/data/portfolioData";
-import { formatDateRange } from "@/lib/utils";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProjectGallery from "@/components/ui/customs/project-gallery";
 import Link from "next/link";
 import ButtonGroup from "@/components/ui/bootstrap/button-group";
-import Dropdown from "@/components/ui/bootstrap/dropdown";
 import { DropdownItem } from "@/lib/bootstrap-types";
+import DetailItem from "@/components/ui/customs/detail-item";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
@@ -151,67 +148,12 @@ export default async function SelectedPortfolio({
               </div>
             </div>
             {/* Details */}
-            <CardBlank className="p-3">
-              <h5 className="card-title mb-3">Detail Proyek</h5>
-              <dl className="row">
-                <dt className="col-4 mb-2 text-body-secondary">Kategori</dt>
-                <dd className="col-8">{item.category}</dd>
-                <dt className="col-4 mb-2 text-body-secondary">Tipe</dt>
-                <dd className="col-8">{item.type}</dd>
-                <dt className="col-4 mb-2 text-body-secondary">Periode</dt>
-                <dd className="col-8">
-                  {formatDateRange(item.start_period, item.finish_period)}
-                </dd>
-                {item.tags && item.tags.length > 0 && (
-                  <>
-                    <dt className="col-12 mb-2 text-body-secondary">
-                      Tags & Teknologi
-                    </dt>
-                    <dd className="col-12 d-flex flex-wrap gap-1">
-                      {item.tags.map((tag) => (
-                        <span key={tag} className="badge text-bg-secondary">
-                          {tag}
-                        </span>
-                      ))}
-                      {item.technology.map((tech) => (
-                        <span key={tech} className="badge text-bg-info">
-                          {tech}
-                        </span>
-                      ))}
-                    </dd>
-                  </>
-                )}
-              </dl>
-              <div className="d-grid gap-1">
-                {/* <Button
-                  as="a"
-                  href={item.repository || undefined}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mb-2"
-                  color="secondary"
-                  disabled={!item.repository}
-                >
-                  Lihat Repository
-                </Button> */}
-                <Dropdown
-                  color="secondary"
-                  items={filteredRepositoryItems}
-                  className="mb-2"
-                  newTab
-                  fullWidth
-                >
-                  Lihat Repository
-                </Dropdown>
-                <ShareButton
-                  title={item.title}
-                  text={`Check out this project: ${item.title}`}
-                >
-                  <i className="bi bi-share-fill me-2"></i>
-                  Bagikan
-                </ShareButton>
-              </div>
-            </CardBlank>
+            <DetailItem
+              type={"Portfolio"}
+              item={item}
+              repositoryItems={filteredRepositoryItems}
+              shareable
+            />
           </div>
         </div>
       </div>
