@@ -3,7 +3,7 @@ import Button from "@/components/ui/bootstrap/button";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import { projectItems } from "@/lib/data/portfolioData";
@@ -13,17 +13,23 @@ import DetailItem from "@/components/ui/customs/detail-item";
 
 // (IMPORTANT) This is exclusively for page with dynamic ID / Slug
 export function generateStaticParams() {
-  return projectItems.map((p) => ({ slug: p.slug })); // pre-render pages using slug
+  // Pre-render pages for both slugs and IDs to handle redirects
+  return projectItems.flatMap((p) => [{ slug: p.slug }, { slug: p.id }]);
 }
 
-// Title of project into web title
+// Defines the props for the page. `params` is a Promise in Next.js 15+,
+// but we type it as a union to support both sync and async access if needed.
 type Props = {
   params: { slug: string } | Promise<{ slug: string }>;
 };
+
+// Title and Description of Page (Metadata)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
-  const item = projectItems.find((p) => p.slug === slug);
+  const item = projectItems.find(
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+  );
 
   if (!item) return { title: "Project Item Not Found" };
 
@@ -41,8 +47,14 @@ export default async function SelectedProject({
 }) {
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
-  const item = projectItems.find((p) => p.slug === slug);
+  const item = projectItems.find(
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+  );
   if (!item) return notFound();
+
+  if (slug !== item.slug) {
+    permanentRedirect(`/project/${encodeURIComponent(item.slug)}`);
+  }
 
   // Navigation's Function
   const currentIndex = projectItems.findIndex((p) => p.slug === item.slug);

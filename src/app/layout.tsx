@@ -6,6 +6,7 @@ import IconDefinitions from "@/components/icons/icon-definitions";
 import BootstrapClient from "@/components/bootstrap-client";
 import { BreadcrumbProvider } from "@/context/breadcrumb-context";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import NextTopLoader from "nextjs-toploader";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -43,6 +44,21 @@ export default function RootLayout({
                   document.documentElement.setAttribute('data-bs-theme', theme);
                 }
               } catch (e) {}
+
+              // Disable console logs and React DevTools in production
+              if ("${process.env.NODE_ENV}" === "production") {
+                // Disable console logs
+                console.log = function() {};
+                console.debug = function() {};
+                console.info = function() {};
+
+                // Disable React DevTools
+                if (typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
+                  for (const method in window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+                    window.__REACT_DEVTOOLS_GLOBAL_HOOK__[method] = function() {};
+                  }
+                }
+              }
             `,
           }}
         />
@@ -53,6 +69,13 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <NextTopLoader
+          color="#2299DD"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          showSpinner={false}
+        />
         {/* List of SVGs' icons */}
         <IconDefinitions />
         {/* Main content via provider of breadcrumb */}

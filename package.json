@@ -21,6 +21,7 @@
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "next": "^16.0.10",
+    "nextjs-toploader": "^3.9.17",
     "react": "19.2.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "19.2.0",

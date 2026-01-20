@@ -14,9 +14,12 @@ import DetailItem from "@/components/ui/customs/detail-item";
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
 export function generateStaticParams() {
-  return blogItems.map((p) => ({ slug: p.slug }));
+  // Pre-render pages for both slugs and IDs to handle redirects
+  return blogItems.flatMap((p) => [{ slug: p.slug }, { slug: p.id }]);
 }
 
+// Defines the props for the page. `params` is a Promise in Next.js 15+,
+// but we type it as a union to support both sync and async access if needed.
 type Props = {
   params: { slug: string } | Promise<{ slug: string }>;
 };
@@ -25,7 +28,9 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
-  const item = blogItems.find((p) => p.slug === slug || p.id === slug);
+  const item = blogItems.find(
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+  );
   if (!item) return { title: "Post Not Found" };
   return {
     title: item.title,
@@ -42,14 +47,12 @@ export default async function SelectedPost({
   // `params` may be a Promise in some Next.js versions; await it before use
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug); // support id or slug in the URL
-  const item = blogItems.find((p) => p.id === slug || p.slug === slug);
+  const item = blogItems.find(
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+  );
   if (!item) return notFound();
 
-  // If the incoming param is actually an id, redirect to the canonical slug URL
-  if (item && slug === item.id) {
-    // Use a server-side redirect so search engines see a single canonical URL
-    // next/navigation redirect is sufficient here since middleware already handles blog ids as well
-    // but keeping this ensures correct behavior even without middleware
+  if (slug !== item.slug) {
     const { redirect } = await import("next/navigation");
     redirect(`/blog/${encodeURIComponent(item.slug)}`);
   }

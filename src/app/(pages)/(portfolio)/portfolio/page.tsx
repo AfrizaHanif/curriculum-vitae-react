@@ -14,14 +14,16 @@ import { useState } from "react";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 
 export default function Portfolio() {
+  // Set useState for replacing element
   const [sortOrder, setSortOrder] = useState("newest");
 
   // Sort items based on selection
   const sortedItems = [...portfolioItems].sort((a, b) => {
+    // Alphabet sorting
     if (sortOrder === "az") return a.title.localeCompare(b.title);
     if (sortOrder === "za") return b.title.localeCompare(a.title);
 
-    // Date sorting values
+    // Date sorting
     const valA = a.finish_period
       ? new Date(a.finish_period).getTime()
       : Infinity;
@@ -29,6 +31,7 @@ export default function Portfolio() {
       ? new Date(b.finish_period).getTime()
       : Infinity;
 
+    // Check if start from oldest selected
     if (sortOrder === "oldest") {
       if (valA !== valB) return valA - valB;
       return (
@@ -36,14 +39,14 @@ export default function Portfolio() {
       );
     }
 
-    // Default: newest
+    // (Default) Check if start from newest selected
     if (valA !== valB) return valB - valA;
     return (
       new Date(b.start_period).getTime() - new Date(a.start_period).getTime()
     );
   });
 
-  // Render cards
+  // Render cards for card item
   const renderCards = (items: typeof portfolioItems) => (
     <PaginatedList
       items={items}
@@ -51,10 +54,12 @@ export default function Portfolio() {
       key={sortOrder}
       renderItem={(item) => (
         <CardBlank key={item.id} fullHeight insideGroup>
+          {/* Category and type */}
           <div className="card-header small fw-semibold text-body-secondary">
             <span className="text-uppercase">{item.category}</span> -{" "}
             {item.type}
           </div>
+          {/* Main image of portfolio */}
           <NextImage
             src={item.image}
             alt={item.title}
@@ -68,6 +73,7 @@ export default function Portfolio() {
               objectPosition: "top",
             }}
           />
+          {/* Short content */}
           <div className="card-body d-flex flex-column">
             <h5 className="card-title">{item.title}</h5>
             <div className="mt-auto pt-2">
@@ -83,6 +89,7 @@ export default function Portfolio() {
               ))}
             </div>
           </div>
+          {/* Period date and button */}
           <div className="card-footer text-body-secondary">
             <div className="row justify-content-center align-items-center g-2">
               <div className="col-8 small">

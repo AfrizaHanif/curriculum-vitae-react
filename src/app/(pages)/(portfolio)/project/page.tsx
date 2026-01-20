@@ -14,23 +14,27 @@ import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import { useState } from "react";
 
 export default function Project() {
+  // Set useState for replacing element
   const [sortOrder, setSortOrder] = useState("newest");
 
   // Sort items based on selection
   const sortedItems = [...projectItems].sort((a, b) => {
+    // Alphabet sorting
     if (sortOrder === "az") return a.title.localeCompare(b.title);
     if (sortOrder === "za") return b.title.localeCompare(a.title);
 
+    // Date sorting
     const dateA = new Date(a.start_period).getTime();
     const dateB = new Date(b.start_period).getTime();
 
+    // Check if start from oldest selected
     if (sortOrder === "oldest") return dateA - dateB;
 
-    // Default: newest
+    // (Default) Check if start from newest selected
     return dateB - dateA;
   });
 
-  // Render cards
+  // Render cards for card item
   const renderCards = (items: typeof projectItems) => (
     <PaginatedList
       items={items}
@@ -38,11 +42,12 @@ export default function Project() {
       key={sortOrder}
       renderItem={(item) => (
         <CardBlank key={item.id} fullHeight insideGroup>
+          {/* Category and type */}
           <div className="card-header small fw-semibold text-body-secondary">
             <span className="text-uppercase">{item.category}</span> -{" "}
             {item.type}
           </div>
-          {/* Replace <img> with the custom NextImage component for optimization */}
+          {/* Main image of portfolio */}
           <NextImage
             src={item.image}
             alt={item.title} // Use item.title for alt text for better accessibility
@@ -56,6 +61,7 @@ export default function Project() {
               objectPosition: "top",
             }} // Crop to widescreen, maintain aspect ratio, and align to top
           />
+          {/* Short content */}
           <div className="card-body d-flex flex-column">
             <h5 className="card-title">{item.title}</h5>
             <div className="mt-auto pt-2">
@@ -71,6 +77,7 @@ export default function Project() {
               ))}
             </div>
           </div>
+          {/* Period date and button */}
           <div className="card-footer text-body-secondary">
             <div className="row justify-content-center align-items-center g-2">
               <div className="col-8 small">{formatDate(item.start_period)}</div>

@@ -1,50 +1,38 @@
+"use client";
+
+import { use } from "react";
 import AppLayout from "@/components/layouts/layout";
 import Button from "@/components/ui/bootstrap/button";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
 import { portfolioItems, repositoryItems } from "@/lib/data/portfolioData";
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import ProjectGallery from "@/components/ui/customs/project-gallery";
 import Link from "next/link";
 import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import { DropdownItem } from "@/lib/bootstrap-types";
 import DetailItem from "@/components/ui/customs/detail-item";
 
-// NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
+// INFO: Different than project and blog page, this page are splitted out into 2 (layout.tsx and page.tsx). This page is a client component
 
-// (IMPORTANT) This is exclusively for page with dynamic ID / Slug
-export function generateStaticParams() {
-  return portfolioItems.map((p) => ({ slug: p.slug })); // pre-render pages using slug
-}
-
-// Title of portfolio into web title
-type Props = {
-  params: { slug: string } | Promise<{ slug: string }>;
-};
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const resolvedParams = await params;
-  const slug = decodeURIComponent(resolvedParams.slug);
-  const item = portfolioItems.find((p) => p.slug === slug);
-
-  if (!item) return { title: "Portfolio Item Not Found" };
-
-  return {
-    title: item.title,
-    description: item.description,
-    alternates: { canonical: `/portfolio/${item.slug}` },
-  };
-}
-
-export default async function SelectedPortfolio({
+export default function SelectedPortfolio({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const resolvedParams = await params;
-  const slug = decodeURIComponent(resolvedParams.slug);
-  const item = portfolioItems.find((p) => p.slug === slug);
-  if (!item) return notFound();
+  //
+  const { slug: rawSlug } = use(params);
+  const slug = decodeURIComponent(rawSlug);
+  // Find portfolio item by slug (case-insensitive) or ID
+  const item = portfolioItems.find(
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+  );
+  if (!item) return notFound(); // Check if item are not found
+
+  // Redirect to canonical slug if the request was for an ID or a non-canonical case
+  if (slug !== item.slug) {
+    redirect(`/portfolio/${encodeURIComponent(item.slug)}`);
+  }
 
   // Navigation's Function
   const currentIndex = portfolioItems.findIndex((p) => p.slug === item.slug);

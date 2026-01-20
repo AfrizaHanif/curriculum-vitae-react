@@ -1,8 +1,6 @@
 "use client";
 
 import AppLayout from "@/components/layouts/layout";
-import Button from "@/components/ui/bootstrap/button";
-import CardBlank from "@/components/ui/bootstrap/card-blank";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import NextImage from "@/components/ui/react/next-image";
 import { blogItems } from "@/lib/data/blogData";
@@ -14,6 +12,7 @@ import Card from "@/components/ui/bootstrap/card";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 
 export default function Blog() {
+  // Get Random Post
   const [featuredPost] = useState(() => {
     const randomIndex = Math.floor(Math.random() * blogItems.length);
     return blogItems[randomIndex];

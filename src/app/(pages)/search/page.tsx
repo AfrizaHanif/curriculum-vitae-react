@@ -14,6 +14,7 @@ import { formatDateRange } from "@/lib/utils";
 import jumbotronImage from "../../../assets/images/jumbotron/search.jpg";
 
 function SearchResults() {
+  // Retrieve query parameters from the url
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
 
@@ -29,6 +30,7 @@ function SearchResults() {
 
   return (
     <>
+      {/* Jumbotron */}
       <Jumbotron
         backgroundColor="secondary"
         textColor="dark"
@@ -45,6 +47,7 @@ function SearchResults() {
         </div>
       </Jumbotron>
 
+      {/* Result of search (Cards) */}
       {filteredItems.length > 0 ? (
         <CardGroup>
           {filteredItems.map((item) => (
@@ -98,6 +101,7 @@ function SearchResults() {
 export default function SearchPage() {
   return (
     <AppLayout>
+      {/* Use Suspense for isolate the dynamic part of search page */}
       <Suspense fallback={<div className="text-center py-5">Loading...</div>}>
         <SearchResults />
       </Suspense>

@@ -19,28 +19,26 @@ export const metadata: Metadata = {
 // Get Data from JSON (Single)
 const userProfile = profileItem[0];
 
-// --- Dynamic Date and Age Calculation ---
-const birthDate = new Date(userProfile.birthday);
-const today = new Date();
-
-// 1. Format the birthday to be more readable (e.g., "8 April 1996")
+// Birthday and Calculate Age Function
+const birthDate = new Date(userProfile.birthday); // Get data of birthday
+const today = new Date(); // Get date of today
+// Change format depend by local of format date
 const formattedBirthday = birthDate.toLocaleDateString("id-ID", {
   day: "numeric",
   month: "long",
   year: "numeric",
 });
-
-// 2. Calculate the age dynamically
-let age = today.getFullYear() - birthDate.getFullYear();
-const monthDifference = today.getMonth() - birthDate.getMonth();
+let age = today.getFullYear() - birthDate.getFullYear(); // Substract between today and birthday's year
+const monthDifference = today.getMonth() - birthDate.getMonth(); // Substract between today and birthday's month and year
+// Check if difference abnormal (less than 0)
 if (
   monthDifference < 0 ||
   (monthDifference === 0 && today.getDate() < birthDate.getDate())
 ) {
-  age--;
+  age--; // Calculate if difference not abnormal
 }
 
-// Create a new object for the biodata table for better formatting
+// Details of profile for better formatting
 const profileDetails = {
   "Nama Lengkap": userProfile.fullname,
   "Tanggal Lahir": formattedBirthday,

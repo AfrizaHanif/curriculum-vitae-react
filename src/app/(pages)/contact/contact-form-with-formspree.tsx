@@ -25,6 +25,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Item of subject selection
   const subjectItems: SelectItem[] = [
     { label: "Penawaran Proyek", value: "Penawaran Proyek" },
     { label: "Pertanyaan Umum", value: "Pertanyaan Umum" },
@@ -33,6 +34,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
     { label: "Lainnya", value: "Lainnya" },
   ];
 
+  // Item of checkbox item
   const checkItems: CheckItem[] = [
     {
       label: "Saya telah mengisi form ini sesuai dengan yang saya butuhkan",
@@ -42,6 +44,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
     },
   ];
 
+  // Handle if reset button has been pressed
   const handleReset = useCallback(() => {
     formRef.current?.reset();
     recaptchaRef.current?.reset();
@@ -51,6 +54,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
     setOtherSubject("");
   }, []);
 
+  // Set timeout of Toast
   useEffect(() => {
     const timer = setTimeout(() => {
       if (state.succeeded) {
@@ -63,6 +67,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
 
   return (
     <>
+      {/* Form Area */}
       <Form
         ref={formRef}
         labelSubmit="Submit"
@@ -76,6 +81,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
         labelReset="Reset"
       >
         <div className="row">
+          {/* Name */}
           <div className="col">
             <FormInput id="name" name="name" type="text" required>
               Nama Lengkap
@@ -87,6 +93,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
               className="text-danger small"
             />
           </div>
+          {/* E-Mail */}
           <div className="col">
             <FormInput id="email" name="email" type="email" required>
               E-Mail
@@ -101,6 +108,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
         </div>
 
         <div className="row">
+          {/* Subject */}
           <div className="col">
             <FormSelect
               id="subject"
@@ -118,6 +126,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
               Subjek
             </FormSelect>
           </div>
+          {/* Other Subject if selected */}
           {subject === "Lainnya" && (
             <div className="col">
               <FormInput
@@ -144,7 +153,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
             </div>
           )}
         </div>
-
+        
         <input
           type="hidden"
           name="_subject"
@@ -156,10 +165,11 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
           errors={state.errors}
           className="text-danger small"
         />
-
+        {/* Link (Optional) */}
         <FormInput id="url" name="url" type="url">
           Link Terkait (Optional)
         </FormInput>
+        {/* Message */}
         <FormInput
           id="message"
           name="message"
@@ -183,8 +193,10 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
           className="text-danger small"
         />
 
+        {/* Confirm box */}
         <FormCheck id={"confirm"} type={"checkbox"} items={checkItems} />
 
+        {/* ReCAPTCHA */}
         {siteKey && (
           <div className="mb-3 mt-3">
             <ReCAPTCHA
@@ -197,6 +209,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
         )}
       </Form>
 
+      {/* Toast */}
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         <Toast
           id="success-toast"

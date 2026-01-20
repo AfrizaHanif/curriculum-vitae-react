@@ -19,16 +19,17 @@ import Button from "@/components/ui/bootstrap/button";
 const userProfile = profileItem[0];
 
 export default function Home() {
+  // Local loading state
+  // const isLoading = useLoading();
   // State to hold the randomly selected portfolio item
   const [featuredPortfolio, setFeaturedPortfolio] = useState(portfolioItems[0]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setFeaturedPortfolio(
-        portfolioItems[Math.floor(Math.random() * portfolioItems.length)]
-      );
-    }, 0);
-    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFeaturedPortfolio(
+      portfolioItems[Math.floor(Math.random() * portfolioItems.length)]
+    );
+    console.log("'featuredPortfolio' has been set");
   }, []);
 
   // Get latest education data
@@ -44,6 +45,9 @@ export default function Home() {
         : new Date().getTime();
       return dateB - dateA;
     })[0];
+  console.log(
+    "Latest Education: " + latestEducation.degree + " " + latestEducation.major
+  );
 
   // Helper function to truncate text
   const truncateText = (text: string, maxLength: number) => {
@@ -52,6 +56,11 @@ export default function Home() {
     }
     return text.substring(0, maxLength) + "...";
   };
+
+  // Show the Loading component while state is initializing
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
 
   // Content Area
   return (

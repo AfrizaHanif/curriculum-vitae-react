@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 // STEP 1: Import useState and useEffect from React, and the FeatureItem type.
-// import { useState, useEffect } from "react";
 // import { FeatureItem } from "@/lib/types";
 
 import AppLayout from "@/components/layouts/layout";
@@ -23,6 +22,8 @@ import jumbotronImage from "../../../assets/images/jumbotron/resume.jpg";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import Image from "@/components/ui/image";
+import Loading from "@/components/ui/bootstrap/loading";
+import { useLoading } from "@/hooks/use-loading";
 
 // Dynamically import the Map component with SSR turned off
 const Map = dynamic(() => import("@/components/ui/customs/map"), {
@@ -30,9 +31,11 @@ const Map = dynamic(() => import("@/components/ui/customs/map"), {
   loading: () => <p>Loading map...</p>,
 });
 
+// Get Data (Single Array)
 const userProfile = profileItem[0];
 
 export default function Resume() {
+  // const isLoading = useLoading();
   // STEP 3: Create state variables to hold the data fetched from the API.
   // const [educationItems, setEducationItems] = useState<FeatureItem[]>([]);
   // const [experienceItems, setExperienceItems] = useState<FeatureItem[]>([]);
@@ -48,7 +51,7 @@ export default function Resume() {
   //   fetchData();
   // }, []); // The empty dependency array ensures this runs only once.
 
-  //
+  // Item of buttons for modal
   const modalButtonItems: ModalButtonItem[] = [
     {
       label: "Tutup",
@@ -58,8 +61,9 @@ export default function Resume() {
     },
   ];
 
+  // Item of card's button
   const generateCertDropdownItems = (
-    item: (typeof certificateItems)[0]
+    item: (typeof certificateItems)[0],
   ): DropdownItem[] => {
     const items: DropdownItem[] = [
       {
@@ -71,6 +75,7 @@ export default function Resume() {
       },
       { type: "divider", label: "" },
     ];
+    // Add item if url of credential is included
     if (item.credential_url) {
       items.push({
         label: "Kunjungi Link",
@@ -80,6 +85,10 @@ export default function Resume() {
     }
     return items;
   };
+
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
 
   return (
     <AppLayout>
@@ -163,7 +172,7 @@ export default function Resume() {
                               <td>
                                 {formatDateRange(
                                   dataItem.start_period,
-                                  dataItem.finish_period
+                                  dataItem.finish_period,
                                 )}
                               </td>
                             </tr>
@@ -187,7 +196,7 @@ export default function Resume() {
                       </div>
                     </div>
                   </div>
-                )
+                ),
             )}
           </Modal>
         ))}
@@ -249,7 +258,7 @@ export default function Resume() {
                               <td>
                                 {formatDateRange(
                                   dataItem.start_period,
-                                  dataItem.finish_period
+                                  dataItem.finish_period,
                                 )}
                               </td>
                             </tr>
@@ -282,7 +291,7 @@ export default function Resume() {
                       </div>
                     </div>
                   </div>
-                )
+                ),
             )}
           </Modal>
         ))}

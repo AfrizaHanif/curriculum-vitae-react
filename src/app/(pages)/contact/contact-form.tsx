@@ -10,18 +10,20 @@ import { CheckItem, SelectItem } from "@/lib/bootstrap-types";
 import FormCheck from "@/components/ui/form/form-check";
 import Toast from "@/components/ui/bootstrap/toast";
 
+// NOTE: This is a form without Formspree. Even it's functional, it will return error that Formspree ID are not to be configured
+
 // Dynamically import the form that uses Formspree so it never runs during SSR
 const ContactFormWithFormspree = dynamic(
   () => import("./contact-form-with-formspree"),
   {
     ssr: false,
-  }
+  },
 );
 
 export default function ContactForm() {
   // Initialize from env but allow runtime override via /site-config.json
   const [siteKey, setSiteKey] = useState<string>(
-    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""
+    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "",
   );
   const initialFormId =
     (process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID || "").split("/").pop() || "";
@@ -109,6 +111,7 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
 
   return (
     <>
+      {/* Form */}
       <Form
         ref={formRef}
         labelSubmit="Submit"
@@ -119,11 +122,13 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
         labelReset="Reset"
       >
         <div className="row">
+          {/* Full Name */}
           <div className="col">
             <FormInput id="name" name="name" type="text" required>
               Nama Lengkap
             </FormInput>
           </div>
+          {/* E-Mail */}
           <div className="col">
             <FormInput id="email" name="email" type="email" required>
               E-Mail
@@ -131,6 +136,7 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
           </div>
         </div>
         <div className="row">
+          {/* Subject */}
           <div className="col">
             <FormSelect
               id="subject"
@@ -148,6 +154,7 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
               Subjek
             </FormSelect>
           </div>
+          {/* Other Subject if selected */}
           {subject === "Lainnya" && (
             <div className="col">
               <FormInput
@@ -168,10 +175,11 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
             </div>
           )}
         </div>
-
+        {/* Link (Optional) */}
         <FormInput id="url" name="url" type="url">
           Link Terkait (Optional)
         </FormInput>
+        {/* Message */}
         <FormInput
           id="message"
           name="message"
@@ -187,8 +195,9 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
             {messageLength} / 200
           </span>
         </FormInput>
-
+        {/* Confirm Box */}
         <FormCheck id={"confirm"} type={"checkbox"} items={checkItems} />
+        {/* ReCAPTCHA */}
         {siteKey && (
           <div className="mb-3 mt-3">
             <ReCAPTCHA
@@ -201,6 +210,7 @@ function ContactFormFallback({ siteKey }: { siteKey: string }) {
         )}
       </Form>
 
+      {/* Toast */}
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         <Toast
           id="success-toast"

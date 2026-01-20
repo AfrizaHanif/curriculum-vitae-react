@@ -18,12 +18,14 @@ export default function Setup() {
   const categories = Array.from(
     new Set(setupItems.map((item) => item.category))
   );
+  console.log("Categories: " + categories);
 
   // Get items for accordion
   const accordionItems = categories.map((category) => ({
     title: category,
     content: (
       <div className="list-group list-group-flush">
+        {/* Get items data in every categories */}
         {setupItems
           .filter((item) => item.category === category)
           .map((item) => (

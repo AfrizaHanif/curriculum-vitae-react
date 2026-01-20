@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../bootstrap/button";
 
 interface ShareButtonProps {
@@ -15,10 +15,12 @@ export default function ShareButton({
   children,
 }: ShareButtonProps) {
   // Check for navigator.share support directly during render
-  // const [isSupported] = useState(!!navigator.share);
-  const [isSupported] = useState<boolean>(
-    () => typeof navigator !== "undefined" && "share" in navigator
-  );
+  const [isSupported, setIsSupported] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsSupported(typeof navigator !== "undefined" && "share" in navigator);
+  }, []);
 
   const handleShare = async () => {
     if (navigator.share) {
