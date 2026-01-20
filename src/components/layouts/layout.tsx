@@ -35,6 +35,7 @@ export default function AppLayout({
 }) {
   const pathname = usePathname();
   const { dynamicCrumbs } = useBreadcrumb();
+  console.log("Current Path: ", pathname);
 
   const breadcrumbItems = useMemo(() => {
     const pathnames = pathname.split("/").filter((x) => x);
@@ -69,6 +70,8 @@ export default function AppLayout({
         isCurrent: isCurrent,
       });
     });
+
+    console.log("Breadcrumb Items:", items);
 
     return items;
   }, [pathname, dynamicCrumbs]);

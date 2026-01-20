@@ -29,6 +29,13 @@ export default function ContactForm() {
     (process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID || "").split("/").pop() || "";
   const [formId, setFormId] = useState<string>(initialFormId);
 
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
   useEffect(() => {
     // Only load runtime config in production to avoid overriding dev envs
     if (process.env.NODE_ENV !== "production") {
@@ -54,7 +61,7 @@ export default function ContactForm() {
   }, [initialFormId]);
 
   // Render the Formspree-backed form only on the client and only when we have a formId
-  if (typeof window === "undefined") {
+  if (!isMounted) {
     // During SSR return a lightweight placeholder to avoid calling Formspree hooks
     return <div style={{ minHeight: "10rem" }} />;
   }
