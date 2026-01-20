@@ -45,6 +45,7 @@ export default function Portfolio() {
       new Date(b.start_period).getTime() - new Date(a.start_period).getTime()
     );
   });
+  console.log("Sort selected: ", sortOrder);
 
   // Render cards for card item
   const renderCards = (items: typeof portfolioItems) => (
@@ -111,8 +112,9 @@ export default function Portfolio() {
 
   // Extract unique categories from portfolio items
   const uniqueCategories = Array.from(
-    new Set(portfolioItems.map((item) => item.category))
+    new Set(portfolioItems.map((item) => item.category)),
   );
+  console.log("Category in tabs: ", uniqueCategories);
 
   // Items of tab
   const tabItems = [
@@ -127,7 +129,7 @@ export default function Portfolio() {
       id: category.toLowerCase().replace(/\s+/g, "-"),
       title: category,
       content: renderCards(
-        sortedItems.filter((item) => item.category === category)
+        sortedItems.filter((item) => item.category === category),
       ),
     })),
   ];

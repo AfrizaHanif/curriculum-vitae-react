@@ -25,8 +25,9 @@ export default function SelectedPortfolio({
   const slug = decodeURIComponent(rawSlug);
   // Find portfolio item by slug (case-insensitive) or ID
   const item = portfolioItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
   );
+  console.log("Item of selected portfolio: ", item);
   if (!item) return notFound(); // Check if item are not found
 
   // Redirect to canonical slug if the request was for an ID or a non-canonical case
@@ -42,9 +43,9 @@ export default function SelectedPortfolio({
       ? portfolioItems[currentIndex + 1]
       : null;
 
-  //
+  // Item of repository
   const filteredRepositoryItems: DropdownItem[] = repositoryItems.filter(
-    (repo) => repo?.portfolio_id === item.id
+    (repo) => repo?.portfolio_id === item.id,
   ) as DropdownItem[];
 
   return (

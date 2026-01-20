@@ -22,8 +22,8 @@ import jumbotronImage from "../../../assets/images/jumbotron/resume.jpg";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import Image from "@/components/ui/image";
-import Loading from "@/components/ui/bootstrap/loading";
-import { useLoading } from "@/hooks/use-loading";
+// import Loading from "@/components/ui/bootstrap/loading";
+// import { useLoading } from "@/hooks/use-loading";
 
 // Dynamically import the Map component with SSR turned off
 const Map = dynamic(() => import("@/components/ui/customs/map"), {
@@ -33,6 +33,7 @@ const Map = dynamic(() => import("@/components/ui/customs/map"), {
 
 // Get Data (Single Array)
 const userProfile = profileItem[0];
+console.log("Profile data: ", profileItem);
 
 export default function Resume() {
   // const isLoading = useLoading();

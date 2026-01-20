@@ -27,10 +27,10 @@ export default function Home() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFeaturedPortfolio(
-      portfolioItems[Math.floor(Math.random() * portfolioItems.length)]
+      portfolioItems[Math.floor(Math.random() * portfolioItems.length)],
     );
-    console.log("'featuredPortfolio' has been set");
   }, []);
+  console.log("Featured Portfolio: ", featuredPortfolio.title);
 
   // Get latest education data
   const latestEducation = educationItems
@@ -46,7 +46,7 @@ export default function Home() {
       return dateB - dateA;
     })[0];
   console.log(
-    "Latest Education: " + latestEducation.degree + " " + latestEducation.major
+    "Latest Education: " + latestEducation.degree + " " + latestEducation.major,
   );
 
   // Helper function to truncate text

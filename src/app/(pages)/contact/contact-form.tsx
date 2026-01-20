@@ -10,7 +10,7 @@ import { CheckItem, SelectItem } from "@/lib/bootstrap-types";
 import FormCheck from "@/components/ui/form/form-check";
 import Toast from "@/components/ui/bootstrap/toast";
 
-// NOTE: This is a form without Formspree. Even it's functional, it will return error that Formspree ID are not to be configured
+// NOTE: This is a form component without Formspree. Even it's functional, it will return error that Formspree ID are not to be configured
 
 // Dynamically import the form that uses Formspree so it never runs during SSR
 const ContactFormWithFormspree = dynamic(
@@ -61,8 +61,11 @@ export default function ContactForm() {
 
   if (!formId) {
     // If no form ID is configured, render a local fallback form that doesn't call Formspree
+    console.log("Formspree is not ready for this form (ID not found)");
     return <ContactFormFallback siteKey={siteKey} />;
   }
+
+  console.log("Formspree is ready for this form (", formId, ")");
 
   return <ContactFormWithFormspree siteKey={siteKey} formId={formId} />;
 }

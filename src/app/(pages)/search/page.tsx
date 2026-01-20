@@ -17,6 +17,7 @@ function SearchResults() {
   // Retrieve query parameters from the url
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
+  console.log("Search query: ", query);
 
   // Filter items based on title, description, or category
   const filteredItems = portfolioItems.filter((item) => {
@@ -27,6 +28,7 @@ function SearchResults() {
       item.category.toLowerCase().includes(lowerQuery)
     );
   });
+  console.log("Items matches with query: ", filteredItems.length);
 
   return (
     <>

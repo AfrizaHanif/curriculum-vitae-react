@@ -12,11 +12,14 @@ import Card from "@/components/ui/bootstrap/card";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 
 export default function Blog() {
+  console.info("This page are being sorted from newest post");
+
   // Get Random Post
   const [featuredPost] = useState(() => {
     const randomIndex = Math.floor(Math.random() * blogItems.length);
     return blogItems[randomIndex];
   });
+  console.log("Featured Post: " + featuredPost.title);
 
   return (
     <AppLayout>

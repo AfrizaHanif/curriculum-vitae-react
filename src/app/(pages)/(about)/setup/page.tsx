@@ -16,9 +16,9 @@ export const metadata: Metadata = {
 export default function Setup() {
   // Group items by category to fit AccordionItem structure
   const categories = Array.from(
-    new Set(setupItems.map((item) => item.category))
+    new Set(setupItems.map((item) => item.category)),
   );
-  console.log("Categories: " + categories);
+  console.log("Categories: ", categories);
 
   // Get items for accordion
   const accordionItems = categories.map((category) => ({
@@ -40,6 +40,7 @@ export default function Setup() {
       </div>
     ),
   }));
+  console.log("Items of Accordion: ", accordionItems.length);
 
   return (
     <AppLayout>

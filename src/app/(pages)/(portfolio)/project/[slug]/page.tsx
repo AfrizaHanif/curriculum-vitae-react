@@ -28,9 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
   const item = projectItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
   );
-
   if (!item) return { title: "Project Item Not Found" };
 
   return {
@@ -48,8 +47,9 @@ export default async function SelectedProject({
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
   const item = projectItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
   );
+  console.log("Item of selected project: ", item);
   if (!item) return notFound();
 
   if (slug !== item.slug) {

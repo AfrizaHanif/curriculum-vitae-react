@@ -33,6 +33,7 @@ export default function Project() {
     // (Default) Check if start from newest selected
     return dateB - dateA;
   });
+  console.log("Sort selected: ", sortOrder);
 
   // Render cards for card item
   const renderCards = (items: typeof projectItems) => (
@@ -97,8 +98,9 @@ export default function Project() {
 
   // Extract unique categories from portfolio items
   const uniqueCategories = Array.from(
-    new Set(projectItems.map((item) => item.category))
+    new Set(projectItems.map((item) => item.category)),
   );
+  console.log("Category in tabs: ", uniqueCategories);
 
   // Items of tab
   const tabItems = [
@@ -113,7 +115,7 @@ export default function Project() {
       id: category.toLowerCase().replace(/\s+/g, "-"),
       title: category,
       content: renderCards(
-        sortedItems.filter((item) => item.category === category)
+        sortedItems.filter((item) => item.category === category),
       ),
     })),
   ];

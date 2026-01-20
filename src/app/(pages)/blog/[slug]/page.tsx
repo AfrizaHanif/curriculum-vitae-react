@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
   const item = blogItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
   );
   if (!item) return { title: "Post Not Found" };
   return {
@@ -48,8 +48,9 @@ export default async function SelectedPost({
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug); // support id or slug in the URL
   const item = blogItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug
+    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
   );
+  console.log("Item of selected post of blog: ", item);
   if (!item) return notFound();
 
   if (slug !== item.slug) {

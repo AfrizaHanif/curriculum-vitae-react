@@ -49,6 +49,9 @@ const profileDetails = {
 };
 
 export default function Profile() {
+  console.log("Profile data:", userProfile);
+  console.log("Detailed Profile:", profileDetails);
+
   return (
     <AppLayout>
       {/* Jumbotron */}
