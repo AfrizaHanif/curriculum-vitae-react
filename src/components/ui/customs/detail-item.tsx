@@ -5,6 +5,8 @@ import Dropdown from "../bootstrap/dropdown";
 import ShareButton from "./share-button";
 import { DropdownItem } from "@/lib/bootstrap-types";
 import { AllowedColors } from "@/types/common";
+import Button from "../bootstrap/button";
+import Link from "next/link";
 
 type ItemData = {
   title: string;
@@ -24,6 +26,7 @@ type DetailProps = ComponentPropsWithoutRef<"div"> & {
   type: "Portfolio" | "Project" | "Blog";
   item: ItemData;
   repositoryItems?: DropdownItem[];
+  caseStudyLink?: string;
   locale?: string;
   shareable?: boolean;
 };
@@ -32,6 +35,7 @@ export default function DetailItem({
   type,
   item,
   repositoryItems,
+  caseStudyLink,
   locale = "id-ID",
   shareable = false,
   className,
@@ -43,8 +47,8 @@ export default function DetailItem({
         type === "Portfolio"
           ? "Portfolio"
           : type === "Project"
-          ? "Proyek"
-          : "Post"
+            ? "Proyek"
+            : "Post"
       }`}</h5>
       <dl className="row">
         {(type === "Portfolio" || type === "Project") && (
@@ -94,6 +98,13 @@ export default function DetailItem({
         )}
       </dl>
       <div className="d-grid gap-1">
+        {caseStudyLink && (
+          <Link href={caseStudyLink}>
+            <Button color="primary" className="mb-2" fullWidth>
+              Studi Kasus
+            </Button>
+          </Link>
+        )}
         {/* <Button
           as="a"
           href={item.repository || undefined}

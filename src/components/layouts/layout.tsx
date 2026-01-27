@@ -26,6 +26,11 @@ const breadcrumbNameMap: { [key: string]: string } = {
   // For example: "/faq": "Frequently Asked Questions",
 };
 
+// Map for specific segments (folders) that need a custom label regardless of parent path
+const segmentNameMap: { [key: string]: string } = {
+  "case-study": "Studi Kasus",
+};
+
 export default function AppLayout({
   children,
   showBreadcrumb = true,
@@ -46,16 +51,14 @@ export default function AppLayout({
     pathnames.forEach((_, index) => {
       const to = `/${pathnames.slice(0, index + 1).join("/")}`;
       const isCurrent = index === pathnames.length - 1;
+      const segment = to.split("/").pop() || "";
 
       // Determine the full label first
       const rawLabel =
         dynamicCrumbs[to] ||
         breadcrumbNameMap[to] ||
-        to
-          .split("/")
-          .pop()
-          ?.replace(/-/g, " ")
-          .replace(/\b\w/g, (l) => l.toUpperCase()) ||
+        segmentNameMap[segment] ||
+        segment.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) ||
         "Unknown";
 
       // Truncate the label if it's too long

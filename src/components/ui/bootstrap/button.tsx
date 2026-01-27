@@ -19,6 +19,7 @@ type BaseButtonProps = {
   outline?: boolean;
   disabled?: boolean;
   stretchedLink?: boolean;
+  fullWidth?: boolean;
 };
 
 type ButtonAsButton = BaseButtonProps &
@@ -39,6 +40,7 @@ export default function Button({
   outline,
   disabled = false,
   stretchedLink = false,
+  fullWidth = false,
   children,
   as = "button",
   className,
@@ -50,7 +52,8 @@ export default function Button({
     `btn-${outline ? "outline-" : ""}${color}`,
     size && `btn-${size}`,
     stretchedLink && "stretched-link",
-    className
+    fullWidth && "w-100",
+    className,
   );
 
   // Check if this component uses Button or A tag

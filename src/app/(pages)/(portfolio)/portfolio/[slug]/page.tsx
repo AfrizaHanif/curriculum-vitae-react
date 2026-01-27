@@ -141,6 +141,7 @@ export default function SelectedPortfolio({
               type={"Portfolio"}
               item={item}
               repositoryItems={filteredRepositoryItems}
+              caseStudyLink={`/portfolio/${item.slug}/case-study/`}
               shareable
             />
           </div>

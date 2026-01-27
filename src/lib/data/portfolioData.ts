@@ -104,6 +104,28 @@ export const repositoryItems = [
     href: "https://ojs.unikom.ac.id/index.php/jati/article/view/15243/",
   },
 ];
+export const caseStudyItems = [
+  {
+    id: "CAS-001",
+    portfolio_id: "POR-001",
+    overview: "",
+    goal: "",
+    problem: "",
+    method_used: "",
+    features: [],
+    solution: "",
+    result: "",
+  },
+];
+export const diagramCSItems = [
+  {
+    id: "DIA-001",
+    case_study_id: "CAS-001",
+    framework: "",
+    context: "",
+    dfd_0: "",
+  },
+];
 
 // Other Projects
 export const projectItems = [
