@@ -21,7 +21,7 @@ import { profileItem } from "@/lib/data/profileData";
 import jumbotronImage from "../../../assets/images/jumbotron/resume.jpg";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
-import Image from "@/components/ui/image";
+import NextImage from "@/components/ui/react/next-image";
 // import Loading from "@/components/ui/bootstrap/loading";
 // import { useLoading } from "@/hooks/use-loading";
 
@@ -327,7 +327,15 @@ export default function Resume() {
           size="lg"
           fullscreen
         >
-          <Image src={item.file} alt={item.name} type="fluid" />
+          <NextImage
+            src={item.file}
+            alt={item.name}
+            type="fluid"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="w-100 h-auto"
+          />
         </Modal>
       ))}
     </AppLayout>

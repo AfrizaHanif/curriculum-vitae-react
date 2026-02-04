@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import NextImage from "../react/next-image";
-import Modal from "../bootstrap/modal";
-import Image from "../image";
+import NextImageModal from "./next-image-modal";
 
 interface ProjectGalleryProps {
   mainImage: string;
   images: string[];
   altText: string;
   thumbnailsPerRow?: number;
+  modalId?: string;
 }
 
 export default function ProjectGallery({
@@ -17,6 +17,7 @@ export default function ProjectGallery({
   images = [],
   altText,
   thumbnailsPerRow = 5, // Default to 5 thumbnails per row
+  modalId,
 }: ProjectGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(mainImage);
 
@@ -33,19 +34,17 @@ export default function ProjectGallery({
   return (
     <div>
       {/* Main Image Display */}
-      <div
-        className="position-relative mb-3"
-        style={{ aspectRatio: "16 / 9", cursor: "pointer" }}
-        data-bs-toggle="modal"
-        data-bs-target="#gallery-modal"
-      >
-        <NextImage
+      <div className="position-relative mb-3" style={{ aspectRatio: "16 / 9" }}>
+        <NextImageModal
           src={selectedImage}
           alt={altText}
           className="rounded-3"
           fill
           style={{ objectFit: "cover", objectPosition: "top" }}
           priority={true} // Prioritize loading the main image
+          zoom
+          modalId={modalId}
+          caption={altText}
         />
       </div>
 
@@ -55,7 +54,7 @@ export default function ProjectGallery({
           {allImages.map(
             (
               img,
-              index // Use flex-fill to make thumbnails occupy equal width
+              index, // Use flex-fill to make thumbnails occupy equal width
             ) => (
               <div
                 key={index}
@@ -81,27 +80,10 @@ export default function ProjectGallery({
                   }}
                 />
               </div>
-            )
+            ),
           )}
         </div>
       )}
-
-      {/* Modal for Full Image */}
-      <Modal
-        id="gallery-modal"
-        size="xl"
-        buttonItems={[
-          { label: "Tutup", type: "button", color: "secondary", dismiss: true },
-        ]}
-        fullscreen
-      >
-        <Image
-          src={selectedImage}
-          alt={altText}
-          type="fluid"
-          className="w-100"
-        />
-      </Modal>
     </div>
   );
 }

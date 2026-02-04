@@ -37,9 +37,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ---
 
-## Production config (reCAPTCHA & Formspree) 🔧
+## Production config (Analytics, reCAPTCHA & Formspree) 🔧
 
-This project supports two ways to provide production values for the reCAPTCHA site key and Formspree form id:
+This project supports two ways to provide production values for Google Analytics, reCAPTCHA, and Formspree:
 
 1. Environment variables at build time (recommended when you can set envs on the host)
 2. A runtime JSON file in `public/` (useful on shared hosting where you can't set envs)
@@ -63,8 +63,9 @@ Create a `public/site-config.json` file (upload via FTP or Hostinger File Manage
 
 ```json
 {
+  "formId": "REPLACE_WITH_PROD_FORMSPREE_FORM_ID_OR_URL",
   "siteKey": "REPLACE_WITH_PROD_RECAPTCHA_SITE_KEY",
-  "formId": "REPLACE_WITH_PROD_FORMSPREE_FORM_ID_OR_URL"
+  "googleAnalyticsId": "G-XXXXXXXXXX"
 }
 ```
 
@@ -85,6 +86,8 @@ useEffect(() => {
     .catch(() => {});
 }, []);
 ```
+
+**Note:** `googleAnalyticsId` is loaded at build time via `layout.tsx`. If you change this ID in `site-config.json`, you must **rebuild** the app for the change to take effect.
 
 ### Hostinger (shared hosting) quick steps
 

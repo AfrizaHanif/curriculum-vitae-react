@@ -18,8 +18,7 @@ export function generateStaticParams() {
   return blogItems.flatMap((p) => [{ slug: p.slug }, { slug: p.id }]);
 }
 
-// Defines the props for the page. `params` is a Promise in Next.js 15+,
-// but we type it as a union to support both sync and async access if needed.
+// Set Props for metadata
 type Props = {
   params: { slug: string } | Promise<{ slug: string }>;
 };
@@ -33,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   );
   if (!item) return { title: "Post Not Found" };
   return {
-    title: item.title,
+    title: { absolute: `${item.title} | Muhammad Afriza Hanif` },
     description: item.summary,
     alternates: { canonical: `/blog/${item.slug}` },
   };

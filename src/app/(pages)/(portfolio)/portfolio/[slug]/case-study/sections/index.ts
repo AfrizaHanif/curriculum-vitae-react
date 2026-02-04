@@ -1,0 +1,10 @@
+export { default as ChallengesSection } from "./ChallengesSection";
+export { default as DefaultSection } from "./DefaultSection";
+export { default as DesignSection } from "./DesignSection";
+export { default as GoalBenefitsSection } from "./GoalBenefitsSection";
+export { default as OverviewSection } from "./OverviewSection";
+export { default as ProblemSection } from "./ProblemSection";
+export { default as ProcessSection } from "./ProcessSection";
+export { default as ResultsSection } from "./ResultsSection";
+export { default as RoleSection } from "./RoleSection";
+export { default as TechStackSection } from "./TechStackSection";

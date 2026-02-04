@@ -5,7 +5,11 @@ import AppLayout from "@/components/layouts/layout";
 import Button from "@/components/ui/bootstrap/button";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
-import { portfolioItems, repositoryItems } from "@/lib/data/portfolioData";
+import {
+  portfolioItems,
+  repositoryItems,
+  caseStudyItems,
+} from "@/lib/data/portfolioData";
 import { notFound, redirect } from "next/navigation";
 import ProjectGallery from "@/components/ui/customs/project-gallery";
 import Link from "next/link";
@@ -47,6 +51,9 @@ export default function SelectedPortfolio({
   const filteredRepositoryItems: DropdownItem[] = repositoryItems.filter(
     (repo) => repo?.portfolio_id === item.id,
   ) as DropdownItem[];
+
+  // Check if case study exists
+  const hasCaseStudy = caseStudyItems.some((cs) => cs.portfolio_id === item.id);
 
   return (
     <AppLayout>
@@ -141,7 +148,9 @@ export default function SelectedPortfolio({
               type={"Portfolio"}
               item={item}
               repositoryItems={filteredRepositoryItems}
-              caseStudyLink={`/portfolio/${item.slug}/case-study/`}
+              caseStudyLink={
+                hasCaseStudy ? `/portfolio/${item.slug}/case-study/` : undefined
+              }
               shareable
             />
           </div>

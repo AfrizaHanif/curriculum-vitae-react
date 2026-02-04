@@ -7,6 +7,8 @@ import BootstrapClient from "@/components/bootstrap-client";
 import { BreadcrumbProvider } from "@/context/breadcrumb-context";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import NextTopLoader from "nextjs-toploader";
+import GoogleAnalytics from "@/components/google-analytics";
+import siteConfig from "../../public/site-config.json";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -81,6 +83,7 @@ export default function RootLayout({
         {/* Main content via provider of breadcrumb */}
         <BreadcrumbProvider>
           <main>{children}</main>
+          <GoogleAnalytics gaId={siteConfig.googleAnalyticsId} />
         </BreadcrumbProvider>
         {/* IMPORTANT: Use Bootstrap's Client file to avoid crash of JS between React and Bootstrap */}
         <BootstrapClient />
