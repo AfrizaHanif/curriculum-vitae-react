@@ -16,6 +16,8 @@ import jumbotronImage from "@/assets/images/jumbotron/case-study.jpg";
 import SectionContent from "./section-content";
 import Button from "@/components/ui/bootstrap/button";
 import Link from "next/link";
+import Offcanvas from "@/components/ui/bootstrap/offcanvas";
+import Accordion from "@/components/ui/bootstrap/accordion";
 
 // (IMPORTANT) This is exclusively for page with dynamic ID / Slug. That include this page inside of ID / Slug
 export function generateStaticParams() {
@@ -138,7 +140,7 @@ export default async function CaseStudy({
       },
     processSubSections.length > 0 && {
       id: "process",
-      title: "Proses dan Solusi",
+      title: "Proses & Solusi",
       subSections: processSubSections,
     },
     challengeSubSections.length > 0 && {
@@ -159,6 +161,54 @@ export default async function CaseStudy({
       subSections?: { id: string; title: string }[];
     } => !!s,
   );
+
+  const helpAccordionItem = [
+    {
+      title: "Ringkasan Proyek",
+      content:
+        "Pada bagian section ini merupakan penjelasan singkat mengenai proyek disertai dengan detail-detail dari proyek ini",
+    },
+    {
+      title: "Peran & Tanggung Jawab",
+      content:
+        "Paga bagian section ini merupakan peran yang saya ambil selama mengerjakan proyek dan tanggung jawab yang harus saya lakukan",
+    },
+    {
+      title: "Permasalahan",
+      content:
+        "Pada bagian section ini merupakan penjelasan permasalahan yang ada setelah saya melakukan observasi, wawancara, atau eksplorasi tempat",
+    },
+    {
+      title: "Tujuan & Manfaat",
+      content:
+        "Pada bagian section ini merupakan penjelasan tujuan dibuatnya proyek dan manfaat yang diperoleh dari proyek ini",
+    },
+    {
+      title: "Perancangan Proyek",
+      content:
+        "Pada bagian section ini merupakan penjelasan perancangan sebelum dilakukannya proyek berupa diagram (Context Diagram, DFD 0, dan PDM)",
+    },
+    {
+      title: "Teknologi yang Digunakan",
+      content:
+        "Pada bagian section ini merupakan daftar teknologi yang saya gunakan untuk melakukan proyek",
+    },
+    {
+      title: "Proses & Solusi",
+      content:
+        "Pada bagian section ini merupakan penjelasan proses selama saya mengerjakan proyek dan solusi yang saya dapatkan dari proyek ini",
+    },
+    {
+      title: "Tantangan & Pembelajaran",
+      content:
+        "Pada bagian section ini merupakan tantangan yang saya alami saat mengerjakan proyek dan pembelajaran yang saya dapatkan dari proyek ini",
+    },
+    {
+      title: "Hasil Akhir",
+      content:
+        "Pada bagian section ini merupakan hasil / kesimpulan dari proyek ini berupa poin-poin dan/atau video hasil",
+    },
+  ];
 
   return (
     <AppLayout>
@@ -204,8 +254,8 @@ export default async function CaseStudy({
             <Button
               color="secondary"
               className="mb-2"
-              data-bs-toggle="tooltip"
-              data-bs-title="Coming Soon"
+              dataToggle="offcanvas"
+              dataTarget="offcanvas-help-cs"
             >
               <i className="bi bi-question-lg pe-2"></i>
               Penjelasan
@@ -258,6 +308,14 @@ export default async function CaseStudy({
           </div>
         </div>
       </div>
+      {/* Offcanvas */}
+      <Offcanvas
+        id={"offcanvas-help-cs"}
+        title={"Penjelasan Studi Kasus"}
+        position={"end"}
+      >
+        <Accordion id={"accordion-help-cs"} items={helpAccordionItem} />
+      </Offcanvas>
     </AppLayout>
   );
 }
