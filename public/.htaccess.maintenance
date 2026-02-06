@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Redirect all traffic to maintenance page except for the maintenance page itself
+  RewriteCond %{REQUEST_URI} !^/maintenance\.html$ [NC]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ /maintenance.html [L,R=503]
+</IfModule>
+
+# Send 503 Service Unavailable header
+ErrorDocument 503 "Service Unavailable"
+Header set Retry-After "3600"

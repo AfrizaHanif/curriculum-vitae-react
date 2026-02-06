@@ -30,6 +30,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Enable Maintenance Mode
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+          # Upload maintenance files
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; put public/maintenance.html -o /domains/afrizahanif.com/public_html/maintenance.html; quit"
+          # Copy maintenance .htaccess to enable redirect
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; put public/.htaccess.maintenance -o /domains/afrizahanif.com/public_html/.htaccess; quit"
+          echo "✓ Maintenance mode enabled"
+
       - name: Build
         run: npm run build
 
@@ -44,5 +58,20 @@ jobs:
           # Mirror out/ to the server directory. 
           # --delete removes files on server that are not in out/ (clean sync)
           # --parallel uploads multiple files at once for speed
+          # --exclude protects maintenance files from deletion during sync
           # set ssl:verify-certificate no avoids issues with shared hosting SSL certs
-          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; mirror -R --verbose --delete --parallel=5 out/ /domains/afrizahanif.com/public_html/; quit"
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; mirror -R --verbose --delete --parallel=5 --exclude=.htaccess* --exclude=maintenance.html out/ /domains/afrizahanif.com/public_html/; quit"
+          echo "✓ Deployment completed"
+
+      - name: Disable Maintenance Mode
+        if: success()
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+          # Restore original .htaccess
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; put public/.htaccess -o /domains/afrizahanif.com/public_html/.htaccess; quit"
+          echo "✓ Maintenance mode disabled - Site is live"
