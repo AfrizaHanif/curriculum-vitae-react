@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
-          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit on; set net:timeout 10; set net:max-retries 2; put public/maintenance.html -o /domains/afrizahanif.com/public_html/maintenance.html; put public/.htaccess.maintenance -o /domains/afrizahanif.com/public_html/.htaccess; quit" || (echo "✗ Failed to enable maintenance mode"; exit 1)
+          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit on; set net:timeout 10; set net:max-retries 2; set ssl:verify-certificate no; put public/maintenance.html -o /domains/afrizahanif.com/public_html/maintenance.html; put public/.htaccess.maintenance -o /domains/afrizahanif.com/public_html/.htaccess; quit" || (echo "✗ Failed to enable maintenance mode"; exit 1)
           echo "✓ Maintenance mode enabled"
 
       - name: Build
@@ -64,5 +64,5 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
-          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit on; set net:timeout 10; set net:max-retries 2; rm -f /domains/afrizahanif.com/public_html/maintenance.html; put public/.htaccess -o /domains/afrizahanif.com/public_html/.htaccess; quit" || (echo "✗ Failed to disable maintenance mode"; exit 1)
+          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit on; set net:timeout 10; set net:max-retries 2; set ssl:verify-certificate no; rm -f /domains/afrizahanif.com/public_html/maintenance.html; put public/.htaccess -o /domains/afrizahanif.com/public_html/.htaccess; quit" || (echo "✗ Failed to disable maintenance mode"; exit 1)
           echo "✓ Maintenance mode disabled - Site is live"
