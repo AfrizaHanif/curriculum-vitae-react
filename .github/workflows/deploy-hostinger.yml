@@ -36,11 +36,12 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
         run: |
+          set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y lftp
-          # Upload maintenance files
+          echo "-- uploading maintenance.html"
           lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; put public/maintenance.html -o /domains/afrizahanif.com/public_html/maintenance.html; quit"
-          # Copy maintenance .htaccess to enable redirect
+          echo "-- uploading .htaccess (maintenance)"
           lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; put public/.htaccess.maintenance -o /domains/afrizahanif.com/public_html/.htaccess; quit"
           echo "✓ Maintenance mode enabled"
 
@@ -70,8 +71,11 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
         run: |
+          set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y lftp
-          # Restore original .htaccess
+          echo "-- removing maintenance.html from server"
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; rm -f /domains/afrizahanif.com/public_html/maintenance.html; quit" || true
+          echo "-- restoring original .htaccess"
           lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set ssl:verify-certificate no; put public/.htaccess -o /domains/afrizahanif.com/public_html/.htaccess; quit"
           echo "✓ Maintenance mode disabled - Site is live"
