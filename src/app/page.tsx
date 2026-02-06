@@ -65,11 +65,6 @@ export default function Home() {
   // Content Area
   return (
     <AppLayout>
-      <Alert color="info">
-        This site is <strong>UNDER CONSTRUCTION</strong>. Please be patient
-        until it&apos;s fully done
-      </Alert>
-
       {/* Welcome Jumbotron */}
       <Jumbotron
         backgroundColor="secondary"

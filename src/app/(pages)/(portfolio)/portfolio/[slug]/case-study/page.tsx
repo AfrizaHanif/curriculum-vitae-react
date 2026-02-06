@@ -1,6 +1,5 @@
 import React from "react";
 import AppLayout from "@/components/layouts/layout";
-import Alert from "@/components/ui/bootstrap/alert";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import {
   getAllPortfolioItems,
@@ -228,11 +227,6 @@ export default async function CaseStudy({
           </div>
         </div>
       </Jumbotron>
-      {/* Alert (Might to be removed after it's fully functional) */}
-      <Alert color={"info"}>
-        Halaman ini sedang dalam pengembangan. Kemungkinan akan terupdate tanpa
-        pemberitahuan lebih lanjut.
-      </Alert>
 
       <div className="row">
         {/* Navigations */}
