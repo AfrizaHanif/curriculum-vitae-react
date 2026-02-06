@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, ChangeEvent } from "react";
-import dynamic from "next/dynamic";
 import ReCAPTCHA from "react-google-recaptcha";
 import Form from "@/components/ui/form";
 import FormInput from "@/components/ui/form/form-input";
@@ -9,16 +8,9 @@ import FormSelect from "@/components/ui/form/form-select";
 import { CheckItem, SelectItem } from "@/lib/bootstrap-types";
 import FormCheck from "@/components/ui/form/form-check";
 import Toast from "@/components/ui/bootstrap/toast";
+import ContactFormWithFormspree from "./contact-form-with-formspree";
 
 // NOTE: This is a form component without Formspree. Even it's functional, it will return error that Formspree ID are not to be configured
-
-// Dynamically import the form that uses Formspree so it never runs during SSR
-const ContactFormWithFormspree = dynamic(
-  () => import("./contact-form-with-formspree"),
-  {
-    ssr: false,
-  },
-);
 
 export default function ContactForm() {
   // Initialize from env but allow runtime override via /site-config.json

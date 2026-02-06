@@ -14,6 +14,11 @@ export default function GoogleAnalytics({ gaId }: { gaId: string }) {
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
         strategy="afterInteractive"
+        onError={() => {
+          console.warn(
+            "Google Analytics script blocked by client (AdBlocker).",
+          );
+        }}
       />
       <Script id="google-analytics" strategy="afterInteractive">
         {`
