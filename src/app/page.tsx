@@ -69,7 +69,6 @@ export default function Home() {
       <Jumbotron
         backgroundColor="secondary"
         textColor="dark"
-        className="my-3"
         img={jumbotronImage.src}
       >
         <div className="container-fluid py-3">
