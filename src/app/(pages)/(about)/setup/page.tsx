@@ -1,6 +1,6 @@
 import AppLayout from "@/components/layouts/layout";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
-import NextImage from "@/components/ui/react/next-image";
+import NextImage from "@/components/ui/next/next-image";
 import setupImage from "../../../../../public/images/Setup.png";
 import { Metadata } from "next";
 import Accordion from "@/components/ui/bootstrap/accordion";

@@ -5,7 +5,7 @@ import Button from "@/components/ui/bootstrap/button";
 import CardBlank from "@/components/ui/bootstrap/card-blank";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import NavTab from "@/components/ui/bootstrap/nav-tab";
-import NextImage from "@/components/ui/react/next-image";
+import NextImage from "@/components/ui/next/next-image";
 import { projectItems } from "@/lib/data/portfolioData";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";

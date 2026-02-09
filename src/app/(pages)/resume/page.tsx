@@ -16,12 +16,12 @@ import {
 import { DropdownItem, ModalButtonItem } from "@/lib/bootstrap-types";
 import Modal from "@/components/ui/bootstrap/modal";
 import { formatDate, formatDateRange } from "@/lib/utils";
-import { isEducationData, isExperienceData } from "@/lib/type-guards";
+import { isEducationData, isExperienceData } from "@/lib/customs/type-guards";
 import { profileItem } from "@/lib/data/profileData";
 import jumbotronImage from "../../../assets/images/jumbotron/resume.jpg";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
-import NextImage from "@/components/ui/react/next-image";
+import NextImage from "@/components/ui/next/next-image";
 // import Loading from "@/components/ui/bootstrap/loading";
 // import { useLoading } from "@/hooks/use-loading";
 

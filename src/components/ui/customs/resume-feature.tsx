@@ -2,7 +2,7 @@ import { ComponentPropsWithoutRef } from "react";
 import "../bootstrap/feature.css";
 import Button from "../bootstrap/button";
 import ResumeDataItem from "./resume-data-item"; // Import the new component
-import { ResumeFeatureItem } from "@/lib/custom-types";
+import { ResumeFeatureItem } from "@/lib/customs/custom-types";
 
 type FeatureProps = ComponentPropsWithoutRef<"div"> & {
   id: string;
@@ -38,10 +38,10 @@ export default function ResumeFeature({
               {item.data?.map(
                 (
                   dataItem,
-                  index // Use the new component
+                  index, // Use the new component
                 ) => (
                   <ResumeDataItem key={index} dataItem={dataItem} />
-                )
+                ),
               )}
               {item.buttonLabel && (
                 <Button
@@ -85,10 +85,10 @@ export default function ResumeFeature({
                 {item.data?.map(
                   (
                     dataItem,
-                    index // Use the new component
+                    index, // Use the new component
                   ) => (
                     <ResumeDataItem key={index} dataItem={dataItem} />
-                  )
+                  ),
                 )}
                 {item.buttonLabel && (
                   <Button

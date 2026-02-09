@@ -1,5 +1,5 @@
 import { FeatureItem } from "../bootstrap-types";
-import { ExpertiseFeatureItem } from "../custom-types";
+import { ExpertiseFeatureItem } from "../customs/custom-types";
 
 // Expertises
 export const expertiseItems: ExpertiseFeatureItem[] = [

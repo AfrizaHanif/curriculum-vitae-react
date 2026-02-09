@@ -3,7 +3,7 @@
 // This require to use custom component from Custom folder and use map() inside of page.tsx
 
 import { DataFeatureItem } from "./data-types";
-import { FeatureItem } from "./bootstrap-types";
+import { FeatureItem } from "../bootstrap-types";
 
 // Feature
 export interface ResumeFeatureItem extends FeatureItem {

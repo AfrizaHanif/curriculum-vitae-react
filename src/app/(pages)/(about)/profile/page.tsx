@@ -1,6 +1,6 @@
 import AppLayout from "@/components/layouts/layout";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
-import NextImage from "@/components/ui/react/next-image";
+import NextImage from "@/components/ui/next/next-image";
 import myPhoto from "@/assets/images/profile.jpg";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";

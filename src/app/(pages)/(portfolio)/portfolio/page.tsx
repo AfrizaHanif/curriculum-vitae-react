@@ -3,7 +3,7 @@
 import AppLayout from "@/components/layouts/layout";
 import Button from "@/components/ui/bootstrap/button";
 import CardBlank from "@/components/ui/bootstrap/card-blank";
-import NextImage from "@/components/ui/react/next-image"; // Import the custom NextImage component
+import NextImage from "@/components/ui/next/next-image"; // Import the custom NextImage component
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import NavTab from "@/components/ui/bootstrap/nav-tab";
 import { portfolioItems } from "@/lib/data/portfolioData";

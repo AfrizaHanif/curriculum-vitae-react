@@ -2,7 +2,7 @@
 
 import AppLayout from "@/components/layouts/layout";
 import Alert from "@/components/ui/bootstrap/alert";
-import NextImage from "@/components/ui/react/next-image";
+import NextImage from "@/components/ui/next/next-image";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import { useState, useEffect } from "react";
 import myPhoto from "@/assets/images/profile.jpg";
@@ -11,7 +11,7 @@ import Link from "next/link";
 import jumbotronImage from "../assets/images/jumbotron/home.jpg";
 import { profileItem } from "@/lib/data/profileData";
 import { educationItems } from "@/lib/data/resumeData";
-import { isEducationData } from "@/lib/type-guards";
+import { isEducationData } from "@/lib/customs/type-guards";
 import Button from "@/components/ui/bootstrap/button";
 // import styles from "./page.module.css";
 

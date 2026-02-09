@@ -1,4 +1,4 @@
-import { ResumeFeatureItem } from "../custom-types";
+import { ResumeFeatureItem } from "../customs/custom-types";
 
 // Educations
 export const educationItems: ResumeFeatureItem[] = [

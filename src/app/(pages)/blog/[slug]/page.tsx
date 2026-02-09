@@ -4,7 +4,7 @@ import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
 import { blogItems } from "@/lib/data/blogData";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import NextImage from "@/components/ui/react/next-image";
+import NextImage from "@/components/ui/next/next-image";
 import SanitizedContent from "@/components/ui/react/sanitized-content";
 import Link from "next/link";
 import Button from "@/components/ui/bootstrap/button";

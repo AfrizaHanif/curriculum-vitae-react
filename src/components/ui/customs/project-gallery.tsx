@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import NextImage from "../react/next-image";
+import NextImage from "../next/next-image";
 import NextImageModal from "./next-image-modal";
 
 interface ProjectGalleryProps {

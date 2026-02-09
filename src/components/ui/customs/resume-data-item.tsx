@@ -1,5 +1,5 @@
 import React from "react";
-import { DataFeatureItem } from "@/lib/data-types";
+import { DataFeatureItem } from "@/lib/customs/data-types";
 import { formatMonthYear } from "@/lib/utils";
 
 interface ResumeDataItemProps {
@@ -33,7 +33,7 @@ const ResumeDataItem: React.FC<ResumeDataItemProps> = ({
 
         <span
           className={`badge fs-6 fw-medium ${getStatusBadgeClass(
-            dataItem.status
+            dataItem.status,
           )}`}
         >
           {dataItem.status}

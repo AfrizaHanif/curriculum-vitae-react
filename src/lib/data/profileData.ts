@@ -1,5 +1,5 @@
 import { FeatureItem } from "../bootstrap-types";
-import { SetupItem } from "../data-types";
+import { SetupItem } from "../customs/data-types";
 
 // Profile
 export const profileItem = [

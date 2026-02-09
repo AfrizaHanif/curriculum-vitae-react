@@ -2,7 +2,7 @@
 
 import AppLayout from "@/components/layouts/layout";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
-import NextImage from "@/components/ui/react/next-image";
+import NextImage from "@/components/ui/next/next-image";
 import { blogItems } from "@/lib/data/blogData";
 import { formatDate, sortItemsByDate } from "@/lib/utils";
 import Link from "next/link";

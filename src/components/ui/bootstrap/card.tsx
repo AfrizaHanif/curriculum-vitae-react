@@ -4,7 +4,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 import Button from "./button";
-import NextImage from "../react/next-image";
+import NextImage from "../next/next-image";
 import { DropdownItem } from "@/lib/bootstrap-types";
 import Dropdown from "./dropdown";
 
@@ -81,7 +81,7 @@ export default function Card({
     `text-bg-${color}`,
     `border-${borderColor}`,
     overlay && "card-img-overlay",
-    className
+    className,
   );
   // Classes for vertical card
   const verClasses = clsx(
@@ -90,7 +90,7 @@ export default function Card({
     `text-bg-${color}`,
     `border-${borderColor}`,
     // "mb-3",
-    className
+    className,
   );
 
   let cardComponent;
