@@ -1,13 +1,14 @@
-import { ComponentPropsWithoutRef, ReactNode } from "react";
-import DropdownItemComponent from "./dropdown-items";
-import { AllowedColors, AllowedSize } from "@/types/common";
 import clsx from "clsx";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import type { AllowedColors, AllowedSize } from "@/types/common";
+import type { DropdownItem } from "../../../lib/bootstrap-types";
+import Button from "./button";
+import DropdownItemComponent from "./dropdown-items";
 import "./dropdown.css";
-import { DropdownItem } from "@/lib/bootstrap-types";
+import NextImage from "../next/next-image";
 
-type DropdownProps = ComponentPropsWithoutRef<"div"> & {
-  color: AllowedColors;
-  split?: boolean;
+type BaseDropdownProps = ComponentPropsWithoutRef<"div"> & {
+  color?: AllowedColors;
   size?: AllowedSize;
   centered?: boolean;
   stretchedLink?: boolean;
@@ -18,10 +19,17 @@ type DropdownProps = ComponentPropsWithoutRef<"div"> & {
   children: ReactNode;
 };
 
+type DropdownProps = BaseDropdownProps & {
+  type?: "button" | "image";
+  split?: boolean;
+  img?: string;
+  alt?: string;
+};
+
 export default function Dropdown({
-  color,
+  color = "primary",
+  type = "button",
   items,
-  split,
   size,
   centered = false,
   stretchedLink = false,
@@ -30,49 +38,73 @@ export default function Dropdown({
   fullWidth = false,
   className,
   children,
+  split = false,
+  img,
+  alt,
   ...props
 }: DropdownProps) {
   const wrapperClasses = clsx(
     split ? "btn-group" : direction,
     direction !== "dropdown" && split && direction,
-    className
+    className,
   );
 
   const buttonClasses = clsx(
     "btn",
-    `btn-${color}`,
+    // `btn-${color}`,
     size && `btn-${size}`,
     stretchedLink && "stretched-link",
-    fullWidth && `w-100`
+    fullWidth && `w-100`,
   );
 
   const dropdownMenuClasses = clsx(
-    "dropdown-menu gap-1 p-2 rounded-3 mx-0 shadow w-220px",
-    centered && "dropdown-menu-center"
+    "dropdown-menu rounded-3 w-220px mx-0 gap-1 p-2 shadow",
+    centered && "dropdown-menu-center",
   );
 
   return (
     <div className={wrapperClasses} {...props}>
-      <button
-        className={clsx(buttonClasses, !split && "dropdown-toggle")}
-        type="button"
-        data-bs-toggle={!split ? "dropdown" : undefined}
-        aria-expanded="false"
-      >
-        {children}
-      </button>
-      {split && (
-        <button
-          type="button"
-          className={clsx(
-            buttonClasses,
-            "dropdown-toggle dropdown-toggle-split"
+      {type === "button" ? (
+        <>
+          <Button
+            className={clsx(buttonClasses, !split && "dropdown-toggle")}
+            color={color}
+            type="button"
+            data-bs-toggle={!split ? "dropdown" : undefined}
+            aria-expanded="false"
+          >
+            {children}
+          </Button>
+          {split && (
+            <Button
+              type="button"
+              className={clsx(
+                buttonClasses,
+                "dropdown-toggle dropdown-toggle-split",
+              )}
+              color={color}
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <span className="visually-hidden">Toggle Dropdown</span>
+            </Button>
           )}
+        </>
+      ) : (
+        <a
+          href="#"
+          className="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle"
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          <span className="visually-hidden">Toggle Dropdown</span>
-        </button>
+          <NextImage
+            src={img || "https://github.com/mdo.png"}
+            alt={alt || ""}
+            width="32"
+            height="32"
+            className="rounded-circle"
+          />
+        </a>
       )}
       <ul className={dropdownMenuClasses}>
         {items.map((item, index) => {

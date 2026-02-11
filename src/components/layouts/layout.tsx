@@ -80,20 +80,18 @@ export default function AppLayout({
   }, [pathname, dynamicCrumbs]);
 
   return (
-    <>
+    <div className="d-flex flex-column min-vh-100">
       <Header />
-      <Container className="py-4">
+      <Container className="py-4 flex-grow-1 d-flex flex-column">
         {/* Render the breadcrumb only if there are items */}
         {showBreadcrumb && breadcrumbItems.length > 0 && (
           <Breadcrumb items={breadcrumbItems} />
         )}
 
         {/* This will render the matched child route component */}
-        {children}
-      </Container>
-      <Container>
+        <div className="flex-grow-1">{children}</div>
         <Footer />
       </Container>
-    </>
+    </div>
   );
 }

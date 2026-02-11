@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { ComponentPropsWithoutRef, useEffect, useRef, useState } from "react";
 
-export default function ColorModeToggle() {
+type ColorModeToggleProps = ComponentPropsWithoutRef<"button">;
+
+export default function ColorModeToggle({
+  className,
+  ...props
+}: ColorModeToggleProps) {
   const [theme, setTheme] = useState("auto");
   const [mounted, setMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -75,19 +80,20 @@ export default function ColorModeToggle() {
     <div className="dropdown">
       <button
         ref={buttonRef}
-        className="btn btn-secondary dropdown-toggle d-flex align-items-center"
+        className={`btn btn-secondary dropdown-toggle d-flex align-items-center ${className || ""}`}
         type="button"
         id="bd-theme"
         data-bs-toggle="dropdown"
         aria-expanded="false"
+        {...props}
       >
         <i
           className={`bi ${
             theme === "light"
               ? "bi-sun-fill"
               : theme === "dark"
-              ? "bi-moon-stars-fill"
-              : "bi-circle-half"
+                ? "bi-moon-stars-fill"
+                : "bi-circle-half"
           } me-2`}
         ></i>
         <span className="d-none">Toggle theme</span>

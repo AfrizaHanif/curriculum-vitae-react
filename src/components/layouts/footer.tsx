@@ -1,7 +1,13 @@
 "use client";
 
+import { profileItem } from "@/lib/data/profileData";
 import { socialItems } from "@/lib/data/profileData";
 import Link from "next/link";
+import logoImage from "../../assets/images/logo/logo-only-white.png";
+import NextImage from "../ui/next/next-image";
+
+// Get Data from JSON (Single)
+const userProfile = profileItem[0];
 
 export default function Footer() {
   return (
@@ -12,12 +18,16 @@ export default function Footer() {
           className="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1"
           aria-label="Bootstrap"
         >
-          <svg className="bi" width="30" height="24" aria-hidden="true">
+          {/* <svg className="bi" width="30" height="24" aria-hidden="true">
             <use xlinkHref="#bootstrap"></use>
-          </svg>
+          </svg> */}
+          <NextImage src={logoImage} alt={"Logo"} height={24} />
         </Link>
-        <span className="mb-3 mb-md-0 text-body-secondary">
-          © 2025 Muhammad Afriza Hanif
+        <span
+          className="mb-3 mb-md-0 text-body-secondary"
+          suppressHydrationWarning
+        >
+          © {new Date().getFullYear()} {userProfile.fullname}
         </span>
       </div>
       <ul className="nav col-md-4 justify-content-end list-unstyled d-flex">
