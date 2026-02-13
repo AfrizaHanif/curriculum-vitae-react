@@ -14,13 +14,14 @@ export default function CardGroup({
   type = "grid",
   cardPerRow = 3,
   children,
+  style,
   className,
   ...props
 }: CardGroupProps) {
   // Check if card group's type are grid or group (Default)
   if (type === "grid") {
     return (
-      <div className={`py-3 ${className || ""}`} {...props}>
+      <div className={`py-3 ${className || ""}`} style={style} {...props}>
         {title && <h2 className="pb-2 border-bottom">{title}</h2>}
         {subtitle && (
           <div className="fs-5 text-body-secondary mb-5">{subtitle}</div>
@@ -32,7 +33,7 @@ export default function CardGroup({
     );
   } else {
     return (
-      <div className="card-group" {...props}>
+      <div className="card-group" style={style} {...props}>
         {children}
       </div>
     );

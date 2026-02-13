@@ -1,7 +1,6 @@
 "use client";
 
 import AppLayout from "@/components/layouts/layout";
-import Alert from "@/components/ui/bootstrap/alert";
 import NextImage from "@/components/ui/next/next-image";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import { useState, useEffect } from "react";
@@ -13,6 +12,8 @@ import { profileItem } from "@/lib/data/profileData";
 import { educationItems } from "@/lib/data/resumeData";
 import { isEducationData } from "@/lib/customs/type-guards";
 import Button from "@/components/ui/bootstrap/button";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 // import styles from "./page.module.css";
 
 // Get Data from JSON (Single)
@@ -62,6 +63,15 @@ export default function Home() {
   //   return <Loading />;
   // }
 
+  // Item of Featured Portfolio (Heroes)
+  const heroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Lihat",
+      color: "primary",
+      href: `/portfolio/${featuredPortfolio.slug}`,
+    },
+  ];
+
   // Content Area
   return (
     <AppLayout>
@@ -106,46 +116,14 @@ export default function Home() {
       </Jumbotron>
 
       {/* Featured Portfolio Heroes */}
-      <div className="container col-xxl-8 px-4 py-1">
-        <div className="row flex-lg-row-reverse align-items-center g-5 py-5">
-          <div className="col-10 col-sm-8 col-lg-6">
-            {/* Use data from state */}
-            <NextImage
-              src={featuredPortfolio.image}
-              className="d-block mx-lg-auto img-fluid rounded-3"
-              alt={featuredPortfolio.title}
-              width="700"
-              height="500"
-              loading="lazy"
-              style={{
-                aspectRatio: "16 / 9",
-                objectFit: "cover",
-                objectPosition: "top",
-                boxShadow: "5px 5px 8px rgba(0, 0, 0, 0.5)",
-              }}
-            />
-          </div>
-
-          <div className="col-lg-6">
-            <h1 className="display-5 fw-bold text-body-emphasis lh-1 mb-3">
-              {truncateText(featuredPortfolio.title, 40)}
-            </h1>
-            <p className="lead">
-              {truncateText(featuredPortfolio.description, 150)}
-            </p>
-            <div className="d-grid gap-2 d-md-flex justify-content-md-start">
-              <Link href={`/portfolio/${featuredPortfolio.slug}`}>
-                <button
-                  type="button"
-                  className="btn btn-primary btn-lg px-4 me-md-2"
-                >
-                  Lihat
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Heroes
+        type="responsive"
+        title={truncateText(featuredPortfolio.title, 40)}
+        img={featuredPortfolio.image}
+        buttonItem={heroesButtonItem}
+      >
+        {truncateText(featuredPortfolio.description, 150)}
+      </Heroes>
 
       {/* Sub Jumbotron */}
       <div className="row align-items-md-stretch">

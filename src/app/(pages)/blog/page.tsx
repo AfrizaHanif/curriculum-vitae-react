@@ -10,6 +10,8 @@ import { useState } from "react";
 import jumbotronImage from "../../../assets/images/jumbotron/blog.jpg";
 import Card from "@/components/ui/bootstrap/card";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 export default function Blog() {
   console.info("This page are being sorted from newest post");
@@ -20,6 +22,15 @@ export default function Blog() {
     return blogItems[randomIndex];
   });
   console.log("Featured Post: " + featuredPost.title);
+
+  // Item of Featured Portfolio (Heroes)
+  const heroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Lihat",
+      color: "primary",
+      href: `/blog/${featuredPost.slug}`,
+    },
+  ];
 
   return (
     <AppLayout>
@@ -41,50 +52,14 @@ export default function Blog() {
       </Jumbotron>
 
       {/* Featured Post Heroes */}
-      <div className="container col-xxl-8 px-4 py-1">
-        <div className="row flex-lg-row-reverse align-items-center g-5 py-5">
-          <div className="col-10 col-sm-8 col-lg-6">
-            {/* <img
-              src="bootstrap-themes.png"
-              className="d-block mx-lg-auto img-fluid"
-              alt="Bootstrap Themes"
-              width="700"
-              height="500"
-              loading="lazy"
-            /> */}
-            <NextImage
-              src={featuredPost.image}
-              className="d-block mx-lg-auto img-fluid rounded-3"
-              alt={featuredPost.title}
-              width="700"
-              height="500"
-              loading="lazy"
-              style={{
-                aspectRatio: "16 / 9",
-                objectFit: "cover",
-                objectPosition: "top",
-                boxShadow: "5px 5px 8px rgba(0, 0, 0, 0.5)",
-              }}
-            />
-          </div>
-          <div className="col-lg-6">
-            <h1 className="display-5 fw-bold text-body-emphasis lh-1 mb-3">
-              {featuredPost.title}
-            </h1>
-            <p className="lead">{featuredPost.summary}</p>
-            <div className="d-grid gap-2 d-md-flex justify-content-md-start">
-              <Link href={`/blog/${featuredPost.slug}`}>
-                <button
-                  type="button"
-                  className="btn btn-primary btn-lg px-4 me-md-2"
-                >
-                  Baca Selengkapnya
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Heroes
+        type="responsive"
+        title={featuredPost.title}
+        img={featuredPost.image}
+        buttonItem={heroesButtonItem}
+      >
+        {featuredPost.summary}
+      </Heroes>
 
       {/* List of Posts (Cards) */}
       <PaginatedList

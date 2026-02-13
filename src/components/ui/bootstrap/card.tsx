@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { AllowedColors } from "@/types/common";
 import clsx from "clsx";
 import Link from "next/link";
@@ -21,7 +20,7 @@ type BaseCardProps = ComponentPropsWithoutRef<"div"> & {
   clickable?: boolean;
   newTab?: boolean;
   overlay?: boolean;
-  vertical?: boolean;
+  horizontal?: boolean;
   fullHeight?: boolean;
   insideGroup?: boolean;
   children: ReactNode;
@@ -64,27 +63,28 @@ export default function Card({
   newTab = false,
   clickable = false,
   overlay = false,
-  vertical = false,
+  horizontal = false,
   fullHeight = false,
   insideGroup = false,
   children,
+  style,
   className,
   ...props
 }: CardsProps) {
   // New Tab Classes
   const newTabClasses = { target: "_blank", rel: "noopener noreferrer" };
 
-  // Classes for horizontal card
-  const horClasses = clsx(
+  // Classes for vertical card
+  const verClasses = clsx(
     "card",
     fullHeight && "h-100",
     `text-bg-${color}`,
     `border-${borderColor}`,
-    overlay && "card-img-overlay",
+    // overlay && "card-img-overlay",
     className,
   );
-  // Classes for vertical card
-  const verClasses = clsx(
+  // Classes for horizontal card
+  const horClasses = clsx(
     "card",
     fullHeight && "h-100",
     `text-bg-${color}`,
@@ -96,18 +96,18 @@ export default function Card({
   let cardComponent;
 
   // Check orientation of card
-  if (vertical) {
-    // Vertical Layout
+  if (horizontal) {
+    // Horizontal Layout
     cardComponent = (
-      <div className={verClasses} {...props}>
+      <div className={horClasses} style={style} {...props}>
         <div className="row g-0">
           <div className="col-md-4">
             {/* Image */}
             {image && (
-              <img
+              <NextImage
                 src={image}
                 className="img-fluid rounded-start"
-                alt={title}
+                alt={title || ""}
               />
             )}
           </div>
@@ -122,9 +122,9 @@ export default function Card({
       </div>
     );
   } else {
-    // Horizontal Layout
+    // Vertical Layout (Default)
     cardComponent = (
-      <div className={horClasses} {...props}>
+      <div className={verClasses} style={style} {...props}>
         {/* Header */}
         {header && (
           <div className="card-header text-uppercase small fw-semibold text-body-secondary">
@@ -132,9 +132,16 @@ export default function Card({
           </div>
         )}
         {/* Overlay */}
-        {overlay && <img src="..." className="card-img" alt="..."></img>}
+        {overlay && (
+          <NextImage
+            src="..."
+            className="card-img"
+            alt="..."
+            style={{ objectFit: "cover", height: "100%", width: "100%" }}
+          ></NextImage>
+        )}
         {/* Image (Top) */}
-        {imgPosition === "top" && image && (
+        {imgPosition === "top" && image && !overlay && (
           // <img src={image} className="card-img-top" alt={title} />
           <NextImage
             src={image}
@@ -151,12 +158,12 @@ export default function Card({
           />
         )}
         {/* Content */}
-        <div className="card-body">
+        <div className={overlay ? "card-img-overlay" : "card-body"}>
           {/* {title && <h5 className="card-title">{title}</h5>} */}
           {children}
         </div>
         {/* Image (Bottom) */}
-        {imgPosition === "bottom" && image && (
+        {imgPosition === "bottom" && image && !overlay && (
           // <img src={image} className="card-img-bottom" alt={title} />
           <NextImage
             src={image}

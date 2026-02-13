@@ -76,6 +76,13 @@ export interface FeatureItem {
   dataTitle?: string;
 }
 
+// Buttons for Heroes
+export interface HeroesButtonItem {
+  label: string;
+  color: AllowedColors;
+  href?: string;
+}
+
 // Breadcrumb
 export interface BreadcrumbItem {
   href: string;

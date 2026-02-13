@@ -1,14 +1,16 @@
 import { AllowedColors } from "@/types/common";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
+import NextImage from "../next/next-image";
 
 // This component are similar with card.tsx, but with blank card. Visit Bootstrap's Documentation for insertion of content inside card
 
 type CardsProps = ComponentPropsWithoutRef<"div"> & {
   color?: AllowedColors;
   borderColor?: AllowedColors;
+  image?: string;
   overlay?: boolean;
-  vertical?: boolean;
+  horizontal?: boolean;
   fullHeight?: boolean;
   insideGroup?: boolean;
   children: ReactNode;
@@ -17,44 +19,58 @@ type CardsProps = ComponentPropsWithoutRef<"div"> & {
 export default function CardBlank({
   color,
   borderColor,
+  image,
   overlay = false,
-  vertical = false,
+  horizontal = false,
   fullHeight = false,
   insideGroup = false,
   children,
+  style,
   className,
   ...props
 }: CardsProps) {
-  const horClasses = clsx(
-    "card",
-    fullHeight && "h-100",
-    `text-bg-${color}`,
-    `border-${borderColor}`,
-    overlay && "card-img-overlay",
-    className
-  );
   const verClasses = clsx(
     "card",
     fullHeight && "h-100",
     `text-bg-${color}`,
     `border-${borderColor}`,
+    // overlay && "card-img-overlay",
+    className,
+  );
+  const horClasses = clsx(
+    "card",
+    fullHeight && "h-100",
+    `text-bg-${color}`,
+    `border-${borderColor}`,
     // "mb-3",
-    className
+    className,
   );
 
   let cardComponent;
 
-  if (vertical) {
-    // Vertical Layout
+  const imageOverlay = (
+    <NextImage
+      src={image ?? ""}
+      className="card-img"
+      alt="..."
+      style={{ objectFit: "cover", height: "100%", width: "100%" }}
+    ></NextImage>
+  );
+
+  if (horizontal) {
+    // Horizontal Layout
     cardComponent = (
-      <div className={verClasses} {...props}>
+      <div className={horClasses} style={style} {...props}>
+        {image && overlay && imageOverlay}
         {children}
       </div>
     );
   } else {
-    // Horizontal Layout
+    // Vertical Layout (Default)
     cardComponent = (
-      <div className={horClasses} {...props}>
+      <div className={verClasses} style={style} {...props}>
+        {image && overlay && imageOverlay}
+        {/* <div className={overlay ? "card-img-overlay" : ""}>{children}</div> */}
         {children}
       </div>
     );

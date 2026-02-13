@@ -5,7 +5,7 @@ import placeholderImage from "../../assets/images/placeholder/placeholder-image.
 
 type ImageProps = ComponentPropsWithoutRef<"img"> & {
   src: string;
-  alt: string;
+  alt?: string;
   type?: "fluid" | "thumbnail";
 };
 

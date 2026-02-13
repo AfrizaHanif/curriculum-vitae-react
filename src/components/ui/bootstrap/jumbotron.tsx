@@ -1,7 +1,7 @@
-import { AllowedColors } from "@/types/common";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 import { Container } from "react-bootstrap";
+import type { AllowedColors } from "@/types/common";
 
 type JumbotronProps = ComponentPropsWithoutRef<"div"> & {
   img?: string;
@@ -19,6 +19,7 @@ export default function Jumbotron({
   fullWidth,
   children,
   className,
+  style,
   // imgClassName,
   ...props
 }: JumbotronProps) {
@@ -34,7 +35,7 @@ export default function Jumbotron({
   if (fullWidth) {
     const fullWidthClasses = clsx(commonClasses, className);
     return (
-      <div className={fullWidthClasses} {...props}>
+      <div className={fullWidthClasses} style={style} {...props}>
         <Container className="py-5" style={img ? backgroundStyle : undefined}>
           {children}
         </Container>
@@ -46,7 +47,7 @@ export default function Jumbotron({
       <Container
         className={containedClasses}
         {...props}
-        style={img ? backgroundStyle : undefined}
+        style={img ? { ...backgroundStyle, ...style } : style}
       >
         {/* {img ? (
           <div className="row align-items-center">
