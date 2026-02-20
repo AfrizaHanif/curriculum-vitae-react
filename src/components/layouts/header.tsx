@@ -8,7 +8,7 @@ import { profileItem } from "@/lib/data/profileData";
 import NextImage from "../ui/next/next-image";
 import logoImage from "../../assets/images/logo/logo-only-white.png";
 import ColorModeToggle from "../ui/bootstrap/color-mode-toggle";
-import { isActiveLink } from "@/lib/utils";
+import { getPathname, isActiveLink } from "@/lib/utils";
 import { headerItems } from "@/lib/data/headerData";
 
 // Get Data from JSON (Single)
@@ -50,7 +50,7 @@ export default function Header() {
               {headerItems.map((item) => {
                 if (item.subItems) {
                   const isDropdownActive = item.subItems.some((subItem) =>
-                    isActiveLink(pathname, subItem.href),
+                    isActiveLink(pathname, getPathname(subItem.href)),
                   );
                   return (
                     <li key={item.label} className="nav-item dropdown">

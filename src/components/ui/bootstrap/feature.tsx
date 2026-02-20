@@ -37,10 +37,7 @@ export default function Feature({
               </div>
               <h3 className="fs-2 text-body-emphasis">{item.title}</h3>
               {item.description && (
-                <div
-                  className="pb-3"
-                  dangerouslySetInnerHTML={{ __html: item.description }}
-                />
+                <div className="pb-3">{item.description}</div>
               )}
               {item.buttonLabel && (
                 <Button
@@ -85,10 +82,7 @@ export default function Feature({
               <div>
                 <h3 className="fs-2 text-body-emphasis">{item.title}</h3>
                 {item.description && (
-                  <div
-                    className="pb-3"
-                    dangerouslySetInnerHTML={{ __html: item.description }}
-                  />
+                  <div className="pb-3">{item.description}</div>
                 )}
                 {item.buttonLabel && (
                   // <a href={item.href} className="btn btn-primary">

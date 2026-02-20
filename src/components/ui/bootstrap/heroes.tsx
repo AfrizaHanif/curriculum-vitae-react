@@ -1,5 +1,4 @@
 import { ComponentPropsWithoutRef, ReactNode } from "react";
-import Image from "next/image";
 import "./heroes.css";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
 import Button from "./button";

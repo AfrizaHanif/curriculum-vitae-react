@@ -68,7 +68,7 @@ export interface FeatureItem {
   key: string;
   icon: string;
   title?: string;
-  description?: string;
+  description?: ReactNode;
   href?: string;
   buttonLabel?: string;
   dataToggle?: "modal" | "offcanvas";

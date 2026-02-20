@@ -9,7 +9,7 @@
 export function formatDateRange(
   startDate: string | Date,
   finishDate?: string | Date | null,
-  locale: string = "id-ID"
+  locale: string = "id-ID",
 ): string {
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
@@ -28,7 +28,7 @@ export function formatDateRange(
 
 export const formatDate = (
   dateString: string,
-  locale: string = "id-ID"
+  locale: string = "id-ID",
 ): string => {
   const date = new Date(dateString);
   const options: Intl.DateTimeFormatOptions = {
@@ -40,10 +40,10 @@ export const formatDate = (
 };
 
 export function sortItemsByDate<T extends { date: string | Date }>(
-  items: readonly T[]
+  items: readonly T[],
 ): T[] {
   return [...items].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 }
 
@@ -59,10 +59,26 @@ export function slugify(s: string) {
     .replace(/\s+/g, "-"); // spaces → hyphens
 }
 
-export const isActiveLink = (pathname: string, href?: string) => {
-  if (!href) return false;
-  return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
-};
+// export const isActiveLink = (pathname: string, href?: string) => {
+//   if (!href) return false;
+//   return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+// };
+export function isActiveLink(
+  pathname: string,
+  href: string | undefined,
+): boolean {
+  if (!href || href === "#") {
+    return false;
+  }
+
+  // Handle exact match for the root path.
+  if (href === "/") {
+    return pathname === "/";
+  }
+
+  // For other paths, check for an exact match or if the current path is a sub-path.
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function formatMonthYear(date: string | Date, locale: string = "id-ID") {
   const dateObj = new Date(date);
@@ -70,4 +86,16 @@ export function formatMonthYear(date: string | Date, locale: string = "id-ID") {
     month: "short",
     year: "numeric",
   });
+}
+
+export function getPathname(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http")) {
+    try {
+      return new URL(url).pathname;
+    } catch {
+      return url;
+    }
+  }
+  return url;
 }

@@ -159,7 +159,7 @@ export default function Project() {
         </div>
       </div>
 
-      {/* List of Portfolio (Cards) */}
+      {/* List of Project (Cards) */}
       <NavTab id="project-tab" items={tabItems} />
     </AppLayout>
   );

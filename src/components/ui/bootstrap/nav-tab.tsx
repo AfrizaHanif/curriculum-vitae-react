@@ -4,19 +4,23 @@ import { NavTabItem } from "@/lib/bootstrap-types";
 
 type NavTabProps = ComponentPropsWithoutRef<"div"> & {
   id: string;
-  style?: "tabs" | "pills";
+  variant?: "tabs" | "pills";
   items: NavTabItem[];
   defaultActiveId?: string;
   vertical?: boolean;
+  fill?: boolean;
+  navSize?: 1 | 2 | 3 | 4;
 };
 
 export default function NavTab({
   id,
-  style = "tabs",
+  variant = "tabs",
   items,
   defaultActiveId,
   className,
   vertical = false,
+  fill = false,
+  navSize = 3,
   ...props
 }: NavTabProps) {
   const activeTabId = defaultActiveId ?? (items.length > 0 ? items[0].id : "");
@@ -27,7 +31,7 @@ export default function NavTab({
     return (
       <div className={`d-flex align-items-start ${className}`} {...props}>
         <div
-          className="nav flex-column nav-pills me-3"
+          className={`nav flex-column nav-pills col-${navSize} me-3`}
           id={`v-${id}-tab`}
           role="tablist"
           aria-orientation="vertical"
@@ -52,7 +56,10 @@ export default function NavTab({
             </button>
           ))}
         </div>
-        <div className="tab-content" id={`v-${id}-tabContent`}>
+        <div
+          className={`tab-content col-${12 - navSize}`}
+          id={`v-${id}-tabContent`}
+        >
           {items.map((item) => (
             <div
               key={item.id}
@@ -73,7 +80,11 @@ export default function NavTab({
   } else {
     return (
       <div className={className} {...props}>
-        <ul className={`nav nav-${style}`} id={`${id}-tab`} role="tablist">
+        <ul
+          className={`nav nav-${variant} ${fill && "nav-fill"}`}
+          id={`${id}-tab`}
+          role="tablist"
+        >
           {items.map((item) => (
             <li key={item.id} className="nav-item" role="presentation">
               <button
