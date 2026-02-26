@@ -12,6 +12,7 @@ export interface HeaderItem {
   label: string;
   icon: string;
   href?: string;
+  newTab?: boolean;
   subItems?: HeaderItem[]; // Recursive definition for sub-menus
 }
 
@@ -27,6 +28,7 @@ export interface DropdownItem {
   label: string;
   icon?: string;
   href?: string;
+  newTab?: boolean;
   type?: "divider" | "item";
   dataToggle?: "modal" | "offcanvas";
   dataTarget?: string;
@@ -70,6 +72,7 @@ export interface FeatureItem {
   title?: string;
   description?: ReactNode;
   href?: string;
+  newTab?: boolean;
   buttonLabel?: string;
   dataToggle?: "modal" | "offcanvas";
   dataTarget?: string;
@@ -81,6 +84,7 @@ export interface HeroesButtonItem {
   label: string;
   color: AllowedColors;
   href?: string;
+  newTab?: boolean;
 }
 
 // Breadcrumb

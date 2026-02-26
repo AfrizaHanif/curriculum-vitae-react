@@ -3,7 +3,6 @@
 import { use } from "react";
 import AppLayout from "@/components/layouts/layout";
 import Button from "@/components/ui/bootstrap/button";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
 import {
   portfolioItems,
@@ -49,9 +48,9 @@ export default function SelectedPortfolio({
       : null;
 
   // Item of repository
-  const filteredRepositoryItems: DropdownItem[] = repositoryItems.filter(
-    (repo) => repo?.portfolio_id === item.id,
-  ) as DropdownItem[];
+  const filteredRepositoryItems: DropdownItem[] = repositoryItems
+    .filter((repo) => repo?.portfolio_id === item.id)
+    .map((repo) => ({ ...repo, newTab: true })) as DropdownItem[];
 
   // Check if case study exists
   const hasCaseStudy = caseStudyItems.some((cs) => cs.portfolio_id === item.id);

@@ -1,0 +1,12 @@
+.certificateImage {
+  width: auto;
+  height: auto;
+}
+
+@media (min-width: 992px) {
+
+  /* lg breakpoint for desktops */
+  .certificateImage {
+    width: 100%;
+  }
+}

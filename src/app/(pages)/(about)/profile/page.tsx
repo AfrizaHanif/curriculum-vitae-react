@@ -64,26 +64,25 @@ export default function Profile() {
       />
 
       {/* My Profile */}
-      <div className="row g-0 pb-3 text-center">
+      <div className="row g-3 pb-3">
         {/* Profile Image */}
-        <div
-          className="col-4 border rounded-3 position-relative"
-          style={{ minHeight: "400px" }}
-        >
-          <NextImage
-            src={myPhoto}
-            alt="My Profile Photo"
-            fill
-            style={{ objectFit: "cover" }}
-            className="rounded-3" // Keep rounded corners
-          />
+        <div className="col-12 col-lg-4">
+          <div
+            className="border rounded-3 position-relative h-100"
+            style={{ minHeight: "300px" }}
+          >
+            <NextImage
+              src={myPhoto}
+              alt="My Profile Photo"
+              fill
+              style={{ objectFit: "cover" }}
+              className="rounded-3"
+            />
+          </div>
         </div>
         {/* Detail of Profile */}
-        <div className="col-8">
-          <div
-            className="ms-3 p-4 text-body border rounded-3 text-start bg-body"
-            style={{ height: "400px" }}
-          >
+        <div className="col-12 col-lg-8">
+          <div className="p-4 text-body border rounded-3 text-start bg-body h-100">
             <h2 className="pb-2 border-bottom">Biodata</h2>
             <div className="table-responsive">
               <table className="table table-borderless pt-3 fs-5">

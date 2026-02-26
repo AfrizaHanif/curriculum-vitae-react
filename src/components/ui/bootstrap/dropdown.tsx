@@ -34,7 +34,7 @@ export default function Dropdown({
   centered = false,
   stretchedLink = false,
   direction = "dropdown",
-  newTab = false,
+  // newTab = false,
   fullWidth = false,
   className,
   children,
@@ -120,7 +120,7 @@ export default function Dropdown({
             <DropdownItemComponent
               key={item.label || index}
               href={item.href}
-              newTab={newTab}
+              newTab={item.newTab}
               dataToggle={item.dataToggle}
               dataTarget={item.dataTarget}
             >

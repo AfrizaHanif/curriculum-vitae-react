@@ -23,6 +23,7 @@ import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import NextImage from "@/components/ui/next/next-image";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import styles from "./page.module.css";
 // import Loading from "@/components/ui/bootstrap/loading";
 // import { useLoading } from "@/hooks/use-loading";
 
@@ -82,6 +83,7 @@ export default function Resume() {
       items.push({
         label: "Kunjungi Link",
         href: item.credential_url,
+        newTab: true,
         icon: "patch-check",
       });
     }
@@ -326,7 +328,7 @@ export default function Resume() {
             width={0}
             height={0}
             sizes="100vw"
-            className="w-100 h-auto"
+            className={styles.certificateImage}
           />
         </Modal>
       ))}

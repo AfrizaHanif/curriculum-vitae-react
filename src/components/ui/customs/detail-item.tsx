@@ -121,7 +121,6 @@ export default function DetailItem({
             color="secondary"
             items={repositoryItems}
             className="mb-2"
-            newTab
             fullWidth
           >
             Lihat Repository

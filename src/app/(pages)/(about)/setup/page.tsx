@@ -1,5 +1,4 @@
 import AppLayout from "@/components/layouts/layout";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import NextImage from "@/components/ui/next/next-image";
 import setupImage from "../../../../../public/images/Setup.png";
 import { Metadata } from "next";
@@ -54,15 +53,14 @@ export default function Setup() {
       />
 
       {/* Content */}
-      <div className="row justify-content-center g-2">
+      <div className="row justify-content-center g-4">
         {/* Image of current setup */}
-        <div className="col-6">
-          <div className="sticky-top" style={{ top: "1rem" }}>
+        <div className="col-12 col-lg-6">
+          <div className="sticky-lg-top" style={{ top: "1rem" }}>
             <NextImage
               src={setupImage}
               alt="Setup Image"
-              className="rounded-3"
-              width={500}
+              className="rounded-3 w-100"
               style={{
                 aspectRatio: "16 / 9",
                 objectFit: "cover",
@@ -73,7 +71,7 @@ export default function Setup() {
             ></NextImage>
           </div>
         </div>
-        <div className="col-6">
+        <div className="col-12 col-lg-6">
           <Accordion
             id="my-new-accordion"
             items={accordionItems}

@@ -1,6 +1,5 @@
 import AppLayout from "@/components/layouts/layout";
 import Accordion from "@/components/ui/bootstrap/accordion";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import { profileItem, socialItems } from "@/lib/data/profileData";
 import { Metadata } from "next";
 import ContactForm from "./contact-form";
@@ -93,8 +92,8 @@ export default function Contact() {
       {/* Content */}
       <div className="row justify-content-center g-3">
         {/* Accordion */}
-        <div className="col-4">
-          <div className="sticky-top" style={{ top: "1rem" }}>
+        <div className="col-12 col-lg-4">
+          <div className="sticky-lg-top" style={{ top: "1rem" }}>
             <Accordion
               id="my-new-accordion"
               items={contactAccordionItems}
@@ -103,7 +102,7 @@ export default function Contact() {
           </div>
         </div>
         {/* Form */}
-        <div className="col-8">
+        <div className="col-12 col-lg-8">
           <ContactForm />
         </div>
       </div>
