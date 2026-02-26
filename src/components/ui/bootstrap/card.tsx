@@ -23,6 +23,7 @@ type BaseCardProps = ComponentPropsWithoutRef<"div"> & {
   horizontal?: boolean;
   fullHeight?: boolean;
   insideGroup?: boolean;
+  asGroup?: boolean;
   children: ReactNode;
 };
 
@@ -66,6 +67,7 @@ export default function Card({
   horizontal = false,
   fullHeight = false,
   insideGroup = false,
+  asGroup = false,
   children,
   style,
   className,
@@ -187,7 +189,7 @@ export default function Card({
               <div className="col-4 text-end">
                 {buttonName &&
                   (urlType === "link" ? (
-                    <Link href={`${url}`}>
+                    <Link href={url ?? "#"}>
                       <Button
                         color="primary"
                         size="sm"
@@ -225,7 +227,7 @@ export default function Card({
     );
   }
 
-  if (insideGroup) {
+  if (insideGroup && !asGroup) {
     return <div className="col">{cardComponent}</div>;
   }
 

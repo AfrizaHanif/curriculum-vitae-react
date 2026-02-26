@@ -22,6 +22,7 @@ import jumbotronImage from "../../../assets/images/jumbotron/resume.jpg";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import NextImage from "@/components/ui/next/next-image";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 // import Loading from "@/components/ui/bootstrap/loading";
 // import { useLoading } from "@/hooks/use-loading";
 
@@ -94,21 +95,12 @@ export default function Resume() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Resume"
+        description="Ringkasan latar belakang profesional saya."
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Resume</h1>
-            <p className="col-md-8 fs-4">
-              Ringkasan latar belakang profesional saya.
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
 
       {/* Overview */}
       <Jumbotron backgroundColor="tertiary" className="my-2">

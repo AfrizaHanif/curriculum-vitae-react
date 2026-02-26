@@ -1,7 +1,8 @@
 import clsx from "clsx";
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ReactNode, CSSProperties } from "react";
 import { Container } from "react-bootstrap";
 import type { AllowedColors } from "@/types/common";
+import styles from "./jumbotron.module.css";
 
 type JumbotronProps = ComponentPropsWithoutRef<"div"> & {
   img?: string;
@@ -26,23 +27,31 @@ export default function Jumbotron({
   const commonClasses = `p-5 ${img ? `` : `bg-body-${backgroundColor}`} ${
     textColor ? `text-bg-${textColor}` : undefined
   }`;
-  const backgroundStyle = {
-    backgroundImage: `linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.3) 100%), url(${img})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  };
+  const backgroundStyle = img
+    ? ({
+        "--bg-img": `url(${img})`,
+      } as CSSProperties)
+    : {};
 
   if (fullWidth) {
     const fullWidthClasses = clsx(commonClasses, className);
     return (
       <div className={fullWidthClasses} style={style} {...props}>
-        <Container className="py-5" style={img ? backgroundStyle : undefined}>
+        <Container
+          className={clsx("py-5", img && styles.jumbotronBackground)}
+          style={img ? backgroundStyle : undefined}
+        >
           {children}
         </Container>
       </div>
     );
   } else {
-    const containedClasses = clsx(commonClasses, "rounded-3", className);
+    const containedClasses = clsx(
+      commonClasses,
+      "rounded-3",
+      className,
+      img && styles.jumbotronBackground,
+    );
     return (
       <Container
         className={containedClasses}

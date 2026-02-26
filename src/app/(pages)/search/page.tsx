@@ -12,6 +12,7 @@ import { portfolioItems } from "@/lib/data/portfolioData";
 import Link from "next/link";
 import { formatDateRange } from "@/lib/utils";
 import jumbotronImage from "../../../assets/images/jumbotron/search.jpg";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 function SearchResults() {
   // Retrieve query parameters from the url
@@ -33,21 +34,16 @@ function SearchResults() {
   return (
     <>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Hasil Pencarian"
+        description={
+          <>
+            Mencari portfolio dari kata: <strong>{query}</strong>
+          </>
+        }
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Hasil Pencarian</h1>
-            <p className="col-md-8 fs-4">
-              Mencari portfolio dari kata: <strong>{query}</strong>
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
 
       {/* Result of search (Cards) */}
       {filteredItems.length > 0 ? (

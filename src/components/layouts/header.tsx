@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, Fragment, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import "./header.css";
@@ -18,6 +18,7 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [maxNavItems, setMaxNavItems] = useState(9);
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,6 +26,33 @@ export default function Header() {
       router.push(`/search?q=${encodeURIComponent(search)}`);
     }
   };
+
+  useEffect(() => {
+    const calculateMaxItems = () => {
+      const width = window.innerWidth;
+      if (width >= 1200) {
+        setMaxNavItems(9);
+      } else if (width >= 992) {
+        setMaxNavItems(6);
+      } else {
+        setMaxNavItems(2);
+      }
+    };
+
+    // Set initial value on component mount
+    calculateMaxItems();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", calculateMaxItems);
+    return () => window.removeEventListener("resize", calculateMaxItems);
+  }, []);
+
+  const visibleHeaderItems =
+    headerItems.length > maxNavItems
+      ? headerItems.slice(0, maxNavItems - 1)
+      : headerItems;
+  const overflowHeaderItems =
+    headerItems.length > maxNavItems ? headerItems.slice(maxNavItems - 1) : [];
 
   return (
     <header>
@@ -47,7 +75,7 @@ export default function Header() {
               </span>
             </Link>
             <ul className="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-              {headerItems.map((item) => {
+              {visibleHeaderItems.map((item) => {
                 if (item.subItems) {
                   const isDropdownActive = item.subItems.some((subItem) =>
                     isActiveLink(pathname, getPathname(subItem.href)),
@@ -124,6 +152,88 @@ export default function Header() {
                   </li>
                 );
               })}
+              {overflowHeaderItems.length > 0 && (
+                <li className="nav-item dropdown">
+                  <a
+                    className="nav-link dropdown-toggle text-white"
+                    href="#"
+                    id="dropdown-more"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <svg
+                      className="bi d-block mx-auto mb-1"
+                      width="24"
+                      height="24"
+                    >
+                      <use xlinkHref="#more" />
+                    </svg>
+                    More
+                  </a>
+                  <ul
+                    className="dropdown-menu gap-1 p-2 rounded-3 mx-0 shadow w-220px"
+                    aria-labelledby="dropdown-more"
+                  >
+                    {overflowHeaderItems.map((item) => {
+                      if (item.subItems) {
+                        return (
+                          <Fragment key={item.label}>
+                            <li>
+                              <h6 className="dropdown-header">{item.label}</h6>
+                            </li>
+                            {item.subItems.map((subItem) => (
+                              <li key={subItem.label}>
+                                <Link
+                                  href={subItem.href ?? "#"}
+                                  className={`dropdown-item rounded-2 ${
+                                    isActiveLink(pathname, subItem.href)
+                                      ? "active"
+                                      : ""
+                                  }`}
+                                >
+                                  {subItem.icon && (
+                                    <svg
+                                      className="bi me-2"
+                                      width="16"
+                                      height="16"
+                                      aria-hidden="true"
+                                    >
+                                      <use xlinkHref={`#${subItem.icon}`} />
+                                    </svg>
+                                  )}
+                                  {subItem.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </Fragment>
+                        );
+                      }
+                      return (
+                        <li key={item.label}>
+                          <Link
+                            href={item.href ?? "#"}
+                            className={`dropdown-item rounded-2 ${
+                              isActiveLink(pathname, item.href) ? "active" : ""
+                            }`}
+                          >
+                            {item.icon && (
+                              <svg
+                                className="bi me-2"
+                                width="16"
+                                height="16"
+                                aria-hidden="true"
+                              >
+                                <use xlinkHref={`#${item.icon}`} />
+                              </svg>
+                            )}
+                            {item.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </li>
+              )}
             </ul>
           </div>
         </div>

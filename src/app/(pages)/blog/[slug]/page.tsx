@@ -10,6 +10,7 @@ import Link from "next/link";
 import Button from "@/components/ui/bootstrap/button";
 import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import DetailItem from "@/components/ui/customs/detail-item";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
@@ -68,15 +69,15 @@ export default async function SelectedPost({
       <BreadcrumbSetter title={item.title} />
 
       {/* Jumbotron */}
-      <Jumbotron backgroundColor="secondary" className="my-3">
-        <div className="container-fluid py-3">
-          <h1 className="display-5 fw-bold">{item.title}</h1>
-          <p className="fs-4">{item.summary}</p>
-        </div>
-      </Jumbotron>
+      <JumbotronTitle
+        title={item.title}
+        description={item.summary}
+        className="my-3"
+      />
+
       {/* Contents */}
       <div className="row justify-content-center g-2">
-        <div className="col-8">
+        <div className="col-12 col-lg-8 order-2 order-lg-1">
           {/* Image */}
           <div
             className="position-relative mb-3"
@@ -95,66 +96,68 @@ export default async function SelectedPost({
             <SanitizedContent className="lead" content={item.content} />
           </div>
         </div>
-        <div className="col-4">
-          {/* Navigation */}
-          <div className="pb-3">
-            <div className="row justify-content-center g-2">
-              <div className="col">
-                <Link href={`/blog`}>
-                  <Button color="secondary" outline>
-                    <i className="bi bi-arrow-return-left pe-2"></i>
-                    Kembali
-                  </Button>
-                </Link>
-              </div>
-              <div className="col text-end">
-                <ButtonGroup role={"group"} arialabel={"port-nav"}>
-                  {prevItem ? (
-                    <Link href={`/blog/${prevItem.slug}`}>
-                      <Button
-                        color="secondary"
-                        style={{
-                          borderTopRightRadius: "0px",
-                          borderBottomRightRadius: "0px",
-                        }}
-                        outline
-                      >
+        <div className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
+          <div className="sticky-lg-top" style={{ top: "1rem" }}>
+            {/* Navigation */}
+            <div className="pb-3">
+              <div className="row justify-content-center g-2">
+                <div className="col">
+                  <Link href={`/blog`}>
+                    <Button color="secondary" outline>
+                      <i className="bi bi-arrow-return-left pe-2"></i>
+                      Kembali
+                    </Button>
+                  </Link>
+                </div>
+                <div className="col text-end">
+                  <ButtonGroup role={"group"} arialabel={"port-nav"}>
+                    {prevItem ? (
+                      <Link href={`/blog/${prevItem.slug}`}>
+                        <Button
+                          color="secondary"
+                          style={{
+                            borderTopRightRadius: "0px",
+                            borderBottomRightRadius: "0px",
+                          }}
+                          outline
+                        >
+                          <i className="bi bi-arrow-left pe-2"></i>
+                          Prev
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button color="secondary" outline disabled>
                         <i className="bi bi-arrow-left pe-2"></i>
                         Prev
                       </Button>
-                    </Link>
-                  ) : (
-                    <Button color="secondary" outline disabled>
-                      <i className="bi bi-arrow-left pe-2"></i>
-                      Prev
-                    </Button>
-                  )}
-                  {nextItem ? (
-                    <Link href={`/blog/${nextItem.slug}`}>
-                      <Button
-                        color="secondary"
-                        style={{
-                          borderTopLeftRadius: "0px",
-                          borderBottomLeftRadius: "0px",
-                        }}
-                        outline
-                      >
+                    )}
+                    {nextItem ? (
+                      <Link href={`/blog/${nextItem.slug}`}>
+                        <Button
+                          color="secondary"
+                          style={{
+                            borderTopLeftRadius: "0px",
+                            borderBottomLeftRadius: "0px",
+                          }}
+                          outline
+                        >
+                          Next
+                          <i className="bi bi-arrow-right ps-2"></i>
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button color="secondary" outline disabled>
                         Next
                         <i className="bi bi-arrow-right ps-2"></i>
                       </Button>
-                    </Link>
-                  ) : (
-                    <Button color="secondary" outline disabled>
-                      Next
-                      <i className="bi bi-arrow-right ps-2"></i>
-                    </Button>
-                  )}
-                </ButtonGroup>
+                    )}
+                  </ButtonGroup>
+                </div>
               </div>
             </div>
+            {/* Details */}
+            <DetailItem type={"Blog"} item={item} />
           </div>
-          {/* Details */}
-          <DetailItem type={"Blog"} item={item} />
         </div>
       </div>
     </AppLayout>

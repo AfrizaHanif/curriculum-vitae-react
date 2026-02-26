@@ -13,6 +13,7 @@ type CardsProps = ComponentPropsWithoutRef<"div"> & {
   horizontal?: boolean;
   fullHeight?: boolean;
   insideGroup?: boolean;
+  asGroup?: boolean;
   children: ReactNode;
 };
 
@@ -24,6 +25,7 @@ export default function CardBlank({
   horizontal = false,
   fullHeight = false,
   insideGroup = false,
+  asGroup = false,
   children,
   style,
   className,
@@ -76,7 +78,7 @@ export default function CardBlank({
     );
   }
 
-  if (insideGroup) {
+  if (insideGroup && !asGroup) {
     return <div className="col">{cardComponent}</div>;
   }
 

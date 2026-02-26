@@ -35,7 +35,7 @@ export default function ProcessSection({
           solusi yang telah saya temukan
         </p>
         {caseStudy?.progress && caseStudy.progress.length > 0 && (
-          <div id="process-progress">
+          <div id="process-progress" style={{ scrollMarginTop: "4rem" }}>
             <h5>Proses</h5>
             <ol>
               {caseStudy.progress.map((item, index) => (
@@ -45,7 +45,7 @@ export default function ProcessSection({
           </div>
         )}
         {solution && solution.length > 0 && (
-          <div id="process-solution">
+          <div id="process-solution" style={{ scrollMarginTop: "4rem" }}>
             <h5>Solusi</h5>
             <ol>
               {solution.map((item) => (
@@ -73,7 +73,7 @@ export default function ProcessSection({
           </div>
         )}
         {item.image && (
-          <div id="process-image">
+          <div id="process-image" style={{ scrollMarginTop: "4rem" }}>
             <h5>Galeri Hasil Proyek</h5>
             <ProjectGallery
               mainImage={item.image}

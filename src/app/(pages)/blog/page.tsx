@@ -12,6 +12,7 @@ import Card from "@/components/ui/bootstrap/card";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 export default function Blog() {
   console.info("This page are being sorted from newest post");
@@ -35,21 +36,12 @@ export default function Blog() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Blog"
+        description="Pikiran, tutorial, dan cerita dari perjalanan pengembangan saya."
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Blog</h1>
-            <p className="col-md-8 fs-4">
-              Pikiran, tutorial, dan cerita dari perjalanan pengembangan saya.
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
 
       {/* Featured Post Heroes */}
       <Heroes

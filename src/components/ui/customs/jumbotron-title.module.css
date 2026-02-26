@@ -1,4 +1,4 @@
-.profileImage {
+.jumbotronImage {
   width: 150px;
   height: 150px;
 }
@@ -6,7 +6,7 @@
 @media (min-width: 992px) {
 
   /* lg breakpoint */
-  .profileImage {
+  .jumbotronImage {
     width: 250px;
     height: 250px;
   }

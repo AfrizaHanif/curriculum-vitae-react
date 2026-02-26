@@ -1,0 +1,15 @@
+/* Mobile / Tablet */
+.jumbotronBackground {
+  background-size: cover;
+  background-position: center;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5)), var(--bg-img);
+}
+
+/* Desktop */
+@media (min-width: 992px) {
+  .jumbotronBackground {
+    background-image: linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.3) 100%), var(--bg-img);
+    /* In case for shorthand use */
+    /* background: linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.3) 100%), var(--bg-img) center / cover; */
+  }
+}

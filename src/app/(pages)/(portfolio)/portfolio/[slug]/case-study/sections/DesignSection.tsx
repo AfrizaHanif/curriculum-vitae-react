@@ -14,7 +14,7 @@ export default function DesignSection({ diagram }: DesignSectionProps) {
   return (
     <div className="d-flex flex-column gap-4">
       {diagram.context && (
-        <div id="context-diagram">
+        <div id="context-diagram" style={{ scrollMarginTop: "4rem" }}>
           <h5>Context Diagram</h5>
           <NextImageModal
             src={diagram.context}
@@ -29,7 +29,7 @@ export default function DesignSection({ diagram }: DesignSectionProps) {
         </div>
       )}
       {diagram.dfd_0 && (
-        <div id="dfd-0">
+        <div id="dfd-0" style={{ scrollMarginTop: "4rem" }}>
           <h5>DFD Level 0</h5>
           <NextImageModal
             src={diagram.dfd_0}
@@ -44,7 +44,7 @@ export default function DesignSection({ diagram }: DesignSectionProps) {
         </div>
       )}
       {diagram.pdm && (
-        <div id="pdm">
+        <div id="pdm" style={{ scrollMarginTop: "4rem" }}>
           <h5>Physical Diagram Model</h5>
           <NextImageModal
             src={diagram.pdm}

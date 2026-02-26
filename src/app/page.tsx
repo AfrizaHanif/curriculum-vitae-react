@@ -14,7 +14,8 @@ import { isEducationData } from "@/lib/customs/type-guards";
 import Button from "@/components/ui/bootstrap/button";
 import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
-// import styles from "./page.module.css";
+import styles from "./page.module.css";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // Get Data from JSON (Single)
 const userProfile = profileItem[0];
@@ -76,44 +77,18 @@ export default function Home() {
   return (
     <AppLayout>
       {/* Welcome Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <div className="col-8">
-              <h1 className="display-5 fw-bold">{userProfile.fullname}</h1>
-              <p className="col-md-8 fs-4">
-                {latestEducation
-                  ? `${userProfile.status} | ${latestEducation.degree} | ${latestEducation.major}`
-                  : "Fresh Graduate | Sarjana 1 | Sistem Informasi"}
-              </p>
-              <Link href="/profile">
-                <Button color="primary" size="lg">
-                  Ketahui Lebih Lanjut
-                </Button>
-              </Link>
-            </div>
-            <div className="col-4">
-              <NextImage
-                src={myPhoto}
-                alt=""
-                type="fluid"
-                className="rounded-circle"
-                width={250}
-                height={250}
-                style={{
-                  aspectRatio: "1 / 1",
-                  objectFit: "cover",
-                  objectPosition: "center top",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </Jumbotron>
+      <JumbotronTitle
+        title={userProfile.fullname}
+        description={
+          latestEducation
+            ? `${userProfile.status} | ${latestEducation.degree} | ${latestEducation.major}`
+            : "Fresh Graduate | Sarjana 1 | Sistem Informasi"
+        }
+        backgroundImg={jumbotronImage.src}
+        urlButton="/profile"
+        labelButton="Ketahui Lebih Lanjut"
+        iconImg={myPhoto.src}
+      />
 
       {/* Featured Portfolio Heroes */}
       <Heroes

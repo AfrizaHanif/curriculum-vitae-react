@@ -17,6 +17,8 @@ import Button from "@/components/ui/bootstrap/button";
 import Link from "next/link";
 import Offcanvas from "@/components/ui/bootstrap/offcanvas";
 import Accordion from "@/components/ui/bootstrap/accordion";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import CaseStudyNavigation from "./case-study-navigation";
 
 // (IMPORTANT) This is exclusively for page with dynamic ID / Slug. That include this page inside of ID / Slug
 export function generateStaticParams() {
@@ -214,46 +216,51 @@ export default async function CaseStudy({
       {/* Initialize ScrollSpy for the body */}
       <ScrollSpy targetId="case-study-nav" />
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Studi Kasus"
+        description={item.title}
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Studi Kasus</h1>
-            <p className="col-md-8 fs-4">{item.title}</p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
+
+      <div className="mb-3">
+        <Link href={`/portfolio/${item.slug}`}>
+          <Button color="secondary" className="mb-2 me-2" outline>
+            <i className="bi bi-arrow-return-left pe-2"></i>
+            Kembali
+          </Button>
+        </Link>
+        <Button
+          color="secondary"
+          className="mb-2 me-2"
+          dataToggle="offcanvas"
+          dataTarget="offcanvas-help-cs"
+        >
+          <i className="bi bi-question-lg pe-2"></i>
+          Penjelasan
+        </Button>
+        <Button
+          color="primary"
+          className="d-lg-none mb-2"
+          dataToggle="offcanvas"
+          dataTarget="offcanvas-casestudy-nav"
+        >
+          <i className="bi bi-list pe-2"></i>
+          Daftar Isi
+        </Button>
+      </div>
 
       <div className="row">
         {/* Navigations */}
-        <div className="col-4 border-end">
+        <div className="col-lg-4 d-none d-lg-block border-end pe-lg-3">
           <div
-            className="sticky-top"
+            className="sticky-lg-top"
             style={{
               top: "1rem",
               maxHeight: "calc(100vh - 2rem)",
               overflowY: "auto",
             }}
           >
-            <Link href={`/portfolio/${item.slug}`}>
-              <Button color="secondary" className="mb-2 me-2" outline>
-                <i className="bi bi-arrow-return-left pe-2"></i>
-                Kembali
-              </Button>
-            </Link>
-            <Button
-              color="secondary"
-              className="mb-2"
-              dataToggle="offcanvas"
-              dataTarget="offcanvas-help-cs"
-            >
-              <i className="bi bi-question-lg pe-2"></i>
-              Penjelasan
-            </Button>
             <nav
               id="case-study-nav"
               className="h-100 flex-column align-items-stretch"
@@ -284,10 +291,15 @@ export default async function CaseStudy({
           </div>
         </div>
         {/* Contents */}
-        <div className="col-8">
-          <div className="scrollspy-example-2" tabIndex={0}>
+        <div className="col-12 col-lg-8">
+          <div className="scrollspy-example-2 ps-lg-3" tabIndex={0}>
             {caseStudySections.map((section) => (
-              <div key={section.id} id={section.id} className="mb-3">
+              <div
+                key={section.id}
+                id={section.id}
+                className="mb-3"
+                style={{ scrollMarginTop: "4rem" }}
+              >
                 <h4>{section.title}</h4>
                 <SectionContent
                   sectionId={section.id}
@@ -304,11 +316,19 @@ export default async function CaseStudy({
       </div>
       {/* Offcanvas */}
       <Offcanvas
-        id={"offcanvas-help-cs"}
+        id="offcanvas-help-cs"
         title={"Penjelasan Studi Kasus"}
         position={"end"}
       >
         <Accordion id={"accordion-help-cs"} items={helpAccordionItem} />
+      </Offcanvas>
+      <Offcanvas
+        id="offcanvas-casestudy-nav"
+        title="Daftar Isi"
+        position="start"
+        className="d-lg-none"
+      >
+        <CaseStudyNavigation sections={caseStudySections} />
       </Offcanvas>
     </AppLayout>
   );

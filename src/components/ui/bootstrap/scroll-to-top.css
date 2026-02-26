@@ -1,0 +1,21 @@
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1050;
+  /* Higher than most Bootstrap components */
+}
+
+.scroll-to-top .btn {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(100px);
+  /* To change the speed of transition, set between 0.1 - 1s in opacity, transform, and visibility*/
+  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s ease;
+}
+
+.scroll-to-top .btn.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}

@@ -19,7 +19,7 @@ export default function ChallengesSection({
         :
       </p>
       {caseStudy.challenges && caseStudy.challenges.length > 0 && (
-        <div id="challenge-challenge">
+        <div id="challenge-challenge" style={{ scrollMarginTop: "4rem" }}>
           <h5>Tantangan</h5>
           <ol>
             {caseStudy.challenges.map((item, index) => (
@@ -29,7 +29,7 @@ export default function ChallengesSection({
         </div>
       )}
       {caseStudy.lessons && caseStudy.lessons.length > 0 && (
-        <div id="challenge-lessons">
+        <div id="challenge-lessons" style={{ scrollMarginTop: "4rem" }}>
           <h5>Pembelajaran</h5>
           <ol>
             {caseStudy.lessons.map((item, index) => (

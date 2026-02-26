@@ -12,6 +12,7 @@ import { formatDateRange } from "@/lib/utils";
 import jumbotronImage from "../../../../assets/images/jumbotron/portfolio.jpg";
 import { useState } from "react";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 export default function Portfolio() {
   // Set useState for replacing element
@@ -137,22 +138,12 @@ export default function Portfolio() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Portfolio"
+        description="Kumpulan proyek yang menampilkan keahlian saya dalam pengembangan web dan desain."
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Portfolio</h1>
-            <p className="col-md-8 fs-4">
-              Kumpulan proyek yang menampilkan keahlian saya dalam pengembangan
-              web dan desain.
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
 
       {/* Sorting Controls */}
       <div className="container-fluid mb-3">

@@ -6,6 +6,7 @@ import { Metadata } from "next";
 import Accordion from "@/components/ui/bootstrap/accordion";
 import { setupItems } from "@/lib/data/profileData";
 import jumbotronImage from "../../../../assets/images/jumbotron/setup.jpg";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -45,22 +46,13 @@ export default function Setup() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Peralatan Saya"
+        description="Sekilas tentang perangkat keras, perangkat lunak, dan alat yang saya gunakan setiap hari."
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Peralatan Saya</h1>
-            <p className="col-md-8 fs-4">
-              Sekilas tentang perangkat keras, perangkat lunak, dan alat yang
-              saya gunakan setiap hari.
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
+
       {/* Content */}
       <div className="row justify-content-center g-2">
         {/* Image of current setup */}

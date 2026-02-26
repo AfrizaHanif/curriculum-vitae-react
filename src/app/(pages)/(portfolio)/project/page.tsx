@@ -12,6 +12,7 @@ import Link from "next/link";
 import jumbotronImage from "../../../../assets/images/jumbotron/project.jpg";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import { useState } from "react";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 export default function Project() {
   // Set useState for replacing element
@@ -123,21 +124,12 @@ export default function Project() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Proyek Lainnya"
+        description="Pelajari proyek-proyek yang sedang dikerjakan oleh saya"
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Proyek Lainnya</h1>
-            <p className="col-md-8 fs-4">
-              Pelajari proyek-proyek yang sedang dikerjakan oleh saya
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
 
       {/* Sorting Controls */}
       <div className="container-fluid mb-3">

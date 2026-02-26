@@ -5,6 +5,7 @@ import { profileItem, socialItems } from "@/lib/data/profileData";
 import { Metadata } from "next";
 import ContactForm from "./contact-form";
 import jumbotronImage from "../../../assets/images/jumbotron/contact.jpg";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 const userProfile = profileItem[0];
 
@@ -82,22 +83,12 @@ export default function Contact() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Kontak"
+        description="Punya pertanyaan atau ingin bekerja sama? Silakan isi form di bawah ini."
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Kontak</h1>
-            <p className="col-md-8 fs-4">
-              Punya pertanyaan atau ingin bekerja sama? Silakan isi form di
-              bawah ini.
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
 
       {/* Content */}
       <div className="row justify-content-center g-3">

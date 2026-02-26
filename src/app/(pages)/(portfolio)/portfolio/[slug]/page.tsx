@@ -16,6 +16,7 @@ import Link from "next/link";
 import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import { DropdownItem } from "@/lib/bootstrap-types";
 import DetailItem from "@/components/ui/customs/detail-item";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // INFO: Different than project and blog page, this page are splitted out into 2 (layout.tsx and page.tsx). This page is a client component
 
@@ -61,17 +62,15 @@ export default function SelectedPortfolio({
       <BreadcrumbSetter title={item.title} />
 
       {/* Jumbotron */}
-      <Jumbotron backgroundColor="secondary" className="my-3">
-        <div className="container-fluid py-3">
-          <h1 className="display-5 fw-bold">{item.title}</h1>
-          <p className="fs-4">
-            {item.category} - {item.subcategory}
-          </p>
-        </div>
-      </Jumbotron>
+      <JumbotronTitle
+        title={item.title}
+        description={`${item.category} - ${item.subcategory}`}
+        className="my-3"
+      />
+
       {/* Contents */}
       <div className="row justify-content-center g-2">
-        <div className="col-8">
+        <div className="col-12 col-lg-8 order-2 order-lg-1">
           {/* Gallery */}
           <ProjectGallery
             mainImage={item.image}
@@ -84,8 +83,8 @@ export default function SelectedPortfolio({
             <p className="lead">{item.description}</p>
           </div>
         </div>
-        <div className="col-4">
-          <div className="sticky-top" style={{ top: "1rem" }}>
+        <div className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
+          <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Navigation */}
             <div className="pb-3">
               <div className="row justify-content-center g-2">

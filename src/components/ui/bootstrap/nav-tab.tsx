@@ -31,7 +31,7 @@ export default function NavTab({
     return (
       <div className={`d-flex align-items-start ${className}`} {...props}>
         <div
-          className={`nav flex-column nav-pills col-${navSize} me-3`}
+          className={`nav flex-column nav-pills col-${navSize} pe-3`}
           id={`v-${id}-tab`}
           role="tablist"
           aria-orientation="vertical"

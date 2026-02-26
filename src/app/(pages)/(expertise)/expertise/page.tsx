@@ -9,6 +9,7 @@ import { ModalButtonItem } from "@/lib/bootstrap-types";
 import { Metadata } from "next";
 import Link from "next/link";
 import jumbotronImage from "../../../../assets/images/jumbotron/expertise.jpg";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -31,22 +32,12 @@ export default function Expertise() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Keahlian"
+        description="Saya mengubah ide kompleks menjadi solusi web yang fungsional, intuitif, dan berbasis data."
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Expertise</h1>
-            <p className="col-md-8 fs-4">
-              Saya mengubah ide kompleks menjadi solusi web yang fungsional,
-              intuitif, dan berbasis data.
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
 
       {/* List of Expertise */}
       {/* Feature */}
@@ -63,7 +54,7 @@ export default function Expertise() {
         .map((item) => {
           const linkedProjects = item.projects
             ? portfolioItems.filter((project) =>
-                item.projects!.includes(project.id)
+                item.projects!.includes(project.id),
               )
             : [];
 

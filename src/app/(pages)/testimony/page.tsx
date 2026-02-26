@@ -6,6 +6,7 @@ import { testimonyItems } from "@/lib/data/testimonyData";
 import { Metadata } from "next";
 import jumbotronImage from "../../../assets/images/jumbotron/testimonial.jpg";
 import Alert from "@/components/ui/bootstrap/alert";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -18,21 +19,13 @@ export default function Testimony() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Testimoni"
+        description="Koleksi testimoni-testimoni dari proyek yang telah saya kerjakan"
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Testimoni</h1>
-            <p className="col-md-8 fs-4">
-              Koleksi testimoni-testimoni dari proyek yang telah saya kerjakan
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
+
       {/* Alert (Temporary) */}
       <Alert color={"warning"}>
         Halaman ini masih dalam tahap pengembangan

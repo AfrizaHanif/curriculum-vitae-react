@@ -10,11 +10,11 @@ interface OverviewSectionProps {
 export default function OverviewSection({ item }: OverviewSectionProps) {
   return (
     <div className="d-flex flex-column">
-      <div id="overview-description">
+      <div id="overview-description" style={{ scrollMarginTop: "4rem" }}>
         <h5>Deskripsi</h5>
         <p>{item.description}</p>
       </div>
-      <div id="overview-details">
+      <div id="overview-details" style={{ scrollMarginTop: "4rem" }}>
         <h5>Detail Portfolio</h5>
         <table className="table table-sm table-borderless">
           <tbody>

@@ -8,6 +8,7 @@ import Feature from "@/components/ui/bootstrap/feature";
 import { hobbyItems, profileItem, skillItems } from "@/lib/data/profileData";
 import { Metadata } from "next";
 import jumbotronImage from "../../../../assets/images/jumbotron/home.jpg";
+import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -55,21 +56,12 @@ export default function Profile() {
   return (
     <AppLayout>
       {/* Jumbotron */}
-      <Jumbotron
-        backgroundColor="secondary"
-        textColor="dark"
+      <JumbotronTitle
+        title="Profil"
+        description={`${userProfile.status} | ${userProfile.tagline}`}
+        backgroundImg={jumbotronImage.src}
         className="my-3"
-        img={jumbotronImage.src}
-      >
-        <div className="container-fluid py-3">
-          <div className="row align-items-center">
-            <h1 className="display-5 fw-bold">Profil</h1>
-            <p className="col-md-8 fs-4">
-              {userProfile.status} | {userProfile.tagline}
-            </p>
-          </div>
-        </div>
-      </Jumbotron>
+      />
 
       {/* My Profile */}
       <div className="row g-0 pb-3 text-center">
