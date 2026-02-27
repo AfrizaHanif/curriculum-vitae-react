@@ -74,9 +74,11 @@ export default function Expertise() {
                   <ul className="list-unstyled">
                     {linkedProjects.map((project) => (
                       <li key={project.id} className="mb-2">
-                        <div className="row justify-content-center align-items-center g-2">
-                          <div className="col-8 fw-medium">{project.title}</div>
-                          <div className="col-4">
+                        <div className="row justify-content-center align-items-center gy-3 g-sm-2">
+                          <div className="col-12 col-sm-8 fw-medium">
+                            {project.title}
+                          </div>
+                          <div className="col-12 col-sm-4">
                             <Link href={`/portfolio/${project.slug}`}>
                               <div className="d-grid" data-bs-dismiss="modal">
                                 <Button color="primary">Lihat Proyek</Button>

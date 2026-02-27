@@ -18,6 +18,9 @@ export default function CardGroup({
   className,
   ...props
 }: CardGroupProps) {
+  // Determine the number of columns for medium devices to prevent squeezing
+  const mdCols = cardPerRow > 2 ? 2 : cardPerRow;
+
   // Check if card group's type are grid or group (Default)
   if (type === "grid") {
     return (
@@ -26,7 +29,9 @@ export default function CardGroup({
         {subtitle && (
           <div className="fs-5 text-body-secondary mb-5">{subtitle}</div>
         )}
-        <div className={`row row-cols-1 row-cols-md-${cardPerRow} g-4`}>
+        <div
+          className={`row row-cols-1 row-cols-md-${mdCols} row-cols-lg-${cardPerRow} g-4`}
+        >
           {children}
         </div>
       </div>

@@ -143,8 +143,8 @@ export default function Resume() {
               (dataItem, i) =>
                 isExperienceData(dataItem) && (
                   <div key={i}>
-                    <div className="row g-2">
-                      <div className="col-5">
+                    <div className="row gy-4 g-md-2">
+                      <div className="col-12 col-md-5">
                         {dataItem.description ?? "Tidak ada deskripsi"}
                         <table className="table mt-3">
                           <tbody>
@@ -174,7 +174,7 @@ export default function Resume() {
                           </tbody>
                         </table>
                       </div>
-                      <div className="col-7">
+                      <div className="col-12 col-md-7">
                         <div className="my-3">
                           {dataItem.latitude !== undefined &&
                             dataItem.longitude !== undefined && (
@@ -229,8 +229,8 @@ export default function Resume() {
               (dataItem, i) =>
                 isEducationData(dataItem) && (
                   <div key={i}>
-                    <div className="row g-2">
-                      <div className="col-5">
+                    <div className="row gy-4 g-md-2">
+                      <div className="col-12 col-md-5">
                         {dataItem.description}
                         <table className="table mt-3">
                           <tbody>
@@ -269,7 +269,7 @@ export default function Resume() {
                           </tbody>
                         </table>
                       </div>
-                      <div className="col-7">
+                      <div className="col-12 col-md-7">
                         <div className="my-3">
                           {dataItem.latitude !== undefined &&
                             dataItem.longitude !== undefined && (

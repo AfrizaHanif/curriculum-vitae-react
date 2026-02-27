@@ -11,6 +11,7 @@ import ColorModeToggle from "../ui/bootstrap/color-mode-toggle";
 import { getPathname, isActiveLink } from "@/lib/utils";
 import { headerItems } from "@/lib/data/headerData";
 import Offcanvas from "../ui/bootstrap/offcanvas";
+import Button from "../ui/bootstrap/button";
 
 // Get Data from JSON (Single)
 const userProfile = profileItem[0];
@@ -40,6 +41,7 @@ export default function Navbar() {
             alt={"Logo"}
             className="me-2"
             height={30}
+            disableSpinner
           />
           <span className="d-none d-sm-inline">{userProfile.fullname}</span>
         </Link>
@@ -48,7 +50,8 @@ export default function Navbar() {
           <div className="d-lg-none">
             <ColorModeToggle />
           </div>
-          <button
+          {/* Header item menu */}
+          {/* <button
             className="navbar-toggler"
             type="button"
             data-bs-toggle="offcanvas"
@@ -57,7 +60,17 @@ export default function Navbar() {
             aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
-          </button>
+          </button> */}
+          <Button
+            color="primary"
+            dataToggle="offcanvas"
+            dataTarget="offcanvasNavbar"
+            aria-controls="offcanvasNavbar"
+            aria-label="Toggle navigation"
+            style={{ width: "60px" }}
+          >
+            <i className="bi bi-three-dots"></i>
+          </Button>
         </div>
 
         {/* Header menu (Offcanvas) */}
@@ -175,7 +188,11 @@ export default function Navbar() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <button className="btn btn-outline-light" type="submit">
+            <button
+              className="btn btn-outline-light"
+              type="submit"
+              data-bs-dismiss="offcanvas"
+            >
               Search
             </button>
           </form>

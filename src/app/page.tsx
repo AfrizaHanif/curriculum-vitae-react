@@ -99,7 +99,7 @@ export default function Home() {
       </Heroes>
 
       {/* Sub Jumbotron */}
-      <div className="row align-items-md-stretch">
+      <div className="row align-items-md-stretch gy-4">
         <div className="col-md-6">
           <Jumbotron backgroundColor="tertiary" className="h-100">
             <h2>My Portfolio</h2>
