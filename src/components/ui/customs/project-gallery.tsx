@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NextImage from "../next/next-image";
 import NextImageModal from "./next-image-modal";
 
@@ -20,6 +20,11 @@ export default function ProjectGallery({
   modalId,
 }: ProjectGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(mainImage);
+
+  // When the mainImage prop changes (e.g., on navigation), update the selected image.
+  useEffect(() => {
+    setSelectedImage(mainImage);
+  }, [mainImage]);
 
   // Combine the main image with the gallery images, ensuring no duplicates.
   const allImages = [mainImage, ...images.filter((img) => img !== mainImage)];
@@ -57,7 +62,10 @@ export default function ProjectGallery({
               index, // Use flex-fill to make thumbnails occupy equal width
             ) => (
               <div
-                key={index}
+                // By using the image `src` as the key, we ensure that React
+                // creates a new component instance when the image changes,
+                // which correctly resets the loading state.
+                key={img}
                 className="position-relative"
                 style={{
                   width: thumbnailWidth,

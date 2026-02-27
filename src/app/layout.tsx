@@ -8,6 +8,7 @@ import { BreadcrumbProvider } from "@/context/breadcrumb-context";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import NextTopLoader from "nextjs-toploader";
 import GoogleAnalytics from "@/components/google-analytics";
+import InitialLoader from "@/components/initial-loader";
 import siteConfig from "../../public/site-config.json";
 
 // Title and Description of Page (Metadata)
@@ -71,22 +72,24 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <NextTopLoader
-          color="#2299DD"
-          initialPosition={0.08}
-          crawlSpeed={200}
-          height={3}
-          showSpinner={false}
-        />
-        {/* List of SVGs' icons */}
-        <IconDefinitions />
-        {/* Main content via provider of breadcrumb */}
-        <BreadcrumbProvider>
-          <main>{children}</main>
-          <GoogleAnalytics gaId={siteConfig.googleAnalyticsId} />
-        </BreadcrumbProvider>
-        {/* IMPORTANT: Use Bootstrap's Client file to avoid crash of JS between React and Bootstrap */}
-        <BootstrapClient />
+        <InitialLoader>
+          <NextTopLoader
+            color="#2299DD"
+            initialPosition={0.08}
+            crawlSpeed={200}
+            height={3}
+            showSpinner={false}
+          />
+          {/* List of SVGs' icons */}
+          <IconDefinitions />
+          {/* Main content via provider of breadcrumb */}
+          <BreadcrumbProvider>
+            <main>{children}</main>
+            <GoogleAnalytics gaId={siteConfig.googleAnalyticsId} />
+          </BreadcrumbProvider>
+          {/* IMPORTANT: Use Bootstrap's Client file to avoid crash of JS between React and Bootstrap */}
+          <BootstrapClient />
+        </InitialLoader>
       </body>
     </html>
   );

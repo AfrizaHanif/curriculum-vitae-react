@@ -21,7 +21,7 @@ export default function Footer() {
           {/* <svg className="bi" width="30" height="24" aria-hidden="true">
             <use xlinkHref="#bootstrap"></use>
           </svg> */}
-          <NextImage src={logoImage} alt={"Logo"} height={24} />
+          <NextImage src={logoImage} alt={"Logo"} height={24} disableSpinner />
         </Link>
         <span
           className="mb-3 mb-md-0 text-body-secondary"

@@ -69,6 +69,7 @@ export default function Header() {
                 alt={"Logo"}
                 className="me-2"
                 height={40}
+                disableSpinner
               />
               <span className="fs-4 d-none d-lg-inline">
                 {userProfile.fullname}

@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useRef, useEffect, useCallback, ChangeEvent } from "react";
-import { useForm, ValidationError } from "@formspree/react";
+import { ValidationError } from "@formspree/react";
+import { useFormSubmission } from "@/hooks/use-form-submission";
+import { useCallback, useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import Form from "@/components/ui/form";
 import FormInput from "@/components/ui/form/form-input";
@@ -16,7 +18,8 @@ interface Props {
 }
 
 export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
-  const [state, handleSubmit] = useForm(formId);
+  // const [state, handleSubmit] = useForm(formId);
+  const [serverErrors, setServerErrors] = useState<any>(null);
   const [recaptchaToken, setRecaptchaToken] = useState<string>("");
   const [messageLength, setMessageLength] = useState<number>(0);
   const [showToast, setShowToast] = useState<boolean>(false);
@@ -24,6 +27,39 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
   const [otherSubject, setOtherSubject] = useState<string>("");
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const {
+    isLoading,
+    submit,
+    reset: resetSubmission,
+  } = useFormSubmission(
+    async (data: any) => {
+      const response = await fetch(`https://formspree.io/f/${formId}`, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      const json = await response.json();
+      if (!response.ok) {
+        throw json;
+      }
+      return json;
+    },
+    {
+      onSuccess: () => {
+        setShowToast(true);
+        handleReset();
+      },
+      onError: (err: any) => {
+        if (err && err.errors) {
+          setServerErrors(err.errors);
+        }
+      },
+    },
+  );
 
   // Item of subject selection
   const subjectItems: SelectItem[] = [
@@ -52,27 +88,29 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
     setMessageLength(0);
     setSubject("");
     setOtherSubject("");
-  }, []);
+    setServerErrors(null);
+    resetSubmission();
+  }, [resetSubmission]);
 
-  // Set timeout of Toast
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (state.succeeded) {
-        setShowToast(true);
-        handleReset();
-      }
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [state.succeeded, handleReset]);
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    if (recaptchaToken) {
+      data["g-recaptcha-response"] = recaptchaToken;
+    }
+
+    await submit(data);
+  };
 
   return (
     <>
-      {/* Form Area */}
       <Form
         ref={formRef}
         labelSubmit="Submit"
-        onSubmit={handleSubmit}
-        submitting={state.submitting}
+        onSubmit={onSubmit}
+        submitting={isLoading}
         disabled={
           (!!siteKey && !recaptchaToken) ||
           (subject === "Lainnya" && !otherSubject)
@@ -81,7 +119,6 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
         labelReset="Reset"
       >
         <div className="row">
-          {/* Name */}
           <div className="col">
             <FormInput id="name" name="name" type="text" required>
               Nama Lengkap
@@ -89,11 +126,10 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
             <ValidationError
               prefix="Name"
               field="name"
-              errors={state.errors}
+              errors={serverErrors}
               className="text-danger small"
             />
           </div>
-          {/* E-Mail */}
           <div className="col">
             <FormInput id="email" name="email" type="email" required>
               E-Mail
@@ -101,14 +137,12 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
             <ValidationError
               prefix="Email"
               field="email"
-              errors={state.errors}
+              errors={serverErrors}
               className="text-danger small"
             />
           </div>
         </div>
-
         <div className="row">
-          {/* Subject */}
           <div className="col">
             <FormSelect
               id="subject"
@@ -116,7 +150,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
               message="Pilih Subjek..."
               items={subjectItems}
               required
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+              onChange={(e) => {
                 setSubject(e.target.value);
                 if (e.target.value !== "Lainnya") {
                   setOtherSubject("");
@@ -126,7 +160,6 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
               Subjek
             </FormSelect>
           </div>
-          {/* Other Subject if selected */}
           {subject === "Lainnya" && (
             <div className="col">
               <FormInput
@@ -135,9 +168,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
                 type="text"
                 required
                 maxLength={100}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setOtherSubject(e.target.value)
-                }
+                onChange={(e) => setOtherSubject(e.target.value)}
               >
                 Subjek Lainnya
                 <span className="badge text-bg-secondary ms-1">
@@ -147,13 +178,12 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
               <ValidationError
                 prefix="Other Subject"
                 field="otherSubject"
-                errors={state.errors}
+                errors={serverErrors}
                 className="text-danger small"
               />
             </div>
           )}
         </div>
-        
         <input
           type="hidden"
           name="_subject"
@@ -162,39 +192,35 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
         <ValidationError
           prefix="Subject"
           field="subject"
-          errors={state.errors}
+          errors={serverErrors}
           className="text-danger small"
         />
-        {/* Link (Optional) */}
+
         <FormInput id="url" name="url" type="url">
           Link Terkait (Optional)
         </FormInput>
-        {/* Message */}
+
         <FormInput
           id="message"
           name="message"
           textarea
           required
           maxLength={1000}
-          onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-            setMessageLength(e.target.value.length)
-          }
+          onChange={(e) => setMessageLength(e.target.value.length)}
         >
           Pesan
           <span className="badge text-bg-secondary ms-1">
             {messageLength} / 200
           </span>
         </FormInput>
-
         <ValidationError
           prefix="Message"
           field="message"
-          errors={state.errors}
+          errors={serverErrors}
           className="text-danger small"
         />
 
-        {/* Confirm box */}
-        <FormCheck id={"confirm"} type={"checkbox"} items={checkItems} />
+        <FormCheck id="confirm" type="checkbox" items={checkItems} />
 
         {/* ReCAPTCHA */}
         {siteKey && (
