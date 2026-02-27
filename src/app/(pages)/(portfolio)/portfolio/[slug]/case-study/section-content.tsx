@@ -31,6 +31,7 @@ interface SectionContentProps {
   solution?: SolutionItem[];
 }
 
+// WARNING: This must match with id of ScrollSpy Nav
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sectionComponents: { [key: string]: React.ComponentType<any> } = {
   overview: OverviewSection,
@@ -45,13 +46,17 @@ const sectionComponents: { [key: string]: React.ComponentType<any> } = {
 };
 
 export default function SectionContent(props: SectionContentProps) {
+  // Set ID and Title as props
   const { sectionId, sectionTitle } = props;
 
+  // Get ID from sectionComponents
   const SectionComponent = sectionComponents[sectionId];
 
+  // Check if data available (Via ID)
   if (SectionComponent) {
     return <SectionComponent {...props} />;
   }
 
+  // Back to default section (Not available / fallback)
   return <DefaultSection sectionTitle={sectionTitle} />;
 }

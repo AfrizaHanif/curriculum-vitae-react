@@ -7,12 +7,14 @@ interface ResultsSectionProps {
 }
 
 export default function ResultsSection({ caseStudy }: ResultsSectionProps) {
+  // NOTE: Video of result are optional
   return caseStudy?.result ? (
     <>
       <p>
         Pada proyek ini telah menghasilkan hasil akhir yang telah saya kerjakan.
         Terdapat poin-poin hasil akhir yang ada:
       </p>
+      {/* Results */}
       {caseStudy.result && caseStudy.result.length > 0 && (
         <ol>
           {caseStudy.result.map((item, index) => (
@@ -20,6 +22,7 @@ export default function ResultsSection({ caseStudy }: ResultsSectionProps) {
           ))}
         </ol>
       )}
+      {/* Video */}
       {caseStudy?.video && (
         <>
           <p>

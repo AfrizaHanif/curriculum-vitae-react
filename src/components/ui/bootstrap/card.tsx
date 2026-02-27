@@ -1,4 +1,4 @@
-import { AllowedColors } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/common";
 import clsx from "clsx";
 import Link from "next/link";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
@@ -8,8 +8,8 @@ import { DropdownItem } from "@/lib/bootstrap-types";
 import Dropdown from "./dropdown";
 
 type BaseCardProps = ComponentPropsWithoutRef<"div"> & {
-  color?: AllowedColors;
-  borderColor?: AllowedColors;
+  color?: AllowedColorsStatus;
+  borderColor?: AllowedColorsStatus;
   header?: string;
   title?: string;
   footer?: string;

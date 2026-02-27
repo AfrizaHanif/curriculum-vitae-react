@@ -4,7 +4,7 @@ import { formatDate, formatDateRange } from "@/lib/utils";
 import Dropdown from "../bootstrap/dropdown";
 import ShareButton from "./share-button";
 import { DropdownItem } from "@/lib/bootstrap-types";
-import { AllowedColors } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/common";
 import Button from "../bootstrap/button";
 import Link from "next/link";
 
@@ -22,7 +22,7 @@ type ItemData = {
 };
 
 type DetailProps = ComponentPropsWithoutRef<"div"> & {
-  color?: AllowedColors;
+  color?: AllowedColorsStatus;
   type: "Portfolio" | "Project" | "Blog";
   item: ItemData;
   repositoryItems?: DropdownItem[];
@@ -43,6 +43,7 @@ export default function DetailItem({
 }: DetailProps) {
   return (
     <CardBlank className={`p-3 ${className || ""}`} {...props}>
+      {/* Title of detail item */}
       <h5 className="card-title mb-3">{`Detail ${
         type === "Portfolio"
           ? "Portfolio"
@@ -50,6 +51,7 @@ export default function DetailItem({
             ? "Proyek"
             : "Post"
       }`}</h5>
+      {/* Detail of item */}
       <dl className="row">
         {(type === "Portfolio" || type === "Project") && (
           <>
@@ -97,6 +99,7 @@ export default function DetailItem({
           </>
         )}
       </dl>
+      {/* Menu buttons */}
       <div className="d-grid gap-1">
         {caseStudyLink && (
           <Link href={caseStudyLink}>

@@ -1,4 +1,4 @@
-import { AllowedSize } from "@/types/common";
+import { AllowedSizeButton } from "@/types/common";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 
@@ -6,7 +6,7 @@ type AllowedRole = "group" | "toolbar";
 
 type ButtonGroupProps = ComponentPropsWithoutRef<"div"> & {
   arialabel: string;
-  size?: AllowedSize;
+  size?: AllowedSizeButton;
   role: AllowedRole;
   children: ReactNode;
 };

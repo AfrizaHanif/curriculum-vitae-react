@@ -92,6 +92,7 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
     resetSubmission();
   }, [resetSubmission]);
 
+  //
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);

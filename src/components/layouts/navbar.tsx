@@ -16,7 +16,7 @@ import Offcanvas from "../ui/bootstrap/offcanvas";
 const userProfile = profileItem[0];
 
 export default function Navbar() {
-  const pathname = usePathname();
+  const pathname = usePathname(); // Get pathname
   const router = useRouter();
   const [search, setSearch] = useState("");
 
@@ -33,6 +33,7 @@ export default function Navbar() {
       aria-label="Mobile navbar"
     >
       <div className="container-fluid">
+        {/* Navbar logo */}
         <Link className="navbar-brand d-flex align-items-center" href="/">
           <NextImage
             src={logoImage}
@@ -43,6 +44,7 @@ export default function Navbar() {
           <span className="d-none d-sm-inline">{userProfile.fullname}</span>
         </Link>
         <div className="d-flex align-items-center gap-2">
+          {/* Color mode toggle */}
           <div className="d-lg-none">
             <ColorModeToggle />
           </div>
@@ -58,6 +60,7 @@ export default function Navbar() {
           </button>
         </div>
 
+        {/* Header menu (Offcanvas) */}
         <Offcanvas
           id="offcanvasNavbar"
           title={userProfile.fullname}
@@ -67,10 +70,11 @@ export default function Navbar() {
         >
           <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
             {headerItems.map((item) => {
+              // Check if item includes subitems
               if (item.subItems) {
                 const isDropdownActive = item.subItems.some((subItem) =>
                   isActiveLink(pathname, getPathname(subItem.href)),
-                );
+                ); // Check if pathname and href from subitem are same
                 const collapseId = `collapse-${item.label.replace(/\s+/g, "-")}`;
                 return (
                   <li key={item.label} className="nav-item">
@@ -134,7 +138,7 @@ export default function Navbar() {
                   </li>
                 );
               }
-              const isActive = isActiveLink(pathname, item.href);
+              const isActive = isActiveLink(pathname, item.href); // Check if pathname and href from item are same
               return (
                 <li
                   key={item.label}
@@ -161,6 +165,7 @@ export default function Navbar() {
               );
             })}
           </ul>
+          {/* Search form */}
           <form className="d-flex mt-3" role="search" onSubmit={handleSearch}>
             <input
               className="form-control me-2"

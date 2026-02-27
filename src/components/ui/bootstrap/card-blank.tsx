@@ -1,4 +1,4 @@
-import { AllowedColors } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/common";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 import NextImage from "../next/next-image";
@@ -6,8 +6,8 @@ import NextImage from "../next/next-image";
 // This component are similar with card.tsx, but with blank card. Visit Bootstrap's Documentation for insertion of content inside card
 
 type CardsProps = ComponentPropsWithoutRef<"div"> & {
-  color?: AllowedColors;
-  borderColor?: AllowedColors;
+  color?: AllowedColorsStatus;
+  borderColor?: AllowedColorsStatus;
   image?: string;
   overlay?: boolean;
   horizontal?: boolean;

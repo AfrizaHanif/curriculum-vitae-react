@@ -1,11 +1,8 @@
 "use client";
 
 import AppLayout from "@/components/layouts/layout";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
-import NextImage from "@/components/ui/next/next-image";
 import { blogItems } from "@/lib/data/blogData";
 import { formatDate, sortItemsByDate } from "@/lib/utils";
-import Link from "next/link";
 import { useState } from "react";
 import jumbotronImage from "../../../assets/images/jumbotron/blog.jpg";
 import Card from "@/components/ui/bootstrap/card";

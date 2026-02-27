@@ -84,9 +84,10 @@ export default function SelectedPortfolio({
         </div>
         <div className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
-            {/* Navigation */}
+            {/* Menu button */}
             <div className="pb-3">
               <div className="row justify-content-center g-2">
+                {/* Back to list of portfolio */}
                 <div className="col">
                   <Link href={`/portfolio`}>
                     <Button color="secondary" outline>
@@ -95,8 +96,10 @@ export default function SelectedPortfolio({
                     </Button>
                   </Link>
                 </div>
+                {/* Navigation */}
                 <div className="col text-end">
                   <ButtonGroup role={"group"} arialabel={"port-nav"}>
+                    {/* Prev Item */}
                     {prevItem ? (
                       <Link href={`/portfolio/${prevItem.slug}`}>
                         <Button
@@ -117,6 +120,7 @@ export default function SelectedPortfolio({
                         Prev
                       </Button>
                     )}
+                    {/* Next Item */}
                     {nextItem ? (
                       <Link href={`/portfolio/${nextItem.slug}`}>
                         <Button

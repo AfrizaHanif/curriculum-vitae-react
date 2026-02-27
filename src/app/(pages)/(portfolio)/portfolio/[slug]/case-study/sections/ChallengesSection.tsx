@@ -18,6 +18,7 @@ export default function ChallengesSection({
         )}
         :
       </p>
+      {/* Challenges */}
       {caseStudy.challenges && caseStudy.challenges.length > 0 && (
         <div id="challenge-challenge" style={{ scrollMarginTop: "4rem" }}>
           <h5>Tantangan</h5>
@@ -28,6 +29,7 @@ export default function ChallengesSection({
           </ol>
         </div>
       )}
+      {/* Lessons */}
       {caseStudy.lessons && caseStudy.lessons.length > 0 && (
         <div id="challenge-lessons" style={{ scrollMarginTop: "4rem" }}>
           <h5>Pembelajaran</h5>

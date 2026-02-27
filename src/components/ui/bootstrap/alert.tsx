@@ -1,9 +1,9 @@
-import { AllowedColors } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/common";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 
 type AlertProps = ComponentPropsWithoutRef<"div"> & {
-  color: AllowedColors; // Or you can use string instead
+  color: AllowedColorsStatus; // Or you can use string instead
   dismissible?: boolean;
   children: ReactNode;
 };

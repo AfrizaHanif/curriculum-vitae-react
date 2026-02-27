@@ -10,6 +10,7 @@ interface TechStackSectionProps {
 }
 
 export default function TechStackSection({ item }: TechStackSectionProps) {
+  // Check if technology are available
   return item?.technology ? (
     <>
       <p>Pada proyek ini, saya menggunakan teknologi yang digunakan:</p>

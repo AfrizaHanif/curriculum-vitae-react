@@ -1,7 +1,6 @@
 import AppLayout from "@/components/layouts/layout";
 import Card from "@/components/ui/bootstrap/card";
 import CardGroup from "@/components/ui/bootstrap/card-group";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import { testimonyItems } from "@/lib/data/testimonyData";
 import { Metadata } from "next";
 import jumbotronImage from "../../../assets/images/jumbotron/testimonial.jpg";

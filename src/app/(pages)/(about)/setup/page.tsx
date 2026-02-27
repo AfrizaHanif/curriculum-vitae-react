@@ -71,6 +71,7 @@ export default function Setup() {
             ></NextImage>
           </div>
         </div>
+        {/* List of current setup */}
         <div className="col-12 col-lg-6">
           <Accordion
             id="my-new-accordion"

@@ -40,8 +40,8 @@ export default function AppLayout({
   children: React.ReactNode;
   showBreadcrumb?: boolean;
 }) {
-  const pathname = usePathname();
-  const { dynamicCrumbs } = useBreadcrumb();
+  const pathname = usePathname(); // Get pathname
+  const { dynamicCrumbs } = useBreadcrumb(); // Breadcrumb in dynamic
   console.log("Current Path: ", pathname);
 
   const breadcrumbItems = useMemo(() => {

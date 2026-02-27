@@ -20,6 +20,7 @@ export default function Header() {
   const [search, setSearch] = useState("");
   const [maxNavItems, setMaxNavItems] = useState(9);
 
+  // Handle search
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (search.trim()) {
@@ -28,6 +29,8 @@ export default function Header() {
   };
 
   useEffect(() => {
+    // Max item depend of window's width
+    // NOTE: You can change maximum items you want. This includes more menu
     const calculateMaxItems = () => {
       const width = window.innerWidth;
       if (width >= 1200) {
@@ -60,6 +63,7 @@ export default function Header() {
       <div className="px-3 py-2 text-bg-dark border-bottom">
         <div className="container">
           <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            {/* Header logo */}
             <Link
               href="/"
               className="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none"
@@ -76,11 +80,14 @@ export default function Header() {
               </span>
             </Link>
             <ul className="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
+              {/* Header navigation */}
+              {/* Visible (Outside 'More' menu) */}
               {visibleHeaderItems.map((item) => {
+                // Check if item includes subitems
                 if (item.subItems) {
                   const isDropdownActive = item.subItems.some((subItem) =>
                     isActiveLink(pathname, getPathname(subItem.href)),
-                  );
+                  ); // Check if pathname and href from subitem are same
                   return (
                     <li key={item.label} className="nav-item dropdown">
                       <a
@@ -131,7 +138,7 @@ export default function Header() {
                     </li>
                   );
                 }
-                const isActive = isActiveLink(pathname, item.href);
+                const isActive = isActiveLink(pathname, item.href); // Check if pathname and href from item are same
                 return (
                   <li key={item.label}>
                     <Link
@@ -153,6 +160,7 @@ export default function Header() {
                   </li>
                 );
               })}
+              {/* Inside 'More' menu */}
               {overflowHeaderItems.length > 0 && (
                 <li className="nav-item dropdown">
                   <a
@@ -242,6 +250,7 @@ export default function Header() {
       {/* Sub Header */}
       <div className="px-3 py-2 border-bottom mb-3">
         <div className="container d-flex flex-wrap justify-content-center">
+          {/* Search form */}
           <form
             className="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto"
             role="search"
@@ -256,6 +265,7 @@ export default function Header() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </form>
+          {/* Color mode toggle */}
           <div className="text-end">
             {/* <button type="button" className="btn btn-light text-dark me-2">
               Login

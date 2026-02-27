@@ -7,7 +7,6 @@ import Button from "@/components/ui/bootstrap/button";
 import CardBlank from "@/components/ui/bootstrap/card-blank";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import NextImage from "@/components/ui/next/next-image";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import { portfolioItems } from "@/lib/data/portfolioData";
 import Link from "next/link";
 import { formatDateRange } from "@/lib/utils";

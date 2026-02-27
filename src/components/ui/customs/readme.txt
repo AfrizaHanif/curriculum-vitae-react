@@ -1,1 +1,0 @@
-Pada komponen yang ada di folder ini (Customs) merupakan kodingan yang telah dimodifikasi dari komponen default (Seperti: Bootstrap dan React). Anda dapat memakai komponen ini jika dibutuhkan.

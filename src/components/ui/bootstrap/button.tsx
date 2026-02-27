@@ -1,6 +1,6 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import clsx from "clsx";
-import type { AllowedColors, AllowedSize } from "../../../types/common"; // Adjust the import path
+import type { AllowedColorsStatus, AllowedSizeButton } from "../../../types/common"; // Adjust the import path
 
 type BaseButtonProps = {
   dataToggle?:
@@ -14,8 +14,8 @@ type BaseButtonProps = {
   dataTitle?: string;
   dataContent?: string;
   children: ReactNode;
-  color: AllowedColors; // Or you can use string instead
-  size?: AllowedSize; // Optional parameter
+  color: AllowedColorsStatus; // Or you can use string instead
+  size?: AllowedSizeButton; // Optional parameter
   outline?: boolean;
   disabled?: boolean;
   stretchedLink?: boolean;

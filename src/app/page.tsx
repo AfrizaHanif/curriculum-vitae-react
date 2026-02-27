@@ -1,7 +1,6 @@
 "use client";
 
 import AppLayout from "@/components/layouts/layout";
-import NextImage from "@/components/ui/next/next-image";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import { useState, useEffect } from "react";
 import myPhoto from "@/assets/images/profile.jpg";
@@ -14,7 +13,6 @@ import { isEducationData } from "@/lib/customs/type-guards";
 import Button from "@/components/ui/bootstrap/button";
 import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
-import styles from "./page.module.css";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // Get Data from JSON (Single)

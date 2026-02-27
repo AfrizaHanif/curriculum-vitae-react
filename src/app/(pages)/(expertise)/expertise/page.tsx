@@ -1,7 +1,6 @@
 import AppLayout from "@/components/layouts/layout";
 import Button from "@/components/ui/bootstrap/button";
 import Feature from "@/components/ui/bootstrap/feature";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import Modal from "@/components/ui/bootstrap/modal";
 import { expertiseItems } from "@/lib/data/expertiseData";
 import { portfolioItems } from "@/lib/data/portfolioData";
@@ -66,6 +65,7 @@ export default function Expertise() {
               title={item.title}
               size="lg"
             >
+              {/* Check if linked projects are available */}
               {linkedProjects.length > 0 ? (
                 <>
                   <p className="lead">

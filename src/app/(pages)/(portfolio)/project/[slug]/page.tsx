@@ -1,6 +1,5 @@
 import AppLayout from "@/components/layouts/layout";
 import Button from "@/components/ui/bootstrap/button";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
 import { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
@@ -92,9 +91,10 @@ export default async function SelectedProject({
         </div>
         <div className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
-            {/* Navigation */}
+            {/* Menu button */}
             <div className="pb-3">
               <div className="row justify-content-center g-2">
+                {/* Back to list of projects */}
                 <div className="col">
                   <Link href={`/project`}>
                     <Button color="secondary" outline>
@@ -103,8 +103,10 @@ export default async function SelectedProject({
                     </Button>
                   </Link>
                 </div>
+                {/* Navigation */}
                 <div className="col text-end">
                   <ButtonGroup role={"group"} arialabel={"port-nav"}>
+                    {/* Previous item */}
                     {prevItem ? (
                       <Link href={`/project/${prevItem.slug}`}>
                         <Button
@@ -125,6 +127,7 @@ export default async function SelectedProject({
                         Prev
                       </Button>
                     )}
+                    {/* Next item */}
                     {nextItem ? (
                       <Link href={`/project/${nextItem.slug}`}>
                         <Button

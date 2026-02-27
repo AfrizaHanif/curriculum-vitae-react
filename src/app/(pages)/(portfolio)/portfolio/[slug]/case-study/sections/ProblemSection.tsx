@@ -7,6 +7,7 @@ interface ProblemSectionProps {
 }
 
 export default function ProblemSection({ caseStudy }: ProblemSectionProps) {
+  // Check if problems available
   if (caseStudy?.problems) {
     return (
       <>
@@ -23,6 +24,7 @@ export default function ProblemSection({ caseStudy }: ProblemSectionProps) {
     );
   }
 
+  // Fallback
   return (
     <div>
       <p>

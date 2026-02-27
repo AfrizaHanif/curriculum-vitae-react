@@ -36,6 +36,7 @@ export default function JumbotronTitle({
     >
       <div className="container-fluid py-3">
         <div className="row align-items-center">
+          {/* Main content */}
           <div
             className={`col-12 ${iconImg ? "col-lg-8" : "col-lg-12"} order-2 order-lg-1 text-center text-lg-start`}
           >
@@ -49,6 +50,7 @@ export default function JumbotronTitle({
               </Link>
             )}
           </div>
+          {/* Sub content (Icon image) */}
           {iconImg && (
             <div className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0 text-center text-lg-start">
               <NextImage

@@ -9,6 +9,7 @@ interface RoleSectionProps {
 export default function RoleSection({ caseStudy }: RoleSectionProps) {
   return caseStudy?.role ? (
     <>
+      {/* Role */}
       <p>
         Saya mengerjakan proyek ini sebagai <b>{caseStudy.role}</b>{" "}
         {caseStudy?.responsibles && caseStudy.responsibles.length > 0 && (
@@ -18,6 +19,7 @@ export default function RoleSection({ caseStudy }: RoleSectionProps) {
           </span>
         )}
       </p>
+      {/* Responsibles */}
       {caseStudy?.responsibles && caseStudy.responsibles.length > 0 && (
         <ol>
           {caseStudy.responsibles.map((item, index) => (

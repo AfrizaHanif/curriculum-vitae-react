@@ -21,6 +21,8 @@ export default function ProcessSection({
   caseStudy,
   solution,
 }: ProcessSectionProps) {
+  // Check if progress and solution available
+  // NOTE: Gallery of result are optional, so it's not included on if condition
   if (
     (caseStudy?.progress && caseStudy.progress.length > 0) ||
     (solution && solution.length > 0)
@@ -34,6 +36,7 @@ export default function ProcessSection({
           )}{" "}
           solusi yang telah saya temukan
         </p>
+        {/* Progress */}
         {caseStudy?.progress && caseStudy.progress.length > 0 && (
           <div id="process-progress" style={{ scrollMarginTop: "4rem" }}>
             <h5>Proses</h5>
@@ -44,6 +47,7 @@ export default function ProcessSection({
             </ol>
           </div>
         )}
+        {/* Solutions */}
         {solution && solution.length > 0 && (
           <div id="process-solution" style={{ scrollMarginTop: "4rem" }}>
             <h5>Solusi</h5>
@@ -72,6 +76,7 @@ export default function ProcessSection({
             </ol>
           </div>
         )}
+        {/* Result of progress as gallery */}
         {item.image && (
           <div id="process-image" style={{ scrollMarginTop: "4rem" }}>
             <h5>Galeri Hasil Proyek</h5>

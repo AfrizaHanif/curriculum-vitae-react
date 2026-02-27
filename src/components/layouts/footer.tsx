@@ -13,6 +13,7 @@ export default function Footer() {
   return (
     <footer className="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
       <div className="col-md-4 d-flex align-items-center">
+        {/* Footer logo */}
         <Link
           href="/"
           className="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1"
@@ -23,6 +24,7 @@ export default function Footer() {
           </svg> */}
           <NextImage src={logoImage} alt={"Logo"} height={24} disableSpinner />
         </Link>
+        {/* Copyright with current year */}
         <span
           className="mb-3 mb-md-0 text-body-secondary"
           suppressHydrationWarning
@@ -31,6 +33,7 @@ export default function Footer() {
         </span>
       </div>
       <ul className="nav col-md-4 justify-content-end list-unstyled d-flex">
+        {/* All social media item */}
         {socialItems.map((item) => (
           <li key={item.key} className="ms-3">
             <a

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import type { AllowedColors, AllowedSize } from "@/types/common";
+import type { AllowedColorsStatus, AllowedSizeButton } from "@/types/common";
 import type { DropdownItem } from "../../../lib/bootstrap-types";
 import Button from "./button";
 import DropdownItemComponent from "./dropdown-items";
@@ -8,8 +8,8 @@ import "./dropdown.css";
 import NextImage from "../next/next-image";
 
 type BaseDropdownProps = ComponentPropsWithoutRef<"div"> & {
-  color?: AllowedColors;
-  size?: AllowedSize;
+  color?: AllowedColorsStatus;
+  size?: AllowedSizeButton;
   centered?: boolean;
   stretchedLink?: boolean;
   direction?: "dropdown" | "dropup" | "dropend" | "dropstart";

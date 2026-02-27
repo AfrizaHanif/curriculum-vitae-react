@@ -17,8 +17,8 @@ export default function AccordionItem({
   isOpen = false,
   ...props
 }: AccordionItemProps) {
-  const collapseId = `collapse-${itemId}`;
-  const headerId = `header-${itemId}`;
+  const collapseId = `collapse-${itemId}`; // Set header ID
+  const headerId = `header-${itemId}`; // Set header ID
 
   return (
     <div className="accordion-item" {...props}>
@@ -35,6 +35,7 @@ export default function AccordionItem({
           {title}
         </button>
       </h2>
+
       {/* Content */}
       <div
         id={collapseId}

@@ -1,6 +1,5 @@
 import React from "react";
 import AppLayout from "@/components/layouts/layout";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import {
   getAllPortfolioItems,
   getCaseStudy,
@@ -78,12 +77,13 @@ export default async function CaseStudy({
   const solution = getSolutions(caseStudy.id);
 
   // Check if subsection of section are not empty
+  // Diagram
   const diagramSubSections = [
     diagram?.context && { id: "context-diagram", title: "Context Diagram" },
     diagram?.dfd_0 && { id: "dfd-0", title: "DFD Level 0" },
     diagram?.pdm && { id: "pdm", title: "PDM" },
   ].filter((s): s is { id: string; title: string } => !!s);
-
+  // Process
   const processSubSections = [
     caseStudy.progress &&
       caseStudy.progress.length > 0 && {
@@ -97,7 +97,7 @@ export default async function CaseStudy({
       title: "Galeri Hasil Proyek",
     },
   ].filter((s): s is { id: string; title: string } => !!s);
-
+  // Challenge
   const challengeSubSections = [
     caseStudy.challenges &&
       caseStudy.challenges.length > 0 && {
@@ -163,6 +163,7 @@ export default async function CaseStudy({
     } => !!s,
   );
 
+  // Explanation of section (Accordion Item)
   const helpAccordionItem = [
     {
       title: "Ringkasan Proyek",
@@ -215,6 +216,7 @@ export default async function CaseStudy({
     <AppLayout>
       {/* Initialize ScrollSpy for the body */}
       <ScrollSpy targetId="case-study-nav" />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Studi Kasus"
@@ -223,13 +225,16 @@ export default async function CaseStudy({
         className="my-3"
       />
 
+      {/* Menu button */}
       <div className="mb-3">
+        {/* Back to portfolio */}
         <Link href={`/portfolio/${item.slug}`}>
           <Button color="secondary" className="mb-2 me-2" outline>
             <i className="bi bi-arrow-return-left pe-2"></i>
             Kembali
           </Button>
         </Link>
+        {/* Explanation */}
         <Button
           color="secondary"
           className="mb-2 me-2"
@@ -239,6 +244,7 @@ export default async function CaseStudy({
           <i className="bi bi-question-lg pe-2"></i>
           Penjelasan
         </Button>
+        {/* List of content (Only for mobile / tablet device) */}
         <Button
           color="primary"
           className="d-lg-none mb-2"
@@ -250,6 +256,7 @@ export default async function CaseStudy({
         </Button>
       </div>
 
+      {/* ScrollSpy Area */}
       <div className="row">
         {/* Navigations */}
         <div className="col-lg-4 d-none d-lg-block border-end pe-lg-3">
@@ -314,7 +321,9 @@ export default async function CaseStudy({
           </div>
         </div>
       </div>
+
       {/* Offcanvas */}
+      {/* Explanation */}
       <Offcanvas
         id="offcanvas-help-cs"
         title={"Penjelasan Studi Kasus"}
@@ -322,6 +331,7 @@ export default async function CaseStudy({
       >
         <Accordion id={"accordion-help-cs"} items={helpAccordionItem} />
       </Offcanvas>
+      {/* List of content */}
       <Offcanvas
         id="offcanvas-casestudy-nav"
         title="Daftar Isi"

@@ -1,5 +1,5 @@
 import { ModalButtonItem } from "@/lib/bootstrap-types";
-import { AllowedSize } from "@/types/common";
+import { AllowedSizeModal } from "@/types/common";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 
 type ModalProps = ComponentPropsWithoutRef<"div"> & {
@@ -9,7 +9,7 @@ type ModalProps = ComponentPropsWithoutRef<"div"> & {
   subtitle?: string;
   scrollable?: boolean; // Renamed from 'static' to 'isStatic'
   isStatic?: boolean;
-  size?: AllowedSize;
+  size?: AllowedSizeModal;
   fullscreen?: boolean;
   children: ReactNode;
 };
