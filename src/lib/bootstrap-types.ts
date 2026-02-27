@@ -1,4 +1,4 @@
-import { AllowedColors } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/common";
 import { ReactNode } from "react";
 
 // Accordion
@@ -38,7 +38,7 @@ export interface DropdownItem {
 export interface ModalButtonItem {
   label: string;
   type?: "button" | "submit" | "reset";
-  color: AllowedColors;
+  color: AllowedColorsStatus;
   dismiss?: boolean;
 }
 
@@ -82,7 +82,7 @@ export interface FeatureItem {
 // Buttons for Heroes
 export interface HeroesButtonItem {
   label: string;
-  color: AllowedColors;
+  color: AllowedColorsStatus;
   href?: string;
   newTab?: boolean;
 }
