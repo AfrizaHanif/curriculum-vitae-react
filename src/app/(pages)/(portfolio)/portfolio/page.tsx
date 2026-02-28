@@ -61,19 +61,22 @@ export default function Portfolio() {
             {item.type}
           </div>
           {/* Main image of portfolio */}
-          <NextImage
-            src={item.image}
-            alt={item.title}
-            className="card-img-top rounded-0"
-            width={500}
-            height={300}
-            style={{
-              aspectRatio: "16 / 9",
-              objectFit: "cover",
-              height: "auto",
-              objectPosition: "top",
-            }}
-          />
+          <div
+            className="position-relative bg-body-tertiary"
+            style={{ aspectRatio: "16 / 9" }}
+          >
+            <NextImage
+              src={item.image}
+              alt={item.title}
+              className="card-img-top rounded-0"
+              fill
+              style={{
+                objectFit: "cover",
+                objectPosition: "top",
+              }}
+              errorContent
+            />
+          </div>
           {/* Short content */}
           <div className="card-body d-flex flex-column">
             <h5 className="card-title">{item.title}</h5>

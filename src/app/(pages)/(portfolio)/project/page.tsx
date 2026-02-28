@@ -48,20 +48,23 @@ export default function Project() {
             <span className="text-uppercase">{item.category}</span> -{" "}
             {item.type}
           </div>
-          {/* Main image of portfolio */}
-          <NextImage
-            src={item.image}
-            alt={item.title} // Use item.title for alt text for better accessibility
-            className="card-img-top rounded-0"
-            width={500} // Adjust width as needed for your design
-            height={300} // Adjust height as needed for your design
-            style={{
-              aspectRatio: "16 / 9",
-              objectFit: "cover",
-              height: "auto",
-              objectPosition: "top",
-            }} // Crop to widescreen, maintain aspect ratio, and align to top
-          />
+          {/* Main image of project */}
+          <div
+            className="position-relative bg-body-tertiary"
+            style={{ aspectRatio: "16 / 9" }}
+          >
+            <NextImage
+              src={item.image}
+              alt={item.title}
+              className="card-img-top rounded-0"
+              fill
+              style={{
+                objectFit: "cover",
+                objectPosition: "top",
+              }}
+              errorContent
+            />
+          </div>
           {/* Short content */}
           <div className="card-body d-flex flex-column">
             <h5 className="card-title">{item.title}</h5>
@@ -96,7 +99,7 @@ export default function Project() {
     />
   );
 
-  // Extract unique categories from portfolio items
+  // Extract unique categories from project items
   const uniqueCategories = Array.from(
     new Set(projectItems.map((item) => item.category)),
   );

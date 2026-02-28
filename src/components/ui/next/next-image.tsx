@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable jsx-a11y/alt-text */
 import Image from "next/image";
-import { ComponentProps } from "react";
+import { ComponentProps, ReactNode } from "react";
 import clsx from "clsx";
 import placeholderImage from "../../../assets/images/placeholder/placeholder-image.png";
 import { useImageLoading } from "@/hooks/use-image-loading";
@@ -13,6 +13,7 @@ type NextImageProps = ComponentProps<typeof Image> & {
   type?: "fluid" | "thumbnail";
   disableSpinner?: boolean;
   maxRetries?: number;
+  errorContent?: ReactNode;
 };
 
 const FALLBACK_SRC = placeholderImage;
@@ -25,6 +26,7 @@ export default function NextImage({
   onError,
   disableSpinner = false,
   maxRetries = 3,
+  errorContent,
   ...props
 }: NextImageProps) {
   const { isLoading, hasError, handleLoad, handleError, retryKey } =
@@ -53,6 +55,13 @@ export default function NextImage({
           <div className="spinner-border text-secondary" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
+        </div>
+      )}
+      {hasError && (
+        <div className="position-absolute top-50 start-50 translate-middle z-1">
+          {errorContent || (
+            <span className="badge text-bg-danger">Gagal memuat</span>
+          )}
         </div>
       )}
       <Image

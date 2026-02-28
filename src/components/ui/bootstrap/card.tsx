@@ -15,6 +15,7 @@ type BaseCardProps = ComponentPropsWithoutRef<"div"> & {
   footer?: string;
   image?: string;
   imgPosition?: "top" | "bottom";
+  aspectRatio?: string;
   url?: string;
   buttonName?: string;
   clickable?: boolean;
@@ -56,6 +57,7 @@ export default function Card({
   footer,
   image,
   imgPosition = "top",
+  aspectRatio = "16 / 9",
   url,
   urlType = "link",
   urlTarget,
@@ -145,19 +147,21 @@ export default function Card({
         {/* Image (Top) */}
         {imgPosition === "top" && image && !overlay && (
           // <img src={image} className="card-img-top" alt={title} />
-          <NextImage
-            src={image}
-            alt={title || ""}
-            className={`card-img-top ${header && "rounded-0"}`}
-            width={500}
-            height={300}
-            style={{
-              aspectRatio: "16 / 9",
-              objectFit: "cover",
-              height: "auto",
-              objectPosition: "top",
-            }}
-          />
+          <div
+            className="position-relative bg-body-tertiary"
+            style={{ aspectRatio: aspectRatio }}
+          >
+            <NextImage
+              src={image}
+              alt={title || ""}
+              className={`card-img-top ${header && "rounded-0"}`}
+              fill
+              style={{
+                objectFit: "cover",
+                objectPosition: "top",
+              }}
+            />
+          </div>
         )}
         {/* Content */}
         <div className={overlay ? "card-img-overlay" : "card-body"}>
@@ -167,19 +171,21 @@ export default function Card({
         {/* Image (Bottom) */}
         {imgPosition === "bottom" && image && !overlay && (
           // <img src={image} className="card-img-bottom" alt={title} />
-          <NextImage
-            src={image}
-            alt={title || ""}
-            className={`card-img-bottom ${header && "rounded-0"}`}
-            width={500}
-            height={300}
-            style={{
-              aspectRatio: "16 / 9",
-              objectFit: "cover",
-              height: "auto",
-              objectPosition: "top",
-            }}
-          />
+          <div
+            className="position-relative bg-body-tertiary"
+            style={{ aspectRatio: aspectRatio }}
+          >
+            <NextImage
+              src={image}
+              alt={title || ""}
+              className={`card-img-bottom ${header && "rounded-0"}`}
+              fill
+              style={{
+                objectFit: "cover",
+                objectPosition: "top",
+              }}
+            />
+          </div>
         )}
         {/* Footer */}
         {footer && (

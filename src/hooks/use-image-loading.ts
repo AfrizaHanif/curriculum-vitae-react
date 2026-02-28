@@ -65,8 +65,8 @@ export function useImageLoading({
   const handleError = useCallback(
     (e: SyntheticEvent<HTMLImageElement, Event>) => {
       if (retryCount < maxRetries) {
-        // Exponential backoff: 1s, 2s, 4s...
-        const delay = 1000 * Math.pow(2, retryCount);
+        // Exponential backoff: 0.5s, 1s, 2s...
+        const delay = 500 * Math.pow(2, retryCount);
         setTimeout(() => {
           if (isMounted.current) {
             setRetryCount((prev) => prev + 1);

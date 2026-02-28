@@ -3,7 +3,7 @@
 import AppLayout from "@/components/layouts/layout";
 import { blogItems } from "@/lib/data/blogData";
 import { formatDate, sortItemsByDate } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import jumbotronImage from "../../../assets/images/jumbotron/blog.jpg";
 import Card from "@/components/ui/bootstrap/card";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
@@ -15,10 +15,16 @@ export default function Blog() {
   console.info("This page are being sorted from newest post");
 
   // Get Random Post
-  const [featuredPost] = useState(() => {
+  // Initialize with the first item to ensure server/client match during hydration
+  const [featuredPost, setFeaturedPost] = useState(blogItems[0]);
+
+  useEffect(() => {
+    // Randomize on the client side after mount
     const randomIndex = Math.floor(Math.random() * blogItems.length);
-    return blogItems[randomIndex];
-  });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFeaturedPost(blogItems[randomIndex]);
+  }, []);
+
   console.log("Featured Post: " + featuredPost.title);
 
   // Item of Featured Portfolio (Heroes)
