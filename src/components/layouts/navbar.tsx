@@ -48,7 +48,7 @@ export default function Navbar() {
         <div className="d-flex align-items-center gap-2">
           {/* Color mode toggle */}
           <div className="d-lg-none">
-            <ColorModeToggle />
+            <ColorModeToggle disableTooltip />
           </div>
           {/* Header item menu */}
           {/* <button

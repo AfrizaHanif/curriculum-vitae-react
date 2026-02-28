@@ -2,28 +2,33 @@
 
 import { ComponentPropsWithoutRef, useEffect, useRef, useState } from "react";
 
-type ColorModeToggleProps = ComponentPropsWithoutRef<"button">;
+type ColorModeToggleProps = ComponentPropsWithoutRef<"button"> & {
+  disableTooltip?: boolean;
+};
 
 export default function ColorModeToggle({
   className,
+  disableTooltip = false,
   ...props
 }: ColorModeToggleProps) {
   const [theme, setTheme] = useState("auto");
   const [mounted, setMounted] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null); // Get reference of button
 
   useEffect(() => {
-    const button = buttonRef.current;
+    if (disableTooltip) return; // Check if tooltip want to be disabled
+    const button = buttonRef.current; // Get current value of button
     if (!button) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let tooltip: any;
     let isMounted = true;
 
+    // IMPORTANT: Do not remove this tooltip function
     import("bootstrap/js/dist/tooltip").then(({ default: Tooltip }) => {
       if (!isMounted) return;
       tooltip = new Tooltip(button, {
-        title: `Current theme: ${
+        title: `Mode warna saat ini: ${
           theme.charAt(0).toUpperCase() + theme.slice(1)
         }`,
         trigger: "hover focus",
@@ -34,7 +39,7 @@ export default function ColorModeToggle({
       isMounted = false;
       tooltip?.dispose();
     };
-  }, [theme]);
+  }, [theme, disableTooltip]);
 
   useEffect(() => {
     // Initialize theme from cookie on mount
@@ -48,6 +53,7 @@ export default function ColorModeToggle({
   useEffect(() => {
     if (!mounted) return;
 
+    // Apply theme function
     const applyTheme = (targetTheme: string) => {
       if (
         targetTheme === "auto" &&
@@ -63,6 +69,7 @@ export default function ColorModeToggle({
 
     applyTheme(theme);
 
+    // If current theme is auto
     if (theme === "auto") {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
       const handleChange = () => applyTheme("auto");
@@ -71,6 +78,7 @@ export default function ColorModeToggle({
     }
   }, [theme, mounted]);
 
+  // Handle changing theme
   const handleThemeChange = (newTheme: string) => {
     setTheme(newTheme);
     document.cookie = `theme=${newTheme}; path=/; max-age=31536000`;
