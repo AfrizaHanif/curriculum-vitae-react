@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     default: "Muhammad Afriza Hanif",
   },
   description: "Sebuah Website Portofolio dari Muhammad Afriza Hanif",
+  verification: {
+    google: "_Umgl1fpf7l1VvK0tpqr-fYJXpK6WCakn7ohdLTaTtk",
+  },
   openGraph: {
     title: "Muhammad Afriza Hanif",
     description: "Sebuah Website Portofolio dari Muhammad Afriza Hanif",
