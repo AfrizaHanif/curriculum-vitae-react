@@ -23,6 +23,7 @@ import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import NextImage from "@/components/ui/next/next-image";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 import styles from "./page.module.css";
 // import Loading from "@/components/ui/bootstrap/loading";
 // import { useLoading } from "@/hooks/use-loading";
@@ -94,8 +95,26 @@ export default function Resume() {
   //   return <Loading />;
   // }
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    name: "Resume | Muhammad Afriza Hanif",
+    description: "Ringkasan latar belakang profesional saya.",
+    url: "https://afrizahanif.com/resume",
+    mainEntity: {
+      "@type": "Person",
+      name: userProfile.fullname,
+      jobTitle: userProfile.status,
+      url: "https://afrizahanif.com",
+    },
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Resume"
@@ -105,19 +124,23 @@ export default function Resume() {
       />
 
       {/* Overview */}
-      <Jumbotron backgroundColor="tertiary" className="my-2">
-        <h2 className="pb-2 border-bottom">Overview</h2>
-        <p className="lead">{userProfile.description}</p>
-      </Jumbotron>
+      <section aria-label="Overview">
+        <Jumbotron backgroundColor="tertiary" className="my-2">
+          <h2 className="pb-2 border-bottom">Overview</h2>
+          <p className="lead">{userProfile.description}</p>
+        </Jumbotron>
+      </section>
 
       {/* Experiences */}
       {/* Features */}
-      <ResumeFeature
-        id="experiences"
-        items={experienceItems}
-        type="hanging"
-        title="Pengalaman"
-      />
+      <section aria-label="Pengalaman Kerja">
+        <ResumeFeature
+          id="experiences"
+          items={experienceItems}
+          type="hanging"
+          title="Pengalaman"
+        />
+      </section>
       {/* Modals */}
       {experienceItems
         .filter((item) => item.dataTarget)
@@ -198,12 +221,14 @@ export default function Resume() {
 
       {/* Educations */}
       {/* Featured */}
-      <ResumeFeature
-        id="educations"
-        items={educationItems} // This will be from state
-        type="hanging"
-        title="Pendidikan"
-      />
+      <section aria-label="Pendidikan">
+        <ResumeFeature
+          id="educations"
+          items={educationItems} // This will be from state
+          type="hanging"
+          title="Pendidikan"
+        />
+      </section>
       {/* Modals */}
       {educationItems
         .filter((item) => item.dataTarget)
@@ -293,24 +318,26 @@ export default function Resume() {
 
       {/* Certificates */}
       {/* Cards */}
-      <CardGroup title="Sertifikat" cardPerRow={4}>
-        {certificateItems.map((item) => (
-          <Card
-            key={item.id}
-            header={item.issuer}
-            footer={formatDate(item.issue_date)}
-            image={item.file}
-            url={item.credential_url}
-            urlType="dropdown"
-            urlItems={generateCertDropdownItems(item)}
-            buttonName="Lihat"
-            clickable
-            insideGroup
-          >
-            <h5 className="card-title">{item.name}</h5>
-          </Card>
-        ))}
-      </CardGroup>
+      <section aria-label="Sertifikat">
+        <CardGroup title="Sertifikat" cardPerRow={4}>
+          {certificateItems.map((item) => (
+            <Card
+              key={item.id}
+              header={item.issuer}
+              footer={formatDate(item.issue_date)}
+              image={item.file}
+              url={item.credential_url}
+              urlType="dropdown"
+              urlItems={generateCertDropdownItems(item)}
+              buttonName="Lihat"
+              clickable
+              insideGroup
+            >
+              <h5 className="card-title">{item.name}</h5>
+            </Card>
+          ))}
+        </CardGroup>
+      </section>
       {/* Modals */}
       {certificateItems.map((item) => (
         <Modal

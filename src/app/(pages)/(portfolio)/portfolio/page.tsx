@@ -12,6 +12,7 @@ import jumbotronImage from "../../../../assets/images/jumbotron/portfolio.jpg";
 import { useState } from "react";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 export default function Portfolio() {
   // Set useState for replacing element
@@ -137,8 +138,30 @@ export default function Portfolio() {
     })),
   ];
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Portfolio Utama | Muhammad Afriza Hanif",
+    description:
+      "Kumpulan proyek yang menampilkan keahlian saya dalam pengembangan web dan desain.",
+    url: "https://afrizahanif.com/portfolio",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: portfolioItems.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `https://afrizahanif.com/portfolio/${item.slug}`,
+        name: item.title,
+      })),
+    },
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Portfolio Utama"
@@ -148,7 +171,7 @@ export default function Portfolio() {
       />
 
       {/* Sorting Controls */}
-      <div className="container-fluid mb-3">
+      <section className="container-fluid mb-3" aria-label="Sorting Controls">
         <div className="d-flex justify-content-end align-items-center">
           <label htmlFor="sortOrder" className="me-2 fw-semibold">
             Urutkan:
@@ -165,10 +188,12 @@ export default function Portfolio() {
             <option value="za">Judul (Z-A)</option>
           </select>
         </div>
-      </div>
+      </section>
 
       {/* List of Portfolio (Cards) */}
-      <NavTab id="portfolio-tab" items={tabItems} />
+      <section aria-label="Daftar Portfolio">
+        <NavTab id="portfolio-tab" items={tabItems} />
+      </section>
     </AppLayout>
   );
 }

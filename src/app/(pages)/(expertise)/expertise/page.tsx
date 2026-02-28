@@ -9,6 +9,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import jumbotronImage from "../../../../assets/images/jumbotron/expertise.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -28,8 +29,29 @@ export default function Expertise() {
     },
   ];
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Ringkasan Keahlian | Muhammad Afriza Hanif",
+    description:
+      "Pelajari keahlian yang saya miliki beserta proyek yang terlibat",
+    url: "https://afrizahanif.com/expertise",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: expertiseItems.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.title,
+      })),
+    },
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Ringkasan Kehalian"
@@ -40,13 +62,15 @@ export default function Expertise() {
 
       {/* List of Expertise */}
       {/* Feature */}
-      <Feature
-        items={expertiseItems}
-        id="expertise"
-        type="columns"
-        itemPerRow={2}
-        chevron
-      />
+      <section aria-label="Daftar Keahlian">
+        <Feature
+          items={expertiseItems}
+          id="expertise"
+          type="columns"
+          itemPerRow={2}
+          chevron
+        />
+      </section>
       {/* Modal */}
       {expertiseItems
         .filter((item) => item.dataTarget)

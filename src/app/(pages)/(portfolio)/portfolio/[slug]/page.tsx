@@ -16,6 +16,7 @@ import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import { DropdownItem } from "@/lib/bootstrap-types";
 import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 // INFO: Different than project and blog page, this page are splitted out into 2 (layout.tsx and page.tsx). This page is a client component
 
@@ -55,8 +56,50 @@ export default function SelectedPortfolio({
   // Check if case study exists
   const hasCaseStudy = caseStudyItems.some((cs) => cs.portfolio_id === item.id);
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Project",
+        name: item.title,
+        description: item.description,
+        url: `https://afrizahanif.com/portfolio/${item.slug}`,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        image: (item.image as any)?.src || item.image, // Handle StaticImageData or string
+        keywords: `${item.category}, ${item.subcategory}`,
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://afrizahanif.com",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Portfolio",
+            item: "https://afrizahanif.com/portfolio",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: item.title,
+            item: `https://afrizahanif.com/portfolio/${item.slug}`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Set Title into Breadcrumb */}
       <BreadcrumbSetter title={item.title} />
 
@@ -68,24 +111,30 @@ export default function SelectedPortfolio({
       />
 
       {/* Contents */}
-      <div className="row justify-content-center g-2">
-        <div className="col-12 col-lg-8 order-2 order-lg-1">
-          {/* Gallery */}
-          <ProjectGallery
-            mainImage={item.image}
-            images={item.gallery}
-            altText={item.title}
-          />
-          {/* Description */}
-          <div className="mt-4">
-            <h2 className="lh-1">Deskripsi Proyek</h2>
+      <main className="row justify-content-center g-2">
+        <article className="col-12 col-lg-8 order-2 order-lg-1">
+          <section id="project-gallery">
+            <ProjectGallery
+              mainImage={item.image}
+              images={item.gallery}
+              altText={item.title}
+            />
+          </section>
+          <section
+            id="project-description"
+            aria-labelledby="project-description-heading"
+            className="mt-4"
+          >
+            <h2 id="project-description-heading" className="lh-1">
+              Deskripsi Proyek
+            </h2>
             <p className="lead">{item.description}</p>
-          </div>
-        </div>
-        <div className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
+          </section>
+        </article>
+        <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Menu button */}
-            <div className="pb-3">
+            <nav className="pb-3" aria-label="Portfolio item navigation">
               <div className="row justify-content-center g-2">
                 {/* Back to list of portfolio */}
                 <div className="col">
@@ -144,7 +193,7 @@ export default function SelectedPortfolio({
                   </ButtonGroup>
                 </div>
               </div>
-            </div>
+            </nav>
             {/* Details */}
             <DetailItem
               type={"Portfolio"}
@@ -156,8 +205,8 @@ export default function SelectedPortfolio({
               shareable
             />
           </div>
-        </div>
-      </div>
+        </aside>
+      </main>
     </AppLayout>
   );
 }

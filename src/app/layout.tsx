@@ -18,6 +18,19 @@ export const metadata: Metadata = {
     default: "Muhammad Afriza Hanif",
   },
   description: "Sebuah Website Portofolio dari Muhammad Afriza Hanif",
+  openGraph: {
+    title: "Muhammad Afriza Hanif",
+    description: "Sebuah Website Portofolio dari Muhammad Afriza Hanif",
+    url: "https://afrizahanif.com",
+    siteName: "Muhammad Afriza Hanif Portfolio",
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Muhammad Afriza Hanif",
+    description: "Sebuah Website Portofolio dari Muhammad Afriza Hanif",
+  },
 };
 
 export default function RootLayout({
@@ -27,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="id"
       data-bs-theme="auto"
       data-scroll-behavior="smooth"
       suppressHydrationWarning

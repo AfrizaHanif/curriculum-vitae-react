@@ -8,6 +8,7 @@ import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import { projectItems } from "@/lib/data/portfolioData";
 import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
@@ -62,8 +63,50 @@ export default async function SelectedProject({
       ? projectItems[currentIndex + 1]
       : null;
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Project",
+        name: item.title,
+        description: item.description,
+        url: `https://afrizahanif.com/project/${item.slug}`,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        image: (item.image as any)?.src || item.image,
+        keywords: `${item.category}, ${item.subcategory}`,
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://afrizahanif.com",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Project",
+            item: "https://afrizahanif.com/project",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: item.title,
+            item: `https://afrizahanif.com/project/${item.slug}`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Set Title into Breadcrumb */}
       <BreadcrumbSetter title={item.title} />
 
@@ -75,8 +118,8 @@ export default async function SelectedProject({
       />
 
       {/* Contents */}
-      <div className="row justify-content-center g-2">
-        <div className="col-12 col-lg-8 order-2 order-lg-1">
+      <main className="row justify-content-center g-2">
+        <article className="col-12 col-lg-8 order-2 order-lg-1">
           {/* Gallery */}
           {/* <ProjectGallery
             mainImage={item.image}
@@ -84,15 +127,21 @@ export default async function SelectedProject({
             altText={item.title}
           /> */}
           {/* Description */}
-          <div className="mt-4">
-            <h2 className="lh-1">Deskripsi Proyek</h2>
+          <section
+            id="project-description"
+            aria-labelledby="project-description-heading"
+            className="mt-4"
+          >
+            <h2 id="project-description-heading" className="lh-1">
+              Deskripsi Proyek
+            </h2>
             <p className="lead">{item.description}</p>
-          </div>
-        </div>
-        <div className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
+          </section>
+        </article>
+        <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Menu button */}
-            <div className="pb-3">
+            <nav className="pb-3" aria-label="Project item navigation">
               <div className="row justify-content-center g-2">
                 {/* Back to list of projects */}
                 <div className="col">
@@ -151,12 +200,12 @@ export default async function SelectedProject({
                   </ButtonGroup>
                 </div>
               </div>
-            </div>
+            </nav>
             {/* Details */}
             <DetailItem type={"Project"} item={item} />
           </div>
-        </div>
-      </div>
+        </aside>
+      </main>
     </AppLayout>
   );
 }

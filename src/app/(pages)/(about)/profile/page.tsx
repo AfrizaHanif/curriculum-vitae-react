@@ -5,10 +5,16 @@ import myPhoto from "@/assets/images/profile.jpg";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import Feature from "@/components/ui/bootstrap/feature";
-import { hobbyItems, profileItem, skillItems } from "@/lib/data/profileData";
+import {
+  hobbyItems,
+  profileItem,
+  skillItems,
+  socialItems,
+} from "@/lib/data/profileData";
 import { Metadata } from "next";
 import jumbotronImage from "../../../../assets/images/jumbotron/home.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -53,8 +59,29 @@ export default function Profile() {
   console.log("Profile data:", userProfile);
   console.log("Detailed Profile:", profileDetails);
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    name: `Tentang Saya | ${userProfile.fullname}`,
+    description:
+      "Informasi lengkap mengenai latar belakang, pendidikan, dan pengalaman saya.",
+    url: "https://afrizahanif.com/profile", // Adjust if your route is /about
+    mainEntity: {
+      "@type": "Person",
+      name: userProfile.fullname,
+      jobTitle: userProfile.status,
+      url: "https://afrizahanif.com",
+      image: myPhoto.src,
+      sameAs: socialItems.map((item) => item.url), // Links to your social media
+    },
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Tentang Saya"
@@ -64,7 +91,7 @@ export default function Profile() {
       />
 
       {/* My Profile */}
-      <div className="row g-3 pb-3">
+      <section className="row g-3 pb-3" aria-label="Biodata">
         {/* Profile Image */}
         <div className="col-12 col-lg-4">
           <div
@@ -103,27 +130,31 @@ export default function Profile() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Skills */}
-      <CardGroup title="Keterampilan / Keahlian">
-        {skillItems.map((item) => (
-          <Card key={item.key} insideGroup>
-            <h2 className="card-title text-center col">{item.name}</h2>
-            <div className="text-center pb-1 text-body-secondary">
-              <i>
-                {item.level} sejak {item.since}
-              </i>
-            </div>
-          </Card>
-        ))}
-      </CardGroup>
+      <section aria-label="Keterampilan">
+        <CardGroup title="Keterampilan / Keahlian">
+          {skillItems.map((item) => (
+            <Card key={item.key} insideGroup>
+              <h3 className="card-title text-center col">{item.name}</h3>
+              <div className="text-center pb-1 text-body-secondary">
+                <i>
+                  {item.level} sejak {item.since}
+                </i>
+              </div>
+            </Card>
+          ))}
+        </CardGroup>
+      </section>
 
       {/* Philosophy */}
-      <Jumbotron backgroundColor="tertiary" className="my-2">
-        <h2>Filosofi Kerja Saya</h2>
-        <p className="lead">{userProfile.philosophy}</p>
-      </Jumbotron>
+      <section aria-label="Filosofi Kerja">
+        <Jumbotron backgroundColor="tertiary" className="my-2">
+          <h2>Filosofi Kerja Saya</h2>
+          <p className="lead">{userProfile.philosophy}</p>
+        </Jumbotron>
+      </section>
 
       {/* Hobbies */}
       <Feature

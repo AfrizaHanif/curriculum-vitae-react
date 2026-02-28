@@ -18,7 +18,7 @@ export default function Colophon() {
         className="my-3"
       />
 
-      <div className="row g-5">
+      <main className="row g-5">
         {/* Main Content */}
         <div className="col-lg-8">
           <article className="blog-post">
@@ -127,7 +127,7 @@ export default function Colophon() {
         </div>
 
         {/* Source Code */}
-        <div className="col-lg-4">
+        <aside className="col-lg-4">
           <div className="sticky-lg-top" style={{ top: "2rem" }}>
             <div className="p-4 mb-3 bg-body-tertiary rounded">
               <h4 className="fst-italic">Source Code</h4>
@@ -149,8 +149,8 @@ export default function Colophon() {
               </Button>
             </div>
           </div>
-        </div>
-      </div>
+        </aside>
+      </main>
     </AppLayout>
   );
 }

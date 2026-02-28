@@ -18,6 +18,7 @@ import Offcanvas from "@/components/ui/bootstrap/offcanvas";
 import Accordion from "@/components/ui/bootstrap/accordion";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import CaseStudyNavigation from "./case-study-navigation";
+import JsonLd from "@/components/json-ld";
 
 // (IMPORTANT) This is exclusively for page with dynamic ID / Slug. That include this page inside of ID / Slug
 export function generateStaticParams() {
@@ -212,8 +213,58 @@ export default async function CaseStudy({
     },
   ];
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: `Studi Kasus: ${item.title}`,
+        description: `Studi kasus mendalam mengenai proyek ${item.title}.`,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        image: (item.image as any)?.src || item.image,
+        author: {
+          "@type": "Person",
+          name: "Muhammad Afriza Hanif",
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://afrizahanif.com",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Portfolio",
+            item: "https://afrizahanif.com/portfolio",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: item.title,
+            item: `https://afrizahanif.com/portfolio/${item.slug}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 4,
+            name: "Studi Kasus",
+            item: `https://afrizahanif.com/portfolio/${item.slug}/case-study`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Initialize ScrollSpy for the body */}
       <ScrollSpy targetId="case-study-nav" />
 
@@ -226,7 +277,7 @@ export default async function CaseStudy({
       />
 
       {/* Menu button */}
-      <div className="mb-3">
+      <nav className="mb-3" aria-label="Case study page navigation">
         {/* Back to portfolio */}
         <Link href={`/portfolio/${item.slug}`}>
           <Button color="secondary" className="mb-2 me-2" outline>
@@ -254,12 +305,12 @@ export default async function CaseStudy({
           <i className="bi bi-list pe-2"></i>
           Daftar Isi
         </Button>
-      </div>
+      </nav>
 
       {/* ScrollSpy Area */}
-      <div className="row">
+      <main className="row">
         {/* Navigations */}
-        <div className="col-lg-4 d-none d-lg-block border-end pe-lg-3">
+        <aside className="col-lg-4 d-none d-lg-block border-end pe-lg-3">
           <div
             className="sticky-lg-top"
             style={{
@@ -296,18 +347,23 @@ export default async function CaseStudy({
               </nav>
             </nav>
           </div>
-        </div>
+        </aside>
         {/* Contents */}
-        <div className="col-12 col-lg-8">
-          <div className="scrollspy-example-2 ps-lg-3" tabIndex={0}>
+        <article className="col-12 col-lg-8">
+          <div
+            className="scrollspy-example-2 ps-lg-3"
+            tabIndex={0}
+            role="document"
+          >
             {caseStudySections.map((section) => (
-              <div
+              <section
                 key={section.id}
                 id={section.id}
                 className="mb-3"
                 style={{ scrollMarginTop: "4rem" }}
+                aria-labelledby={`${section.id}-heading`}
               >
-                <h4>{section.title}</h4>
+                <h2 id={`${section.id}-heading`}>{section.title}</h2>
                 <SectionContent
                   sectionId={section.id}
                   sectionTitle={section.title}
@@ -316,11 +372,11 @@ export default async function CaseStudy({
                   diagram={diagram}
                   solution={solution}
                 />
-              </div>
+              </section>
             ))}
           </div>
-        </div>
-      </div>
+        </article>
+      </main>
 
       {/* Offcanvas */}
       {/* Explanation */}

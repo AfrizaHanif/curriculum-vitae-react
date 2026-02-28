@@ -12,6 +12,7 @@ import jumbotronImage from "../../../../assets/images/jumbotron/project.jpg";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import { useState } from "react";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 export default function Project() {
   // Set useState for replacing element
@@ -123,8 +124,29 @@ export default function Project() {
     })),
   ];
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Proyek Lainnya | Muhammad Afriza Hanif",
+    description: "Pelajari proyek-proyek yang sedang dikerjakan oleh saya",
+    url: "https://afrizahanif.com/project",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: projectItems.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `https://afrizahanif.com/project/${item.slug}`,
+        name: item.title,
+      })),
+    },
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Proyek Lainnya"
@@ -134,7 +156,7 @@ export default function Project() {
       />
 
       {/* Sorting Controls */}
-      <div className="container-fluid mb-3">
+      <section className="container-fluid mb-3" aria-label="Sorting Controls">
         <div className="d-flex justify-content-end align-items-center">
           <label htmlFor="sortOrder" className="me-2 fw-semibold">
             Urutkan:
@@ -151,10 +173,12 @@ export default function Project() {
             <option value="za">Judul (Z-A)</option>
           </select>
         </div>
-      </div>
+      </section>
 
       {/* List of Project (Cards) */}
-      <NavTab id="project-tab" items={tabItems} />
+      <section aria-label="Daftar Proyek">
+        <NavTab id="project-tab" items={tabItems} />
+      </section>
     </AppLayout>
   );
 }

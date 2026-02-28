@@ -14,6 +14,7 @@ import Button from "@/components/ui/bootstrap/button";
 import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 // Get Data from JSON (Single)
 const userProfile = profileItem[0];
@@ -71,9 +72,45 @@ export default function Home() {
     },
   ];
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        name: userProfile.fullname,
+        jobTitle: userProfile.status,
+        url: "https://afrizahanif.com",
+        image: myPhoto.src,
+      },
+      {
+        "@type": "WebSite",
+        url: "https://afrizahanif.com",
+        name: `${userProfile.fullname} - Portfolio`,
+        description: "Sebuah Website Portofolio dari Muhammad Afriza Hanif",
+        publisher: {
+          "@type": "Person",
+          name: userProfile.fullname,
+        },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate:
+              "https://afrizahanif.com/search?q={search_term_string}",
+          },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+
   // Content Area
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Welcome Jumbotron */}
       <JumbotronTitle
         title={userProfile.fullname}

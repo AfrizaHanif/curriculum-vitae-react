@@ -6,6 +6,7 @@ import Accordion from "@/components/ui/bootstrap/accordion";
 import { setupItems } from "@/lib/data/profileData";
 import jumbotronImage from "../../../../assets/images/jumbotron/setup.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -42,8 +43,29 @@ export default function Setup() {
   }));
   console.log("Items of Accordion: ", accordionItems.length);
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Peralatan Saya | Muhammad Afriza Hanif",
+    description:
+      "Pelajari peralatan yang saya miliki selama mengerjakan proyek",
+    url: "https://afrizahanif.com/setup",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: setupItems.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.name,
+      })),
+    },
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Peralatan Saya"
@@ -53,7 +75,7 @@ export default function Setup() {
       />
 
       {/* Content */}
-      <div className="row justify-content-center g-4">
+      <section className="row justify-content-center g-4">
         {/* Image of current setup */}
         <div className="col-12 col-lg-6">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
@@ -79,7 +101,7 @@ export default function Setup() {
             openItemIndex={0}
           />
         </div>
-      </div>
+      </section>
     </AppLayout>
   );
 }

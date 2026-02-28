@@ -10,6 +10,7 @@ import Button from "@/components/ui/bootstrap/button";
 import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
@@ -63,8 +64,53 @@ export default async function SelectedPost({
   const nextItem =
     currentIndex < blogItems.length - 1 ? blogItems[currentIndex + 1] : null;
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        headline: item.title,
+        description: item.summary,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        image: (item.image as any)?.src || item.image,
+        url: `https://afrizahanif.com/blog/${item.slug}`,
+        author: {
+          "@type": "Person",
+          name: "Muhammad Afriza Hanif",
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://afrizahanif.com",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Blog",
+            item: "https://afrizahanif.com/blog",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: item.title,
+            item: `https://afrizahanif.com/blog/${item.slug}`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       <BreadcrumbSetter title={item.title} />
 
       {/* Jumbotron */}
@@ -75,10 +121,9 @@ export default async function SelectedPost({
       />
 
       {/* Contents */}
-      <div className="row justify-content-center g-2">
-        <div className="col-12 col-lg-8 order-2 order-lg-1">
-          {/* Image */}
-          <div
+      <main className="row justify-content-center g-2">
+        <article className="col-12 col-lg-8 order-2 order-lg-1">
+          <figure
             className="position-relative mb-3"
             style={{ aspectRatio: "16 / 9" }}
           >
@@ -89,16 +134,15 @@ export default async function SelectedPost({
               fill
               style={{ objectFit: "cover", objectPosition: "top" }}
             />
-          </div>
-          {/* Description */}
-          <div className="mt-4">
+          </figure>
+          <section id="blog-content" aria-label="Blog content" className="mt-4">
             <SanitizedContent className="lead" content={item.content} />
-          </div>
-        </div>
-        <div className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
+          </section>
+        </article>
+        <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Menu button */}
-            <div className="pb-3">
+            <nav className="pb-3" aria-label="Blog post navigation">
               <div className="row justify-content-center g-2">
                 {/* Back to list of posts */}
                 <div className="col">
@@ -157,12 +201,12 @@ export default async function SelectedPost({
                   </ButtonGroup>
                 </div>
               </div>
-            </div>
+            </nav>
             {/* Details */}
             <DetailItem type={"Blog"} item={item} />
           </div>
-        </div>
-      </div>
+        </aside>
+      </main>
     </AppLayout>
   );
 }

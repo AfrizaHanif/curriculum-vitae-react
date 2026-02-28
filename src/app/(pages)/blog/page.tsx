@@ -10,6 +10,7 @@ import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 export default function Blog() {
   console.info("This page are being sorted from newest post");
@@ -36,8 +37,29 @@ export default function Blog() {
     },
   ];
 
+  // JSON-LD Structured Data for Blog
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Blog | Muhammad Afriza Hanif",
+    description: "Tulisan dan artikel mengenai teknologi dan pengalaman saya.", // Adjust description
+    url: "https://afrizahanif.com/blog",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: blogItems.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `https://afrizahanif.com/blog/${item.slug}`,
+        name: item.title,
+      })),
+    },
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Blog"
@@ -47,36 +69,40 @@ export default function Blog() {
       />
 
       {/* Featured Post Heroes */}
-      <Heroes
-        type="responsive"
-        title={featuredPost.title}
-        img={featuredPost.image}
-        buttonItem={heroesButtonItem}
-      >
-        {featuredPost.summary}
-      </Heroes>
+      <section aria-label="Featured Post">
+        <Heroes
+          type="responsive"
+          title={featuredPost.title}
+          img={featuredPost.image}
+          buttonItem={heroesButtonItem}
+        >
+          {featuredPost.summary}
+        </Heroes>
+      </section>
 
       {/* List of Posts (Cards) */}
-      <PaginatedList
-        items={sortItemsByDate(blogItems)}
-        itemsPerPage={9}
-        renderItem={(item) => (
-          <Card
-            key={item.id}
-            header={formatDate(item.date)}
-            image={item.image}
-            footer={`Oleh ${item.author}`}
-            url={`/blog/${item.slug}`}
-            buttonName="Lihat"
-            insideGroup
-            fullHeight
-            clickable
-          >
-            <h5 className="card-title">{item.title}</h5>
-            <p>{item.summary}</p>
-          </Card>
-        )}
-      />
+      <section aria-label="Daftar Artikel">
+        <PaginatedList
+          items={sortItemsByDate(blogItems)}
+          itemsPerPage={9}
+          renderItem={(item) => (
+            <Card
+              key={item.id}
+              header={formatDate(item.date)}
+              image={item.image}
+              footer={`Oleh ${item.author}`}
+              url={`/blog/${item.slug}`}
+              buttonName="Lihat"
+              insideGroup
+              fullHeight
+              clickable
+            >
+              <h5 className="card-title">{item.title}</h5>
+              <p>{item.summary}</p>
+            </Card>
+          )}
+        />
+      </section>
     </AppLayout>
   );
 }

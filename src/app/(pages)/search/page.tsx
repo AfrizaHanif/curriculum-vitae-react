@@ -12,6 +12,7 @@ import Link from "next/link";
 import { formatDateRange } from "@/lib/utils";
 import jumbotronImage from "../../../assets/images/jumbotron/search.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 function SearchResults() {
   // Retrieve query parameters from the url
@@ -30,8 +31,19 @@ function SearchResults() {
   });
   console.log("Items matches with query: ", filteredItems.length);
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SearchResultsPage",
+    name: `Hasil Pencarian: ${query} | Muhammad Afriza Hanif`,
+    url: `https://afrizahanif.com/search?q=${query}`,
+  };
+
   return (
     <>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Hasil Pencarian"
@@ -45,52 +57,54 @@ function SearchResults() {
       />
 
       {/* Result of search (Cards) */}
-      {filteredItems.length > 0 ? (
-        <CardGroup>
-          {filteredItems.map((item) => (
-            <CardBlank key={item.id} fullHeight insideGroup>
-              <div className="card-header text-uppercase small fw-semibold text-body-secondary">
-                {item.category}
-              </div>
-              <NextImage
-                src={item.image}
-                alt={item.title}
-                className="card-img-top rounded-0"
-                width={500}
-                height={300}
-                style={{
-                  aspectRatio: "16 / 9",
-                  objectFit: "cover",
-                  height: "auto",
-                  objectPosition: "top",
-                }}
-              />
-              <div className="card-body">
-                <h5 className="card-title">{item.title}</h5>
-              </div>
-              <div className="card-footer text-body-secondary">
-                <div className="row justify-content-center align-items-center g-2">
-                  <div className="col-8 small">
-                    {formatDateRange(item.start_period, item.finish_period)}
-                  </div>
-                  <div className="col-4 text-end">
-                    <Link href={`/portfolio/${item.slug}`}>
-                      <Button color="primary" size="sm" stretchedLink>
-                        Lihat
-                      </Button>
-                    </Link>
+      <section aria-label="Search Results">
+        {filteredItems.length > 0 ? (
+          <CardGroup>
+            {filteredItems.map((item) => (
+              <CardBlank key={item.id} fullHeight insideGroup>
+                <div className="card-header text-uppercase small fw-semibold text-body-secondary">
+                  {item.category}
+                </div>
+                <NextImage
+                  src={item.image}
+                  alt={item.title}
+                  className="card-img-top rounded-0"
+                  width={500}
+                  height={300}
+                  style={{
+                    aspectRatio: "16 / 9",
+                    objectFit: "cover",
+                    height: "auto",
+                    objectPosition: "top",
+                  }}
+                />
+                <div className="card-body">
+                  <h5 className="card-title">{item.title}</h5>
+                </div>
+                <div className="card-footer text-body-secondary">
+                  <div className="row justify-content-center align-items-center g-2">
+                    <div className="col-8 small">
+                      {formatDateRange(item.start_period, item.finish_period)}
+                    </div>
+                    <div className="col-4 text-end">
+                      <Link href={`/portfolio/${item.slug}`}>
+                        <Button color="primary" size="sm" stretchedLink>
+                          Lihat
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardBlank>
-          ))}
-        </CardGroup>
-      ) : (
-        <div className="text-center py-5">
-          <h3>No results found</h3>
-          <p>Try adjusting your search query.</p>
-        </div>
-      )}
+              </CardBlank>
+            ))}
+          </CardGroup>
+        ) : (
+          <div className="text-center py-5">
+            <h3>No results found</h3>
+            <p>Try adjusting your search query.</p>
+          </div>
+        )}
+      </section>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import ContactForm from "./contact-form";
 import jumbotronImage from "../../../assets/images/jumbotron/contact.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
+import JsonLd from "@/components/json-ld";
 
 const userProfile = profileItem[0];
 
@@ -79,8 +80,25 @@ export default function Contact() {
   //   },
   // ];
 
+  // JSON-LD Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "Hubungi Saya | Muhammad Afriza Hanif",
+    description: "Halaman kontak untuk menghubungi Muhammad Afriza Hanif.",
+    url: "https://afrizahanif.com/contact",
+    mainEntity: {
+      "@type": "Person",
+      name: "Muhammad Afriza Hanif",
+      url: "https://afrizahanif.com",
+    },
+  };
+
   return (
     <AppLayout>
+      {/* Structured Data */}
+      <JsonLd data={jsonLd} />
+
       {/* Jumbotron */}
       <JumbotronTitle
         title="Hubungi Saya"
@@ -90,7 +108,7 @@ export default function Contact() {
       />
 
       {/* Content */}
-      <div className="row justify-content-center g-3">
+      <div className="row justify-content-center g-3" role="main">
         {/* Accordion */}
         <div className="col-12 col-lg-4">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
@@ -102,9 +120,9 @@ export default function Contact() {
           </div>
         </div>
         {/* Form */}
-        <div className="col-12 col-lg-8">
+        <section className="col-12 col-lg-8" aria-label="Contact Form">
           <ContactForm />
-        </div>
+        </section>
       </div>
     </AppLayout>
   );
