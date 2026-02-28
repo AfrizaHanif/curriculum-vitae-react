@@ -30,6 +30,13 @@ export default function Footer() {
           suppressHydrationWarning
         >
           © {new Date().getFullYear()} {userProfile.fullname}
+          <span className="mx-2">|</span>
+          <Link
+            href="/colophon"
+            className="text-body-secondary text-decoration-none small"
+          >
+            Site Specs
+          </Link>
         </span>
       </div>
       <ul className="nav col-md-4 justify-content-end list-unstyled d-flex">

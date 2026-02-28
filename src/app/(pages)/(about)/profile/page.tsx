@@ -57,7 +57,7 @@ export default function Profile() {
     <AppLayout>
       {/* Jumbotron */}
       <JumbotronTitle
-        title="Profil"
+        title="Tentang Saya"
         description={`${userProfile.status} | ${userProfile.tagline}`}
         backgroundImg={jumbotronImage.src}
         className="my-3"

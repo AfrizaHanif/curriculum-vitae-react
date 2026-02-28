@@ -9,7 +9,7 @@ import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
-  title: "Peralatan",
+  title: "Peralatan Saya",
   description: "Pelajari peralatan yang saya miliki selama mengerjakan proyek",
 };
 

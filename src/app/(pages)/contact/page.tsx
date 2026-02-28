@@ -83,7 +83,7 @@ export default function Contact() {
     <AppLayout>
       {/* Jumbotron */}
       <JumbotronTitle
-        title="Kontak"
+        title="Hubungi Saya"
         description="Punya pertanyaan atau ingin bekerja sama? Silakan isi form di bawah ini."
         backgroundImg={jumbotronImage.src}
         className="my-3"

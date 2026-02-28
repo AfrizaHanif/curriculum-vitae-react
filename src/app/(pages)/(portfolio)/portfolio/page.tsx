@@ -141,7 +141,7 @@ export default function Portfolio() {
     <AppLayout>
       {/* Jumbotron */}
       <JumbotronTitle
-        title="Portfolio"
+        title="Portfolio Utama"
         description="Kumpulan proyek yang menampilkan keahlian saya dalam pengembangan web dan desain."
         backgroundImg={jumbotronImage.src}
         className="my-3"

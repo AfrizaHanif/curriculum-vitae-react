@@ -23,7 +23,8 @@ const breadcrumbNameMap: { [key: string]: string } = {
   "/portfolio": "Portfolio Utama",
   "/project": "Proyek Lainnya",
   "/testimony": "Testimoni",
-  "/contact": "Kontak",
+  "/contact": "Hubungi Saya",
+  "/colophon": "Spesifikasi Website",
   // Add any route overrides here when the auto-generated name isn't ideal.
   // For example: "/faq": "Frequently Asked Questions",
 };

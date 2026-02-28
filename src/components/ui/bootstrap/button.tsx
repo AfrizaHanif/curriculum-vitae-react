@@ -1,6 +1,9 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import clsx from "clsx";
-import type { AllowedColorsStatus, AllowedSizeButton } from "../../../types/common"; // Adjust the import path
+import type {
+  AllowedColorsStatus,
+  AllowedSizeButton,
+} from "../../../types/common"; // Adjust the import path
 
 type BaseButtonProps = {
   dataToggle?:
@@ -20,6 +23,7 @@ type BaseButtonProps = {
   disabled?: boolean;
   stretchedLink?: boolean;
   fullWidth?: boolean;
+  newTab?: boolean;
 };
 
 type ButtonAsButton = BaseButtonProps &
@@ -41,12 +45,13 @@ export default function Button({
   disabled = false,
   stretchedLink = false,
   fullWidth = false,
+  newTab = false,
   children,
   as = "button",
   className,
   ...props
 }: ButtonProps) {
-  // Classes
+  // Base Classes
   const classes = clsx(
     "btn",
     `btn-${outline ? "outline-" : ""}${color}`,
@@ -55,6 +60,9 @@ export default function Button({
     fullWidth && "w-100",
     className,
   );
+
+  // New Tab Classes
+  const newTabClasses = { target: "_blank", rel: "noopener noreferrer" };
 
   // Check if this component uses Button or A tag
   if (as === "button") {
@@ -78,6 +86,7 @@ export default function Button({
         data-bs-toggle={dataToggle}
         data-bs-target={`#${dataTarget}`}
         data-bs-title={dataTitle}
+        {...(newTab && newTabClasses)}
         {...(props as ComponentPropsWithoutRef<"a">)}
       >
         {children}

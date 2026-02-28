@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
-  title: "Portfolio",
+  title: "Portfolio Utama",
   description:
     "Kumpulan proyek yang menampilkan keahlian saya dalam pengembangan web dan desain",
 };

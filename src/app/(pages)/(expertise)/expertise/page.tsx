@@ -12,7 +12,7 @@ import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
-  title: "Kehalian",
+  title: "Ringkasan Kehalian",
   description:
     "Pelajari keahlian yang saya miliki beserta proyek yang terlibat",
 };
@@ -32,7 +32,7 @@ export default function Expertise() {
     <AppLayout>
       {/* Jumbotron */}
       <JumbotronTitle
-        title="Keahlian"
+        title="Ringkasan Kehalian"
         description="Saya mengubah ide kompleks menjadi solusi web yang fungsional, intuitif, dan berbasis data."
         backgroundImg={jumbotronImage.src}
         className="my-3"
