@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import Breadcrumb from "../ui/bootstrap/breadcrumb";
 import { Container } from "react-bootstrap";
 import Header from "./header";
-import Navbar from "./navbar";
+import NavbarMobile from "./navbar-mobile";
+import NavbarDesktop from "./navbar-desktop";
 import Footer from "./footer";
 import { useBreadcrumb } from "@/context/breadcrumb-context";
 import ScrollToTop from "../ui/bootstrap/scroll-to-top";
@@ -85,11 +86,12 @@ export default function AppLayout({
   return (
     <div className="d-flex flex-column min-vh-100">
       <div className="d-lg-none sticky-top">
-        <Navbar />
+        <NavbarMobile />
       </div>
       <div className="d-none d-lg-block">
         <Header />
       </div>
+      <NavbarDesktop />
       <Container className="py-4 flex-grow-1 d-flex flex-column">
         {/* Render the breadcrumb only if there are items */}
         {showBreadcrumb && breadcrumbItems.length > 0 && (

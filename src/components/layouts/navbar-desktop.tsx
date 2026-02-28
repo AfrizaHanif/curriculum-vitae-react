@@ -1,24 +1,21 @@
 "use client";
 
-import { useState, FormEvent, Fragment, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import "./header.css";
-import { profileItem } from "@/lib/data/profileData";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState, useRef, FormEvent, Fragment } from "react";
 import NextImage from "../ui/next/next-image";
 import logoImage from "../../assets/images/logo/logo-only-white.png";
-import ColorModeToggle from "../ui/bootstrap/color-mode-toggle";
-import { getPathname, isActiveLink } from "@/lib/utils";
 import { headerItems } from "@/lib/data/headerData";
+import { getPathname, isActiveLink } from "@/lib/utils";
 import Button from "../ui/bootstrap/button";
 
-// Get Data from JSON (Single)
-const userProfile = profileItem[0];
-
-export default function Header() {
-  const pathname = usePathname();
+export default function NavbarDesktop() {
+  const pathname = usePathname(); // Get pathname
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const lastScrollY = useRef(0);
   const [maxNavItems, setMaxNavItems] = useState(9);
 
   // Handle search
@@ -28,6 +25,22 @@ export default function Header() {
       router.push(`/search?q=${encodeURIComponent(search)}`);
     }
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > 200 && currentScrollY < lastScrollY.current) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     // Max item depend of window's width
@@ -59,28 +72,44 @@ export default function Header() {
     headerItems.length > maxNavItems ? headerItems.slice(maxNavItems - 1) : [];
 
   return (
-    <header>
-      {/* Main Header */}
-      <div className="px-3 py-2 text-bg-dark border-bottom">
+    <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          .navbar-sticky {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          .navbar-sticky.visible {
+            transform: translateY(0);
+            opacity: 1;
+          }
+          .form-control-dark::placeholder {
+            color: rgba(255, 255, 255, 0.75);
+            opacity: 1;
+          }
+        `,
+        }}
+      />
+      <header
+        className={`p-3 text-bg-dark fixed-top d-none d-lg-block shadow navbar-sticky ${isVisible ? "visible" : ""}`}
+      >
         <div className="container">
           <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            {/* Header logo */}
             <Link
-              href="/"
-              className="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none"
+              className="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none"
+              href={"/"}
             >
               <NextImage
                 src={logoImage}
                 alt={"Logo"}
                 className="me-2"
-                height={40}
+                height={30}
                 disableSpinner
               />
-              <span className="fs-4 d-none d-lg-inline">
-                {userProfile.fullname}
-              </span>
             </Link>
-            <ul className="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
+            <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
               {/* Header navigation */}
               {/* Visible (Outside 'More' menu) */}
               {visibleHeaderItems.map((item) => {
@@ -92,7 +121,7 @@ export default function Header() {
                   return (
                     <li key={item.label} className="nav-item dropdown">
                       <a
-                        className={`nav-link dropdown-toggle ${
+                        className={`nav-link px-2 dropdown-toggle ${
                           isDropdownActive ? "text-secondary" : "text-white"
                         }`}
                         href="#"
@@ -101,11 +130,12 @@ export default function Header() {
                         aria-expanded="false"
                       >
                         <svg
-                          className="bi d-block mx-auto mb-1"
-                          width="24"
-                          height="24"
+                          className="bi me-2"
+                          width="16"
+                          height="16"
+                          aria-hidden="true"
                         >
-                          <use xlinkHref={`#${item.icon}`} />
+                          <use xlinkHref={`#${item.icon}`}></use>
                         </svg>
                         {item.label}
                       </a>
@@ -144,17 +174,17 @@ export default function Header() {
                   <li key={item.label}>
                     <Link
                       href={item.href ?? "#"}
-                      className={`nav-link ${
+                      className={`nav-link px-2 ${
                         isActive ? "text-secondary" : "text-white"
                       }`}
                     >
                       <svg
-                        className="bi d-block mx-auto mb-1"
-                        width="24"
-                        height="24"
+                        className="bi me-2"
+                        width="16"
+                        height="16"
                         aria-hidden="true"
                       >
-                        <use xlinkHref={`#${item.icon}`} />
+                        <use xlinkHref={`#${item.icon}`}></use>
                       </svg>
                       {item.label}
                     </Link>
@@ -165,19 +195,12 @@ export default function Header() {
               {overflowHeaderItems.length > 0 && (
                 <li className="nav-item dropdown">
                   <a
-                    className="nav-link dropdown-toggle text-white"
+                    className="nav-link dropdown-toggle px-2 text-white"
                     href="#"
                     id="dropdown-more"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <svg
-                      className="bi d-block mx-auto mb-1"
-                      width="24"
-                      height="24"
-                    >
-                      <use xlinkHref="#more" />
-                    </svg>
                     More
                   </a>
                   <ul
@@ -245,52 +268,36 @@ export default function Header() {
                 </li>
               )}
             </ul>
+            <form
+              className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"
+              role="search"
+              onSubmit={handleSearch}
+            >
+              <div className="input-group">
+                <input
+                  type="search"
+                  className="form-control form-control-dark text-bg-dark"
+                  placeholder="Cari portfolio..."
+                  aria-label="Search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <Button color="dark" className="border-secondary" type="submit">
+                  <i className="bi bi-search"></i>
+                </Button>
+              </div>
+            </form>
+            {/* <div className="text-end">
+              <button type="button" className="btn btn-outline-light me-2">
+                Login
+              </button>
+              <button type="button" className="btn btn-warning">
+                Sign-up
+              </button>
+            </div> */}
           </div>
         </div>
-      </div>
-      {/* Sub Header */}
-      <div className="px-3 py-2 border-bottom mb-3">
-        <div className="container d-flex flex-wrap justify-content-center">
-          {/* Search form */}
-          <form
-            className="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto"
-            role="search"
-            onSubmit={handleSearch}
-          >
-            <div className="input-group">
-              <input
-                type="search"
-                className="form-control"
-                placeholder="Cari portfolio..."
-                aria-label="Search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              {/* <button
-                className="btn btn-dark border-secondary-subtle"
-                type="submit"
-              >
-                <i className="bi bi-search"></i>
-              </button> */}
-              <Button
-                color="secondary"
-                className="border-secondary-subtle"
-                type="submit"
-                outline
-              >
-                <i className="bi bi-search"></i>
-              </Button>
-            </div>
-          </form>
-          {/* Color mode toggle */}
-          <div className="text-end">
-            {/* <button type="button" className="btn btn-light text-dark me-2">
-              Login
-            </button> */}
-            <ColorModeToggle />
-          </div>
-        </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

@@ -16,11 +16,12 @@ import Button from "../ui/bootstrap/button";
 // Get Data from JSON (Single)
 const userProfile = profileItem[0];
 
-export default function Navbar() {
+export default function NavbarMobile() {
   const pathname = usePathname(); // Get pathname
   const router = useRouter();
   const [search, setSearch] = useState("");
 
+  // Handle search
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (search.trim()) {
@@ -180,21 +181,28 @@ export default function Navbar() {
           </ul>
           {/* Search form */}
           <form className="d-flex mt-3" role="search" onSubmit={handleSearch}>
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Cari portfolio..."
-              aria-label="Search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button
-              className="btn btn-outline-light"
+            <div className="input-group">
+              <span className="input-group-text border-secondary-subtle">
+                <i className="bi bi-search"></i>
+              </span>
+              <input
+                className="form-control me-2"
+                type="search"
+                placeholder="Cari portfolio..."
+                aria-label="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <Button
+              color="secondary"
+              className="btn-outline-light"
               type="submit"
               data-bs-dismiss="offcanvas"
+              outline
             >
-              Search
-            </button>
+              Cari
+            </Button>
           </form>
         </Offcanvas>
       </div>
