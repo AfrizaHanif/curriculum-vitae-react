@@ -3,6 +3,7 @@
 
 interface BaseFeatureData {
   location: string;
+  address: string;
   status: "Planning" | "Ongoing" | "Stopped" | "Finished";
   description?: string;
   latitude?: number;

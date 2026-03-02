@@ -1,6 +1,6 @@
 import { AllowedColorsStatus } from "@/types/common";
 import clsx from "clsx";
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import NextImage from "../next/next-image";
 
 // This component are similar with card.tsx, but with blank card. Visit Bootstrap's Documentation for insertion of content inside card
@@ -15,6 +15,7 @@ type CardsProps = ComponentPropsWithoutRef<"div"> & {
   insideGroup?: boolean;
   asGroup?: boolean;
   children: ReactNode;
+  as?: ElementType;
 };
 
 export default function CardBlank({
@@ -27,6 +28,7 @@ export default function CardBlank({
   insideGroup = false,
   asGroup = false,
   children,
+  as: Tag = "div",
   style,
   className,
   ...props
@@ -62,19 +64,19 @@ export default function CardBlank({
   if (horizontal) {
     // Horizontal Layout
     cardComponent = (
-      <div className={horClasses} style={style} {...props}>
+      <Tag className={horClasses} style={style} {...props}>
         {image && overlay && imageOverlay}
         {children}
-      </div>
+      </Tag>
     );
   } else {
     // Vertical Layout (Default)
     cardComponent = (
-      <div className={verClasses} style={style} {...props}>
+      <Tag className={verClasses} style={style} {...props}>
         {image && overlay && imageOverlay}
         {/* <div className={overlay ? "card-img-overlay" : ""}>{children}</div> */}
         {children}
-      </div>
+      </Tag>
     );
   }
 

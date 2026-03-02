@@ -1,6 +1,6 @@
 import { AllowedSize } from "@/types/common";
 import clsx from "clsx";
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
 type OffcanvasProps = ComponentPropsWithoutRef<"div"> & {
   id: string;
@@ -10,6 +10,7 @@ type OffcanvasProps = ComponentPropsWithoutRef<"div"> & {
   responsive?: AllowedSize;
   position?: "start" | "end" | "top" | "bottom";
   children: ReactNode;
+  as?: ElementType;
 };
 
 export default function Offcanvas({
@@ -21,6 +22,7 @@ export default function Offcanvas({
   position = "start",
   children,
   className,
+  as: Tag = "div",
   ...props
 }: OffcanvasProps) {
   const classes = clsx(
@@ -31,7 +33,7 @@ export default function Offcanvas({
   );
 
   return (
-    <div
+    <Tag
       className={classes}
       tabIndex={-1}
       id={id}
@@ -52,6 +54,6 @@ export default function Offcanvas({
         ></button>
       </div>
       <div className="offcanvas-body">{children}</div>
-    </div>
+    </Tag>
   );
 }

@@ -17,6 +17,7 @@ export const getPortfolioItem = cache((slug: string) => {
         p.id === decodedSlug,
     );
   } catch (error) {
+    console.error(error);
     return undefined;
   }
 });

@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, ElementType } from "react";
 import "./feature.css";
 import Button from "./button";
 import { FeatureItem } from "@/lib/bootstrap-types";
@@ -10,6 +10,7 @@ type FeatureProps = ComponentPropsWithoutRef<"div"> & {
   itemPerRow?: number;
   items: FeatureItem[];
   chevron?: boolean;
+  as?: ElementType;
 };
 
 export default function Feature({
@@ -20,11 +21,12 @@ export default function Feature({
   chevron = false,
   items,
   className,
+  as: Tag = "div",
   ...props
 }: FeatureProps) {
   if (type === "columns") {
     return (
-      <div className={`px-0 py-3 ${className || ""}`} id={id} {...props}>
+      <Tag className={`px-0 py-3 ${className || ""}`} id={id} {...props}>
         {title && <h2 className="pb-2 border-bottom">{title}</h2>}
         <div className={`row g-4 py-5 row-cols-1 row-cols-lg-${itemPerRow}`}>
           {items.map((item) => (
@@ -60,11 +62,11 @@ export default function Feature({
             </div>
           ))}
         </div>
-      </div>
+      </Tag>
     );
   } else if (type === "hanging") {
     return (
-      <div
+      <Tag
         className={`container px-0 py-3 ${className || ""}`}
         id={id}
         {...props}
@@ -103,7 +105,7 @@ export default function Feature({
             </div>
           ))}
         </div>
-      </div>
+      </Tag>
     );
   }
 }

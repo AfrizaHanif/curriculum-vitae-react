@@ -1,6 +1,6 @@
 import { CarouselItem } from "@/lib/bootstrap-types";
 import clsx from "clsx";
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -10,6 +10,7 @@ type CarouselProps = ComponentPropsWithoutRef<"div"> & {
   indicator?: boolean;
   fade?: boolean;
   children: ReactNode;
+  as?: ElementType;
 };
 
 export default function Carousel({
@@ -18,12 +19,13 @@ export default function Carousel({
   indicator = false,
   fade = false,
   className,
+  as: Tag = "div",
   ...props
 }: CarouselProps) {
   const classes = clsx("carousel", "slide", fade && "carousel-fade", className);
 
   return (
-    <div id={id} className={classes} {...props}>
+    <Tag id={id} className={classes} {...props}>
       {/* Indicator */}
       {indicator && (
         <div className="carousel-indicators">
@@ -76,6 +78,6 @@ export default function Carousel({
         <span className="carousel-control-next-icon" aria-hidden="true"></span>
         <span className="visually-hidden">Next</span>
       </button>
-    </div>
+    </Tag>
   );
 }

@@ -1,16 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  ElementType,
+  ComponentPropsWithoutRef,
+} from "react";
 import NextImage from "../next/next-image";
 import NextImageModal from "./next-image-modal";
 
-interface ProjectGalleryProps {
+type ProjectGalleryProps = ComponentPropsWithoutRef<"div"> & {
   mainImage: string;
   images: string[];
   altText: string;
   thumbnailsPerRow?: number;
   modalId?: string;
-}
+  as?: ElementType;
+};
 
 export default function ProjectGallery({
   mainImage,
@@ -18,6 +24,8 @@ export default function ProjectGallery({
   altText,
   thumbnailsPerRow = 5, // Default to 5 thumbnails per row
   modalId,
+  as: Tag = "div",
+  ...props
 }: ProjectGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(mainImage);
 
@@ -37,7 +45,7 @@ export default function ProjectGallery({
   ).toPrecision(4)}rem)`;
 
   return (
-    <div>
+    <Tag {...props}>
       {/* Main Image Display */}
       <div className="position-relative mb-3" style={{ aspectRatio: "16 / 9" }}>
         <NextImageModal
@@ -92,6 +100,6 @@ export default function ProjectGallery({
           )}
         </div>
       )}
-    </div>
+    </Tag>
   );
 }

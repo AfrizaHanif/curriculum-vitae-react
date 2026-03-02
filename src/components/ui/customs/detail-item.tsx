@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, ElementType } from "react";
 import CardBlank from "../bootstrap/card-blank";
 import { formatDate, formatDateRange } from "@/lib/utils";
 import Dropdown from "../bootstrap/dropdown";
@@ -29,6 +29,7 @@ type DetailProps = ComponentPropsWithoutRef<"div"> & {
   caseStudyLink?: string;
   locale?: string;
   shareable?: boolean;
+  as?: ElementType;
 };
 
 export default function DetailItem({
@@ -39,10 +40,11 @@ export default function DetailItem({
   locale = "id-ID",
   shareable = false,
   className,
+  as,
   ...props
 }: DetailProps) {
   return (
-    <CardBlank className={`p-3 ${className || ""}`} {...props}>
+    <CardBlank as={as} className={`p-3 ${className || ""}`} {...props}>
       {/* Title of detail item */}
       <h5 className="card-title mb-3">{`Detail ${
         type === "Portfolio"

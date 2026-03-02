@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, ElementType } from "react";
 import AccordionItemNew from "./accordion-item";
 import clsx from "clsx";
 import { AccordionItem } from "@/lib/bootstrap-types";
@@ -9,6 +9,7 @@ type AccordionProps = ComponentPropsWithoutRef<"div"> & {
   alwaysOpen?: boolean;
   items: AccordionItem[];
   openItemIndex?: number;
+  as?: ElementType;
 };
 
 export default function Accordion({
@@ -18,12 +19,13 @@ export default function Accordion({
   alwaysOpen = false,
   openItemIndex,
   className,
+  as: Tag = "div",
   ...props
 }: AccordionProps) {
   const classes = clsx("accordion", { "accordion-flush": flush }, className);
 
   return (
-    <div className={classes} id={id} {...props}>
+    <Tag className={classes} id={id} {...props}>
       {/* Item loop */}
       {items.map((item, index) => (
         <AccordionItemNew
@@ -37,6 +39,6 @@ export default function Accordion({
           {item.content}
         </AccordionItemNew>
       ))}
-    </div>
+    </Tag>
   );
 }

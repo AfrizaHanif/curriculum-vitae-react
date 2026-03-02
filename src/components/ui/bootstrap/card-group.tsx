@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
 type CardGroupProps = ComponentPropsWithoutRef<"div"> & {
   title?: string;
@@ -6,6 +6,7 @@ type CardGroupProps = ComponentPropsWithoutRef<"div"> & {
   type?: "group" | "grid";
   cardPerRow?: 1 | 2 | 3 | 4;
   children: ReactNode;
+  as?: ElementType;
 };
 
 export default function CardGroup({
@@ -14,6 +15,7 @@ export default function CardGroup({
   type = "grid",
   cardPerRow = 3,
   children,
+  as: Tag = "div",
   style,
   className,
   ...props
@@ -24,7 +26,7 @@ export default function CardGroup({
   // Check if card group's type are grid or group (Default)
   if (type === "grid") {
     return (
-      <div className={`py-3 ${className || ""}`} style={style} {...props}>
+      <Tag className={`py-3 ${className || ""}`} style={style} {...props}>
         {title && <h2 className="pb-2 border-bottom">{title}</h2>}
         {subtitle && (
           <div className="fs-5 text-body-secondary mb-5">{subtitle}</div>
@@ -34,13 +36,13 @@ export default function CardGroup({
         >
           {children}
         </div>
-      </div>
+      </Tag>
     );
   } else {
     return (
-      <div className="card-group" style={style} {...props}>
+      <Tag className="card-group" style={style} {...props}>
         {children}
-      </div>
+      </Tag>
     );
   }
 }

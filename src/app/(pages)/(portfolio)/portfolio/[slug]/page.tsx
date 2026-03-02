@@ -2,21 +2,23 @@
 
 import { use } from "react";
 import AppLayout from "@/components/layouts/layout";
-import Button from "@/components/ui/bootstrap/button";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
 import {
   portfolioItems,
   repositoryItems,
+  featureItems,
   caseStudyItems,
 } from "@/lib/data/portfolioData";
 import { notFound, redirect } from "next/navigation";
 import ProjectGallery from "@/components/ui/customs/project-gallery";
-import Link from "next/link";
-import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import { DropdownItem } from "@/lib/bootstrap-types";
 import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import CardGroup from "@/components/ui/bootstrap/card-group";
+import Card from "@/components/ui/bootstrap/card";
+import { techIcons } from "@/lib/data/techIcons";
+import SlugNavigation from "@/components/ui/customs/slug-navigation";
 
 // INFO: Different than project and blog page, this page are splitted out into 2 (layout.tsx and page.tsx). This page is a client component
 
@@ -40,14 +42,6 @@ export default function SelectedPortfolio({
     redirect(`/portfolio/${encodeURIComponent(item.slug)}`);
   }
 
-  // Navigation's Function
-  const currentIndex = portfolioItems.findIndex((p) => p.slug === item.slug);
-  const prevItem = currentIndex > 0 ? portfolioItems[currentIndex - 1] : null;
-  const nextItem =
-    currentIndex < portfolioItems.length - 1
-      ? portfolioItems[currentIndex + 1]
-      : null;
-
   // Item of repository
   const filteredRepositoryItems: DropdownItem[] = repositoryItems
     .filter((repo) => repo?.portfolio_id === item.id)
@@ -55,6 +49,11 @@ export default function SelectedPortfolio({
 
   // Check if case study exists
   const hasCaseStudy = caseStudyItems.some((cs) => cs.portfolio_id === item.id);
+
+  // Get Data of Feature
+  const filteredFeatures = featureItems.filter(
+    (feature) => feature.portfolio_id === item.id,
+  );
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -112,7 +111,9 @@ export default function SelectedPortfolio({
 
       {/* Contents */}
       <main className="row justify-content-center g-2">
+        {/* Main */}
         <article className="col-12 col-lg-8 order-2 order-lg-1">
+          {/* Gallery */}
           <section id="project-gallery">
             <ProjectGallery
               mainImage={item.image}
@@ -120,6 +121,7 @@ export default function SelectedPortfolio({
               altText={item.title}
             />
           </section>
+          {/* Description */}
           <section
             id="project-description"
             aria-labelledby="project-description-heading"
@@ -130,70 +132,61 @@ export default function SelectedPortfolio({
             </h2>
             <p className="lead">{item.description}</p>
           </section>
+          {/* Key Features */}
+          {filteredFeatures.length > 0 && (
+            <section id="project-features" className="mt-4">
+              <h3 className="h4 mb-3">Fitur Utama</h3>
+              <ul className="list-group list-group-flush">
+                {filteredFeatures.map((feature) => (
+                  <li
+                    key={feature.id}
+                    className="list-group-item bg-transparent px-0 d-flex align-items-start"
+                  >
+                    <i className="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                    <div>
+                      <span className="fw-semibold">{feature.title}</span>
+                      <p className="mb-0 small text-body-secondary">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          {/* Technology Used */}
+          {item.technology && item.technology.length > 0 && (
+            <section id="technology-used" className="mt-4">
+              <h3 className="h4 mb-3">Teknologi yang Digunakan</h3>
+              <CardGroup cardPerRow={4}>
+                {item.technology.map((tech, index) => (
+                  <Card key={index} insideGroup>
+                    <div className="d-flex flex-column align-items-center">
+                      {techIcons[tech] && (
+                        <div
+                          style={{ width: "40px", height: "24px" }}
+                          className="mb-4"
+                        >
+                          {techIcons[tech]}
+                        </div>
+                      )}
+                      <span>{tech}</span>
+                    </div>
+                  </Card>
+                ))}
+              </CardGroup>
+            </section>
+          )}
         </article>
+        {/* Sidebar */}
         <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Menu button */}
-            <nav className="pb-3" aria-label="Portfolio item navigation">
-              <div className="row justify-content-center g-2">
-                {/* Back to list of portfolio */}
-                <div className="col">
-                  <Link href={`/portfolio`}>
-                    <Button color="secondary" outline>
-                      <i className="bi bi-arrow-return-left pe-2"></i>
-                      Kembali
-                    </Button>
-                  </Link>
-                </div>
-                {/* Navigation */}
-                <div className="col text-end">
-                  <ButtonGroup role={"group"} arialabel={"port-nav"}>
-                    {/* Prev Item */}
-                    {prevItem ? (
-                      <Link href={`/portfolio/${prevItem.slug}`}>
-                        <Button
-                          color="secondary"
-                          style={{
-                            borderTopRightRadius: "0px",
-                            borderBottomRightRadius: "0px",
-                          }}
-                          outline
-                        >
-                          <i className="bi bi-arrow-left pe-2"></i>
-                          Prev
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button color="secondary" outline disabled>
-                        <i className="bi bi-arrow-left pe-2"></i>
-                        Prev
-                      </Button>
-                    )}
-                    {/* Next Item */}
-                    {nextItem ? (
-                      <Link href={`/portfolio/${nextItem.slug}`}>
-                        <Button
-                          color="secondary"
-                          style={{
-                            borderTopLeftRadius: "0px",
-                            borderBottomLeftRadius: "0px",
-                          }}
-                          outline
-                        >
-                          Next
-                          <i className="bi bi-arrow-right ps-2"></i>
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button color="secondary" outline disabled>
-                        Next
-                        <i className="bi bi-arrow-right ps-2"></i>
-                      </Button>
-                    )}
-                  </ButtonGroup>
-                </div>
-              </div>
-            </nav>
+            <SlugNavigation
+              items={portfolioItems}
+              item={item}
+              backURL="portfolio"
+            />
             {/* Details */}
             <DetailItem
               type={"Portfolio"}

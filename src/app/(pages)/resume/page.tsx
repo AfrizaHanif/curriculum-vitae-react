@@ -207,7 +207,7 @@ export default function Resume() {
                                   dataItem.longitude,
                                 ]}
                                 zoom={15}
-                                popupContent={dataItem.location}
+                                popupContent={dataItem.address}
                               />
                             )}
                         </div>
@@ -304,7 +304,7 @@ export default function Resume() {
                                   dataItem.longitude,
                                 ]}
                                 zoom={15}
-                                popupContent={dataItem.location}
+                                popupContent={dataItem.address}
                               />
                             )}
                         </div>

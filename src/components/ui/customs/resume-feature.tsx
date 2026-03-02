@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, ElementType } from "react";
 import "../bootstrap/feature.css";
 import Button from "../bootstrap/button";
 import ResumeDataItem from "./resume-data-item"; // Import the new component
@@ -10,6 +10,7 @@ type FeatureProps = ComponentPropsWithoutRef<"div"> & {
   type: "columns" | "hanging";
   itemPerRow?: number;
   items: ResumeFeatureItem[];
+  as?: ElementType;
 };
 
 export default function ResumeFeature({
@@ -19,11 +20,12 @@ export default function ResumeFeature({
   itemPerRow = 3,
   items,
   className,
+  as: Tag = "div",
   ...props
 }: FeatureProps) {
   if (type === "columns") {
     return (
-      <div className={`px-0 py-3 ${className || ""}`} id={id} {...props}>
+      <Tag className={`px-0 py-3 ${className || ""}`} id={id} {...props}>
         {title && <h2 className="pb-2 border-bottom">{title}</h2>}
         <div className={`row g-4 py-5 row-cols-1 row-cols-lg-${itemPerRow}`}>
           {items.map((item) => (
@@ -62,11 +64,11 @@ export default function ResumeFeature({
             </div>
           ))}
         </div>
-      </div>
+      </Tag>
     );
   } else if (type === "hanging") {
     return (
-      <div
+      <Tag
         className={`container px-0 py-3 ${className || ""}`}
         id={id}
         {...props}
@@ -106,7 +108,7 @@ export default function ResumeFeature({
             </div>
           ))}
         </div>
-      </div>
+      </Tag>
     );
   }
 }

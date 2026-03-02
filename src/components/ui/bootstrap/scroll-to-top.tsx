@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ElementType } from "react";
 import clsx from "clsx";
 import Button from "./button";
 import "./scroll-to-top.css";
 
 type ScrollToTopProps = {
   showAt?: number;
+  as?: ElementType;
 };
 
-export default function ScrollToTop({ showAt = 300 }: ScrollToTopProps) {
+export default function ScrollToTop({
+  showAt = 300,
+  as: Tag = "div",
+}: ScrollToTopProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   // Show button when page is scrolled down
@@ -39,7 +43,7 @@ export default function ScrollToTop({ showAt = 300 }: ScrollToTopProps) {
   });
 
   return (
-    <div className="scroll-to-top">
+    <Tag className="scroll-to-top">
       <Button
         type="button"
         onClick={scrollToTop}
@@ -49,6 +53,6 @@ export default function ScrollToTop({ showAt = 300 }: ScrollToTopProps) {
       >
         <i className="bi bi-arrow-up fs-4"></i>
       </Button>
-    </div>
+    </Tag>
   );
 }

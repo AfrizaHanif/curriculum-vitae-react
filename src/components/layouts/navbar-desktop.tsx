@@ -47,8 +47,10 @@ export default function NavbarDesktop() {
     // NOTE: You can change maximum items you want. This includes more menu
     const calculateMaxItems = () => {
       const width = window.innerWidth;
-      if (width >= 1200) {
-        setMaxNavItems(9);
+      if (width >= 1400) {
+        setMaxNavItems(8);
+      } else if (width >= 1200) {
+        setMaxNavItems(7);
       } else if (width >= 992) {
         setMaxNavItems(6);
       } else {

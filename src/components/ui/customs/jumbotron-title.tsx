@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import Jumbotron from "../bootstrap/jumbotron";
 import { AllowedColors } from "@/types/common";
 import Link from "next/link";
@@ -14,6 +14,7 @@ type JumbotronTitleProps = ComponentPropsWithoutRef<"div"> & {
   urlButton?: string;
   labelButton?: string;
   iconImg?: string;
+  as?: ElementType;
   // children: ReactNode;
 };
 
@@ -26,12 +27,14 @@ export default function JumbotronTitle({
   labelButton,
   iconImg,
   className,
+  as,
 }: JumbotronTitleProps) {
   return (
     <Jumbotron
       backgroundColor={backgroundColor || "secondary"}
       textColor={backgroundImg ? "dark" : undefined}
       img={backgroundImg}
+      as={as}
       className={className}
     >
       <div className="container-fluid py-3">

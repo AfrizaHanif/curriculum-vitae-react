@@ -1,7 +1,7 @@
 import { AllowedColorsStatus } from "@/types/common";
 import clsx from "clsx";
 import Link from "next/link";
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import Button from "./button";
 import NextImage from "../next/next-image";
 import { DropdownItem } from "@/lib/bootstrap-types";
@@ -26,6 +26,7 @@ type BaseCardProps = ComponentPropsWithoutRef<"div"> & {
   insideGroup?: boolean;
   asGroup?: boolean;
   children: ReactNode;
+  as?: ElementType;
 };
 
 type CardLinkProps = {
@@ -71,6 +72,7 @@ export default function Card({
   insideGroup = false,
   asGroup = false,
   children,
+  as: Tag = "div",
   style,
   className,
   ...props
@@ -103,7 +105,7 @@ export default function Card({
   if (horizontal) {
     // Horizontal Layout
     cardComponent = (
-      <div className={horClasses} style={style} {...props}>
+      <Tag className={horClasses} style={style} {...props}>
         <div className="row g-0">
           <div className="col-md-4">
             {/* Image */}
@@ -123,12 +125,12 @@ export default function Card({
             </div>
           </div>
         </div>
-      </div>
+      </Tag>
     );
   } else {
     // Vertical Layout (Default)
     cardComponent = (
-      <div className={verClasses} style={style} {...props}>
+      <Tag className={verClasses} style={style} {...props}>
         {/* Header */}
         {header && (
           <div className="card-header text-uppercase small fw-semibold text-body-secondary">
@@ -229,7 +231,7 @@ export default function Card({
             </div>
           </div>
         )}
-      </div>
+      </Tag>
     );
   }
 

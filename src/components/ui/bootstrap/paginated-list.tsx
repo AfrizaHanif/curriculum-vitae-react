@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, ElementType } from "react";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 
 interface PaginatedListProps<T> {
@@ -8,6 +8,7 @@ interface PaginatedListProps<T> {
   renderItem: (item: T) => React.ReactNode;
   itemsPerPage?: number;
   className?: string;
+  as?: ElementType;
 }
 
 export default function PaginatedList<T>({
@@ -15,14 +16,15 @@ export default function PaginatedList<T>({
   renderItem,
   itemsPerPage = 6,
   className,
+  as: Tag = "div",
 }: PaginatedListProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
-  const listRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLElement>(null);
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const currentItems = items.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   // Ensure currentPage is valid if itemsPerPage or items change (Remove if ERROR)
@@ -39,7 +41,7 @@ export default function PaginatedList<T>({
   };
 
   return (
-    <div
+    <Tag
       ref={listRef}
       className={className}
       style={{ scrollMarginTop: "2rem" }}
@@ -92,6 +94,6 @@ export default function PaginatedList<T>({
           </ul>
         </nav>
       )}
-    </div>
+    </Tag>
   );
 }

@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
 type AccordionItemProps = ComponentPropsWithoutRef<"div"> & {
   title: ReactNode;
@@ -6,6 +6,7 @@ type AccordionItemProps = ComponentPropsWithoutRef<"div"> & {
   parentId: string;
   alwaysOpen?: boolean;
   isOpen?: boolean;
+  headingTag?: ElementType;
 };
 
 export default function AccordionItem({
@@ -15,6 +16,7 @@ export default function AccordionItem({
   parentId,
   alwaysOpen = false,
   isOpen = false,
+  headingTag: Heading = "h2",
   ...props
 }: AccordionItemProps) {
   const collapseId = `collapse-${itemId}`; // Set header ID
@@ -23,7 +25,7 @@ export default function AccordionItem({
   return (
     <div className="accordion-item" {...props}>
       {/* Header */}
-      <h2 className="accordion-header" id={headerId}>
+      <Heading className="accordion-header" id={headerId}>
         <button
           className={`accordion-button ${isOpen ? "" : "collapsed"}`}
           type="button"
@@ -34,7 +36,7 @@ export default function AccordionItem({
         >
           {title}
         </button>
-      </h2>
+      </Heading>
 
       {/* Content */}
       <div

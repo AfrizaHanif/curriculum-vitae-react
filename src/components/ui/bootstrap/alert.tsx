@@ -1,11 +1,12 @@
 import { AllowedColorsStatus } from "@/types/common";
 import clsx from "clsx";
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
 type AlertProps = ComponentPropsWithoutRef<"div"> & {
   color: AllowedColorsStatus; // Or you can use string instead
   dismissible?: boolean;
   children: ReactNode;
+  as?: ElementType;
 };
 
 export default function Alert({
@@ -13,6 +14,7 @@ export default function Alert({
   dismissible,
   children,
   className,
+  as: Tag = "div",
   ...props
 }: AlertProps) {
   // Classes
@@ -20,11 +22,11 @@ export default function Alert({
     "alert",
     `alert-${color}`,
     { "alert-dismissible fade show": dismissible },
-    className
+    className,
   );
 
   return (
-    <div {...props} className={classes} role="alert">
+    <Tag {...props} className={classes} role="alert">
       {/* Content */}
       {children}
       {/* Close button for dismiss */}
@@ -36,6 +38,6 @@ export default function Alert({
           aria-label="Close"
         ></button>
       )}
-    </div>
+    </Tag>
   );
 }

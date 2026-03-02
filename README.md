@@ -1,4 +1,25 @@
+![Next.js](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=Leaflet&logoColor=white)
+![Sass](https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white)
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Project Description
+
+This project is a responsive and interactive curriculum vitae (CV) or resume website. It's designed to showcase professional experience, skills, and portfolio projects in a modern web format.
+
+## Technologies Used
+
+| Technology      | Description          |
+| --------------- | -------------------- |
+| Next.js         | React Framework      |
+| React           | UI Library           |
+| React Leaflet   | Maps                 |
+| Bootstrap       | CSS Framework        |
+| React Bootstrap | Bootstrap Components |
 
 ## Getting Started
 

@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable jsx-a11y/alt-text */
 import Image from "next/image";
-import { ComponentProps, useEffect, useState, useId } from "react";
+import { ComponentProps, useEffect, useState, useId, ElementType } from "react";
 import placeholderImage from "../../../assets/images/placeholder/placeholder-image.png";
 import Modal from "../bootstrap/modal";
 
@@ -14,6 +14,7 @@ type NextImageModalProps = ComponentProps<typeof Image> & {
   type?: "fluid" | "thumbnail";
   zoom?: boolean;
   caption?: string;
+  as?: ElementType;
 };
 
 const FALLBACK_SRC = placeholderImage;
@@ -26,6 +27,7 @@ export default function NextImageModal({
   className,
   caption,
   src,
+  as: Tag = "div",
   ...props
 }: NextImageModalProps) {
   const [imgSrc, setImgSrc] = useState(src);
@@ -48,7 +50,7 @@ export default function NextImageModal({
   }, [src]);
 
   return (
-    <div>
+    <Tag>
       {/* Image */}
       <Image
         {...props} // Spread the rest of the props here
@@ -95,6 +97,6 @@ export default function NextImageModal({
           )}
         </Modal>
       )}
-    </div>
+    </Tag>
   );
 }

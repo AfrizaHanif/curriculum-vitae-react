@@ -5,12 +5,10 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import NextImage from "@/components/ui/next/next-image";
 import SanitizedContent from "@/components/ui/react/sanitized-content";
-import Link from "next/link";
-import Button from "@/components/ui/bootstrap/button";
-import ButtonGroup from "@/components/ui/bootstrap/button-group";
 import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import SlugNavigation from "@/components/ui/customs/slug-navigation";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
@@ -57,12 +55,6 @@ export default async function SelectedPost({
     const { redirect } = await import("next/navigation");
     redirect(`/blog/${encodeURIComponent(item.slug)}`);
   }
-
-  // Navigation's Function
-  const currentIndex = blogItems.findIndex((p) => p.slug === item.slug);
-  const prevItem = currentIndex > 0 ? blogItems[currentIndex - 1] : null;
-  const nextItem =
-    currentIndex < blogItems.length - 1 ? blogItems[currentIndex + 1] : null;
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -142,66 +134,7 @@ export default async function SelectedPost({
         <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Menu button */}
-            <nav className="pb-3" aria-label="Blog post navigation">
-              <div className="row justify-content-center g-2">
-                {/* Back to list of posts */}
-                <div className="col">
-                  <Link href={`/blog`}>
-                    <Button color="secondary" outline>
-                      <i className="bi bi-arrow-return-left pe-2"></i>
-                      Kembali
-                    </Button>
-                  </Link>
-                </div>
-                {/* Navigation */}
-                <div className="col text-end">
-                  <ButtonGroup role={"group"} arialabel={"port-nav"}>
-                    {/* Previous item */}
-                    {prevItem ? (
-                      <Link href={`/blog/${prevItem.slug}`}>
-                        <Button
-                          color="secondary"
-                          style={{
-                            borderTopRightRadius: "0px",
-                            borderBottomRightRadius: "0px",
-                          }}
-                          outline
-                        >
-                          <i className="bi bi-arrow-left pe-2"></i>
-                          Prev
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button color="secondary" outline disabled>
-                        <i className="bi bi-arrow-left pe-2"></i>
-                        Prev
-                      </Button>
-                    )}
-                    {/* Next item */}
-                    {nextItem ? (
-                      <Link href={`/blog/${nextItem.slug}`}>
-                        <Button
-                          color="secondary"
-                          style={{
-                            borderTopLeftRadius: "0px",
-                            borderBottomLeftRadius: "0px",
-                          }}
-                          outline
-                        >
-                          Next
-                          <i className="bi bi-arrow-right ps-2"></i>
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button color="secondary" outline disabled>
-                        Next
-                        <i className="bi bi-arrow-right ps-2"></i>
-                      </Button>
-                    )}
-                  </ButtonGroup>
-                </div>
-              </div>
-            </nav>
+            <SlugNavigation items={blogItems} item={item} backURL="blog" />
             {/* Details */}
             <DetailItem type={"Blog"} item={item} />
           </div>

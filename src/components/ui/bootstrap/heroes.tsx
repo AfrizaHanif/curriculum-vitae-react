@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, ReactNode } from "react";
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import "./heroes.css";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
 import Button from "./button";
@@ -11,6 +11,7 @@ type HeroesProps = ComponentPropsWithoutRef<"div"> & {
   buttonItem?: HeroesButtonItem[];
   img?: string;
   children: ReactNode;
+  as?: ElementType;
 };
 
 export default function Heroes({
@@ -19,11 +20,12 @@ export default function Heroes({
   buttonItem,
   img,
   children,
+  as: Tag = "div",
   ...props
 }: HeroesProps) {
   if (type === "center") {
     return (
-      <div className="px-4 py-5 my-5 text-center" {...props}>
+      <Tag className="px-4 py-5 my-5 text-center" {...props}>
         <h1 className="display-5 fw-bold text-body-emphasis">{title}</h1>
         <div className="col-lg-6 mx-auto">
           <p className="lead mb-4">{children}</p>
@@ -44,12 +46,12 @@ export default function Heroes({
             ))}
           </div>
         </div>
-      </div>
+      </Tag>
     );
   } else if (type === "screenshot") {
     if (!img) return null;
     return (
-      <div className="px-4 pt-5 my-5 text-center border-bottom" {...props}>
+      <Tag className="px-4 pt-5 my-5 text-center border-bottom" {...props}>
         <h1 className="display-4 fw-bold text-body-emphasis">{title}</h1>
         <div className="col-lg-6 mx-auto">
           <p className="lead mb-4">{children}</p>
@@ -82,12 +84,12 @@ export default function Heroes({
             />
           </div>
         </div>
-      </div>
+      </Tag>
     );
   } else if (type === "responsive") {
     if (!img) return null;
     return (
-      <div className="container col-xxl-8 px-4 py-5" {...props}>
+      <Tag className="container col-xxl-8 px-4 py-5" {...props}>
         <div className="row flex-lg-row-reverse align-items-center g-5 py-5">
           <div className="col-10 col-sm-8 col-lg-6">
             <NextImage
@@ -128,12 +130,12 @@ export default function Heroes({
             </div>
           </div>
         </div>
-      </div>
+      </Tag>
     );
   } else if (type === "border") {
     if (!img) return null;
     return (
-      <div className="container my-5" {...props}>
+      <Tag className="container my-5" {...props}>
         <div className="row p-4 pb-0 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
           <div className="col-lg-7 p-3 p-lg-5 pt-lg-3">
             <h1 className="display-4 fw-bold lh-1 text-body-emphasis">
@@ -152,7 +154,7 @@ export default function Heroes({
             />
           </div>
         </div>
-      </div>
+      </Tag>
     );
   }
   return null;

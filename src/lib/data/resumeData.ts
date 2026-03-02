@@ -12,6 +12,8 @@ export const educationItems: ResumeFeatureItem[] = [
       {
         type: "education",
         location: "Universitas Dinamika",
+        address:
+          "Jl. Raya Kedung Baruk No.98, Kedung Baruk, Kec. Rungkut, Surabaya, Jawa Timur 60298",
         degree: "S1",
         major: "Sistem Informasi",
         gpa: 3.26,
@@ -42,6 +44,8 @@ export const experienceItems: ResumeFeatureItem[] = [
         description:
           "Bertanggung jawab dalam merancang dan membangun aplikasi pelayanan perpustakaan untuk meningkatkan efisiensi layanan. Terlibat dalam seluruh siklus pengembangan, mulai dari pengumpulan kebutuhan hingga implementasi.",
         location: "BPS Jawa Timur",
+        address:
+          "Jl. Raya Kendangsari Industri No.43-44, Kendangsari, Kec. Tenggilis Mejoyo, Surabaya, Jawa Timur 60292",
         status: "Finished",
         start_period: new Date("2023-01-01"),
         finish_period: new Date("2023-03-01"),
@@ -61,6 +65,8 @@ export const experienceItems: ResumeFeatureItem[] = [
         type: "experience",
         title: "Intern Frontend Developer",
         location: "Kominfo Jawa Timur",
+        address:
+          "Jl. Ahmad Yani No.242-244, Gayungan, Kec. Gayungan, Surabaya, Jawa Timur 60235",
         status: "Finished",
         start_period: new Date("2025-09-01"),
         finish_period: new Date("2026-01-31"),

@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import {
   ComponentPropsWithoutRef,
+  ElementType,
   ReactNode,
   useState,
   useEffect,
@@ -20,6 +21,7 @@ type JumbotronProps = ComponentPropsWithoutRef<"div"> & {
   fullWidth?: boolean;
   imgClassName?: string;
   children: ReactNode;
+  as?: ElementType;
 };
 
 function BackgroundElement({
@@ -71,6 +73,7 @@ export default function Jumbotron({
   children,
   className,
   style,
+  as: Tag = "div",
   // imgClassName,
   ...props
 }: JumbotronProps) {
@@ -88,7 +91,7 @@ export default function Jumbotron({
   if (fullWidth) {
     const fullWidthClasses = clsx(commonClasses, className);
     return (
-      <div className={fullWidthClasses} style={style} {...props}>
+      <Tag className={fullWidthClasses} style={style} {...props}>
         <Container className={clsx("py-5 position-relative overflow-hidden")}>
           <BackgroundElement
             img={img}
@@ -99,7 +102,7 @@ export default function Jumbotron({
             {children}
           </div>
         </Container>
-      </div>
+      </Tag>
     );
   } else {
     const containedClasses = clsx(
@@ -108,7 +111,7 @@ export default function Jumbotron({
       className,
     );
     return (
-      <Container className={containedClasses} {...props} style={style}>
+      <Container as={Tag} className={containedClasses} {...props} style={style}>
         <BackgroundElement
           img={img}
           isLoaded={isLoaded}

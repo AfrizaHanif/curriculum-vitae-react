@@ -104,6 +104,50 @@ export const repositoryItems = [
     href: "https://ojs.unikom.ac.id/index.php/jati/article/view/15243/",
   },
 ];
+export const featureItems = [
+  {
+    id: "FEA-001",
+    portfolio_id: "POR-001",
+    title: "Daftar buku dan daftar isi untuk pengunjung",
+    description:
+      "Pengunjung dapat melihat daftar buku dan daftar isi yang telah dirapikan",
+  },
+  {
+    id: "FEA-002",
+    portfolio_id: "POR-001",
+    title: "Export detail buku ke PDF",
+    description:
+      "Pengguna dapat export detail buku ke file PDF yang dapat disimpan oleh pengguna",
+  },
+  {
+    id: "FEA-003",
+    portfolio_id: "POR-001",
+    title: "Import data dari Excel",
+    description:
+      "Pegawai PST dapat melakukan import buku dan daftar isi dari Excel untuk memudahkan penambahan data",
+  },
+  {
+    id: "FEA-004",
+    portfolio_id: "POR-002",
+    title: "Dashboard interaktif",
+    description:
+      "Kepegawaian, dan kepala BPS Jawa Timur dapat melihat status-status data secara interaktif di halaman dashboard",
+  },
+  {
+    id: "FEA-005",
+    portfolio_id: "POR-002",
+    title: "CRUD dalam satu halaman",
+    description:
+      "Kepegawaian dapat melakukan penambahan, penghapusan, perubahan, dan membaca data yang ada hanya dalam satu halaman",
+  },
+  {
+    id: "FEA-006",
+    portfolio_id: "POR-002",
+    title: "Import data dari Excel",
+    description:
+      "Kepegawaian dapat mengimport data Excel ke aplikasi untuk memudahkan pemasukkan nilai untuk pengambilan keputusan",
+  },
+];
 
 // Case Studies
 export const caseStudyItems = [

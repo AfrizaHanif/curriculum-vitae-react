@@ -1,5 +1,11 @@
 import clsx from "clsx";
-import { ComponentPropsWithoutRef, ReactNode, useEffect, useRef } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ElementType,
+  ReactNode,
+  useEffect,
+  useRef,
+} from "react";
 import type { Toast as BsToast } from "bootstrap";
 
 type ToastProps = ComponentPropsWithoutRef<"div"> & {
@@ -9,6 +15,7 @@ type ToastProps = ComponentPropsWithoutRef<"div"> & {
   children: ReactNode;
   show: boolean;
   onClose?: () => void;
+  as?: ElementType;
 };
 
 export default function Toast({
@@ -19,10 +26,11 @@ export default function Toast({
   show,
   onClose,
   children,
+  as: Tag = "div",
   ...props
 }: ToastProps) {
   const classes = clsx("toast", className);
-  const toastRef = useRef<HTMLDivElement>(null);
+  const toastRef = useRef<HTMLDivElement>(null); // Note: If Tag is not a div, this might need to be HTMLElement, but div is safe default for Toast
   const bsToastRef = useRef<BsToast | null>(null); // To store the Bootstrap Toast instance
 
   useEffect(() => {
@@ -63,7 +71,7 @@ export default function Toast({
   }, [show]); // React to changes in the 'show' prop
 
   return (
-    <div
+    <Tag
       id={id}
       ref={toastRef}
       className={classes}
@@ -73,7 +81,6 @@ export default function Toast({
       {...props}
     >
       <div className="toast-header">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         {/* <img src="..." className="rounded me-2" alt="..." /> */}
         <strong className="me-auto">{title}</strong>
         <small>{subtitle}</small>
@@ -86,6 +93,6 @@ export default function Toast({
         ></button>
       </div>
       <div className="toast-body">{children}</div>
-    </div>
+    </Tag>
   );
 }

@@ -2,7 +2,12 @@
 // src/components/ui/customs/VanillaMap.tsx
 "use client";
 
-import { useEffect, useRef } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ElementType,
+  useEffect,
+  useRef,
+} from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -12,13 +17,20 @@ import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 
-interface VanillaMapProps {
+type VanillaMapProps = ComponentPropsWithoutRef<"div"> & {
   position: L.LatLngExpression;
   zoom: number;
-}
+  as?: ElementType;
+};
 
-const VanillaMap: React.FC<VanillaMapProps> = ({ position, zoom }) => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+const VanillaMap = ({
+  position,
+  zoom,
+  as: Tag = "div",
+  style,
+  ...props
+}: VanillaMapProps) => {
+  const mapContainerRef = useRef<HTMLElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
@@ -37,7 +49,7 @@ const VanillaMap: React.FC<VanillaMapProps> = ({ position, zoom }) => {
       // Initialize the map and set its view
       mapInstanceRef.current = L.map(mapContainerRef.current).setView(
         position,
-        zoom
+        zoom,
       );
 
       // Add a tile layer to the map (e.g., OpenStreetMap)
@@ -66,7 +78,11 @@ const VanillaMap: React.FC<VanillaMapProps> = ({ position, zoom }) => {
 
   // This div is the container where the Leaflet map will be rendered.
   return (
-    <div ref={mapContainerRef} style={{ height: "400px", width: "100%" }} />
+    <Tag
+      ref={mapContainerRef}
+      style={{ height: "400px", width: "100%", ...style }}
+      {...props}
+    />
   );
 };
 

@@ -2,17 +2,18 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
-import React, { useEffect } from "react";
+import React, { ComponentPropsWithoutRef, ElementType, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L, { LatLngExpression } from "leaflet";
 import customMarkerIcon from "../../../assets/images/leaflet/marker-icon.png";
 
-interface MapProps {
+type MapProps = ComponentPropsWithoutRef<"div"> & {
   position: LatLngExpression;
   zoom: number;
   // popupContent?: React.ReactNode;
   popupContent?: string;
-}
+  as?: ElementType;
+};
 
 const myCustomIcon = new L.Icon({
   iconUrl: customMarkerIcon.src,
@@ -71,29 +72,38 @@ function MapUpdater({ position, zoom }: MapProps) {
   return null;
 }
 
-const Map: React.FC<MapProps> = ({ position, zoom, popupContent }) => {
+const Map = ({
+  position,
+  zoom,
+  popupContent,
+  as: Tag = "div",
+  className,
+  ...props
+}: MapProps) => {
   return (
-    <MapContainer
-      center={position}
-      zoom={zoom}
-      scrollWheelZoom={false}
-      style={{ height: "400px", width: "100%" }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <Marker icon={myCustomIcon} position={position}>
-        {popupContent ? (
-          <Popup>{popupContent}</Popup>
-        ) : (
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        )}
-      </Marker>
-      <MapUpdater position={position} zoom={zoom} />
-    </MapContainer>
+    <Tag className={className} {...props}>
+      <MapContainer
+        center={position}
+        zoom={zoom}
+        scrollWheelZoom={false}
+        style={{ height: "400px", width: "100%" }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker icon={myCustomIcon} position={position}>
+          {popupContent ? (
+            <Popup>{popupContent}</Popup>
+          ) : (
+            <Popup>
+              A pretty CSS3 popup. <br /> Easily customizable.
+            </Popup>
+          )}
+        </Marker>
+        <MapUpdater position={position} zoom={zoom} />
+      </MapContainer>
+    </Tag>
   );
 };
 
