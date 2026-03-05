@@ -4,6 +4,7 @@ import { NavTabItem } from "@/lib/bootstrap-types";
 
 type NavTabProps = ComponentPropsWithoutRef<"div"> & {
   id: string;
+  title?: string;
   variant?: "tabs" | "pills";
   items: NavTabItem[];
   defaultActiveId?: string;
@@ -14,6 +15,7 @@ type NavTabProps = ComponentPropsWithoutRef<"div"> & {
 
 export default function NavTab({
   id,
+  title,
   variant = "tabs",
   items,
   defaultActiveId,
@@ -30,6 +32,7 @@ export default function NavTab({
   if (vertical) {
     return (
       <div className={`d-flex align-items-start ${className}`} {...props}>
+        {title && <h2 className="pb-2 mb-3 border-bottom">{title}</h2>}
         <div
           className={`nav flex-column nav-pills col-${navSize} pe-3`}
           id={`v-${id}-tab`}
@@ -80,6 +83,7 @@ export default function NavTab({
   } else {
     return (
       <div className={className} {...props}>
+        {title && <h2 className="pb-2 mb-3 border-bottom">{title}</h2>}
         <ul
           className={`nav nav-${variant} ${fill && "nav-fill"}`}
           id={`${id}-tab`}

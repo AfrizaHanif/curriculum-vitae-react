@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, ElementType } from "react";
+import { useState, useRef, ElementType } from "react";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 
 interface PaginatedListProps<T> {
   items: T[];
   renderItem: (item: T) => React.ReactNode;
   itemsPerPage?: number;
+  cardsPerRow?: 1 | 2 | 3 | 4;
   className?: string;
   as?: ElementType;
 }
@@ -15,6 +16,7 @@ export default function PaginatedList<T>({
   items,
   renderItem,
   itemsPerPage = 6,
+  cardsPerRow = 3,
   className,
   as: Tag = "div",
 }: PaginatedListProps<T>) {
@@ -22,18 +24,14 @@ export default function PaginatedList<T>({
   const listRef = useRef<HTMLElement>(null);
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
-  const currentItems = items.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
 
-  // Ensure currentPage is valid if itemsPerPage or items change (Remove if ERROR)
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCurrentPage(Math.max(1, totalPages));
-    }
-  }, [itemsPerPage, totalPages, currentPage]);
+  // Ensure currentPage is valid if itemsPerPage or items change
+  const safePage = Math.min(Math.max(1, currentPage), Math.max(1, totalPages));
+
+  const currentItems = items.slice(
+    (safePage - 1) * itemsPerPage,
+    safePage * itemsPerPage,
+  );
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -46,20 +44,22 @@ export default function PaginatedList<T>({
       className={className}
       style={{ scrollMarginTop: "2rem" }}
     >
-      <CardGroup>{currentItems.map((item) => renderItem(item))}</CardGroup>
+      <CardGroup cardPerRow={cardsPerRow}>
+        {currentItems.map((item) => renderItem(item))}
+      </CardGroup>
 
       {totalPages > 1 && (
         <nav aria-label="Page navigation" className="mt-4">
           <div className="text-center mb-2 small text-body-secondary">
-            Menampilkan halaman {currentPage} dari {totalPages}
+            Menampilkan halaman {safePage} dari {totalPages}
           </div>
           <ul className="pagination justify-content-center">
-            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+            <li className={`page-item ${safePage === 1 ? "disabled" : ""}`}>
               <button
                 className="page-link"
-                onClick={() => handlePageChange(currentPage - 1)}
+                onClick={() => handlePageChange(safePage - 1)}
                 aria-label="Previous"
-                disabled={currentPage === 1}
+                disabled={safePage === 1}
               >
                 <span aria-hidden="true">&laquo;</span>
               </button>
@@ -67,7 +67,7 @@ export default function PaginatedList<T>({
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <li
                 key={page}
-                className={`page-item ${currentPage === page ? "active" : ""}`}
+                className={`page-item ${safePage === page ? "active" : ""}`}
               >
                 <button
                   className="page-link"
@@ -79,14 +79,14 @@ export default function PaginatedList<T>({
             ))}
             <li
               className={`page-item ${
-                currentPage === totalPages ? "disabled" : ""
+                safePage === totalPages ? "disabled" : ""
               }`}
             >
               <button
                 className="page-link"
-                onClick={() => handlePageChange(currentPage + 1)}
+                onClick={() => handlePageChange(safePage + 1)}
                 aria-label="Next"
-                disabled={currentPage === totalPages}
+                disabled={safePage === totalPages}
               >
                 <span aria-hidden="true">&raquo;</span>
               </button>

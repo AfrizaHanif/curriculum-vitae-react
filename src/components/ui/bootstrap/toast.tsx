@@ -37,24 +37,25 @@ export default function Toast({
     const toastElement = toastRef.current;
     if (!toastElement) return;
 
+    const handleHidden = () => {
+      onClose?.(); // Notify parent that the toast is fully hidden
+    };
+
+    // Add event listener for when Bootstrap finishes hiding the toast
+    toastElement.addEventListener("hidden.bs.toast", handleHidden);
+
     // Initialize Bootstrap Toast instance and event listener once
     if (!bsToastRef.current) {
       import("bootstrap/js/dist/toast").then(({ default: ToastClass }) => {
-        bsToastRef.current = ToastClass.getOrCreateInstance(toastElement);
-
-        const handleHidden = () => {
-          onClose?.(); // Notify parent that the toast is fully hidden
-        };
-
-        // Add event listener for when Bootstrap finishes hiding the toast
-        toastElement.addEventListener("hidden.bs.toast", handleHidden);
-
-        // Cleanup function for the event listener
-        return () => {
-          toastElement.removeEventListener("hidden.bs.toast", handleHidden);
-        };
+        if (toastRef.current) {
+          bsToastRef.current = ToastClass.getOrCreateInstance(toastRef.current);
+        }
       });
     }
+
+    return () => {
+      toastElement.removeEventListener("hidden.bs.toast", handleHidden);
+    };
   }, [onClose]); // Dependency on onClose to ensure correct closure if it changes
 
   useEffect(() => {

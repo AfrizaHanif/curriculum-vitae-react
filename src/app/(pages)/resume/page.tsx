@@ -19,12 +19,13 @@ import { formatDate, formatDateRange } from "@/lib/utils";
 import { isEducationData, isExperienceData } from "@/lib/customs/type-guards";
 import { profileItem } from "@/lib/data/profileData";
 import jumbotronImage from "../../../assets/images/jumbotron/resume.jpg";
-import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import NextImage from "@/components/ui/next/next-image";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import styles from "./page.module.css";
+import NavTab from "@/components/ui/bootstrap/nav-tab";
+import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 // import Loading from "@/components/ui/bootstrap/loading";
 // import { useLoading } from "@/hooks/use-loading";
 
@@ -63,6 +64,54 @@ export default function Resume() {
       color: "secondary",
       dismiss: true,
     },
+  ];
+
+  const renderCards = (items: typeof certificateItems) => (
+    <PaginatedList
+      items={items}
+      itemsPerPage={9}
+      cardsPerRow={4}
+      // key={sortOrder}
+      renderItem={(item) => (
+        <Card
+          key={item.id}
+          header={item.issuer}
+          footer={formatDate(item.issue_date)}
+          image={item.file}
+          url={item.credential_url}
+          urlType="dropdown"
+          urlItems={generateCertDropdownItems(item)}
+          buttonName="Lihat"
+          clickable
+          insideGroup
+        >
+          <h5 className="card-title">{item.name}</h5>
+        </Card>
+      )}
+    />
+  );
+
+  const uniqueCertificates = Array.from(
+    new Set(certificateItems.map((item) => item.issuer)),
+  );
+  console.log("Category in tabs: ", uniqueCertificates);
+
+  // Items of tab
+  const tabItems = [
+    // All certificate (No category filter)
+    {
+      id: "all",
+      title: "Semua",
+      content: renderCards(certificateItems),
+    },
+    // Post with category filter
+    ...uniqueCertificates.map((issuer) => ({
+      id: issuer.toLowerCase().replace(/\s+/g, "-"),
+      title: issuer,
+      content: renderCards(
+        certificateItems.filter((item) => item.issuer === issuer),
+      ),
+    })),
   ];
 
   // Item of card's button
@@ -319,24 +368,7 @@ export default function Resume() {
       {/* Certificates */}
       {/* Cards */}
       <section aria-label="Sertifikat">
-        <CardGroup title="Sertifikat" cardPerRow={4}>
-          {certificateItems.map((item) => (
-            <Card
-              key={item.id}
-              header={item.issuer}
-              footer={formatDate(item.issue_date)}
-              image={item.file}
-              url={item.credential_url}
-              urlType="dropdown"
-              urlItems={generateCertDropdownItems(item)}
-              buttonName="Lihat"
-              clickable
-              insideGroup
-            >
-              <h5 className="card-title">{item.name}</h5>
-            </Card>
-          ))}
-        </CardGroup>
+        <NavTab title="Sertifikat" id="certificate-tab" items={tabItems} />
       </section>
       {/* Modals */}
       {certificateItems.map((item) => (

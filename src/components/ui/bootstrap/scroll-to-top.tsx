@@ -17,15 +17,6 @@ export default function ScrollToTop({
   const [isVisible, setIsVisible] = useState(false);
 
   // Show button when page is scrolled down
-  const toggleVisibility = () => {
-    // The button becomes visible when the user scrolls beyond `showAt` pixels.
-    if (window.scrollY > showAt) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
-  };
-
   // Scroll to top on button click
   const scrollToTop = () => {
     window.scrollTo({
@@ -35,12 +26,21 @@ export default function ScrollToTop({
   };
 
   useEffect(() => {
+    const toggleVisibility = () => {
+      // The button becomes visible when the user scrolls beyond `showAt` pixels.
+      if (window.scrollY > showAt) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
     window.addEventListener("scroll", toggleVisibility);
 
     return () => {
       window.removeEventListener("scroll", toggleVisibility);
     };
-  });
+  }, [showAt]);
 
   return (
     <Tag className="scroll-to-top">
