@@ -7,7 +7,7 @@ import NextImage from "@/components/ui/next/next-image"; // Import the custom Ne
 import NavTab from "@/components/ui/bootstrap/nav-tab";
 import { portfolioItems } from "@/lib/data/portfolioData";
 import Link from "next/link";
-import { formatDateRange } from "@/lib/utils";
+import { formatDateRange, sortItems, SortOrder } from "@/lib/utils";
 import jumbotronImage from "../../../../assets/images/jumbotron/portfolio.jpg";
 import { useState } from "react";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
@@ -16,35 +16,14 @@ import JsonLd from "@/components/json-ld";
 
 export default function Portfolio() {
   // Set useState for replacing element
-  const [sortOrder, setSortOrder] = useState("newest");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
 
   // Sort items based on selection
-  const sortedItems = [...portfolioItems].sort((a, b) => {
-    // Alphabet sorting
-    if (sortOrder === "az") return a.title.localeCompare(b.title);
-    if (sortOrder === "za") return b.title.localeCompare(a.title);
-
-    // Date sorting
-    const valA = a.finish_period
-      ? new Date(a.finish_period).getTime()
-      : Infinity;
-    const valB = b.finish_period
-      ? new Date(b.finish_period).getTime()
-      : Infinity;
-
-    // Check if start from oldest selected
-    if (sortOrder === "oldest") {
-      if (valA !== valB) return valA - valB;
-      return (
-        new Date(a.start_period).getTime() - new Date(b.start_period).getTime()
-      );
-    }
-
-    // (Default) Check if start from newest selected
-    if (valA !== valB) return valB - valA;
-    return (
-      new Date(b.start_period).getTime() - new Date(a.start_period).getTime()
-    );
+  const sortedItems = sortItems(portfolioItems, {
+    sortOrder,
+    titleKey: "title",
+    primaryDateKey: "finish_period",
+    secondaryDateKey: "start_period",
   });
   console.log("Sort selected: ", sortOrder);
 
@@ -180,7 +159,7 @@ export default function Portfolio() {
             id="sortOrder"
             className="form-select w-auto"
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
+            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
           >
             <option value="newest">Terbaru</option>
             <option value="oldest">Terlama</option>

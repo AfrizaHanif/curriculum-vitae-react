@@ -6,7 +6,7 @@ import CardBlank from "@/components/ui/bootstrap/card-blank";
 import NavTab from "@/components/ui/bootstrap/nav-tab";
 import NextImage from "@/components/ui/next/next-image";
 import { projectItems } from "@/lib/data/portfolioData";
-import { formatDate } from "@/lib/utils";
+import { formatDate, sortItems, SortOrder } from "@/lib/utils";
 import Link from "next/link";
 import jumbotronImage from "../../../../assets/images/jumbotron/project.jpg";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
@@ -16,23 +16,13 @@ import JsonLd from "@/components/json-ld";
 
 export default function Project() {
   // Set useState for replacing element
-  const [sortOrder, setSortOrder] = useState("newest");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
 
   // Sort items based on selection
-  const sortedItems = [...projectItems].sort((a, b) => {
-    // Alphabet sorting
-    if (sortOrder === "az") return a.title.localeCompare(b.title);
-    if (sortOrder === "za") return b.title.localeCompare(a.title);
-
-    // Date sorting
-    const dateA = new Date(a.start_period).getTime();
-    const dateB = new Date(b.start_period).getTime();
-
-    // Check if start from oldest selected
-    if (sortOrder === "oldest") return dateA - dateB;
-
-    // (Default) Check if start from newest selected
-    return dateB - dateA;
+  const sortedItems = sortItems(projectItems, {
+    sortOrder,
+    titleKey: "title",
+    primaryDateKey: "start_period",
   });
   console.log("Sort selected: ", sortOrder);
 
@@ -165,7 +155,7 @@ export default function Project() {
             id="sortOrder"
             className="form-select w-auto"
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
+            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
           >
             <option value="newest">Terbaru</option>
             <option value="oldest">Terlama</option>

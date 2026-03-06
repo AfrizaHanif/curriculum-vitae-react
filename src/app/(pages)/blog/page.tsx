@@ -2,7 +2,7 @@
 
 import AppLayout from "@/components/layouts/layout";
 import { blogItems } from "@/lib/data/blogData";
-import { formatDate, sortItemsByDate } from "@/lib/utils";
+import { formatDate, sortItems } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import jumbotronImage from "../../../assets/images/jumbotron/blog.jpg";
 import Card from "@/components/ui/bootstrap/card";
@@ -83,7 +83,11 @@ export default function Blog() {
       {/* List of Posts (Cards) */}
       <section aria-label="Daftar Artikel">
         <PaginatedList
-          items={sortItemsByDate(blogItems)}
+          items={sortItems(blogItems, {
+            sortOrder: "newest",
+            titleKey: "title",
+            primaryDateKey: "date",
+          })}
           itemsPerPage={9}
           renderItem={(item) => (
             <Card

@@ -15,19 +15,34 @@ import {
 } from "@/lib/data/resumeData";
 import { DropdownItem, ModalButtonItem } from "@/lib/bootstrap-types";
 import Modal from "@/components/ui/bootstrap/modal";
-import { formatDate, formatDateRange } from "@/lib/utils";
+import { formatDate, formatDateRange, sortItemsByDateKey } from "@/lib/utils";
 import { isEducationData, isExperienceData } from "@/lib/customs/type-guards";
 import { profileItem } from "@/lib/data/profileData";
 import jumbotronImage from "../../../assets/images/jumbotron/resume.jpg";
-import Card from "@/components/ui/bootstrap/card";
 import NextImage from "@/components/ui/next/next-image";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import styles from "./page.module.css";
 import NavTab from "@/components/ui/bootstrap/nav-tab";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
+import CardBlank from "@/components/ui/bootstrap/card-blank";
+import Dropdown from "@/components/ui/bootstrap/dropdown";
 // import Loading from "@/components/ui/bootstrap/loading";
 // import { useLoading } from "@/hooks/use-loading";
+
+const PdfThumbnail = dynamic(
+  () => import("@/components/ui/customs/pdf-thumbnail"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="d-flex justify-content-center align-items-center w-100 h-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    ),
+  },
+);
 
 // Dynamically import the Map component with SSR turned off
 const Map = dynamic(() => import("@/components/ui/customs/map"), {
@@ -66,33 +81,77 @@ export default function Resume() {
     },
   ];
 
+  // Sort certificates by latest issue_date
+  const sortedCertificates = sortItemsByDateKey(certificateItems, "issue_date");
+
   const renderCards = (items: typeof certificateItems) => (
     <PaginatedList
       items={items}
       itemsPerPage={9}
       cardsPerRow={4}
       // key={sortOrder}
-      renderItem={(item) => (
-        <Card
-          key={item.id}
-          header={item.issuer}
-          footer={formatDate(item.issue_date)}
-          image={item.file}
-          url={item.credential_url}
-          urlType="dropdown"
-          urlItems={generateCertDropdownItems(item)}
-          buttonName="Lihat"
-          clickable
-          insideGroup
-        >
-          <h5 className="card-title">{item.name}</h5>
-        </Card>
-      )}
+      renderItem={(item) => {
+        const isPdf = item.file.trim().toLowerCase().endsWith(".pdf");
+        return (
+          <CardBlank key={item.id} fullHeight insideGroup>
+            <div className="card-header small fw-semibold text-body-secondary">
+              <span className="text-uppercase">{item.issuer}</span> -{" "}
+              {item.type}
+            </div>
+
+            <div
+              className="position-relative bg-body-tertiary d-flex align-items-center justify-content-center"
+              style={{ aspectRatio: "16 / 9" }}
+            >
+              {isPdf ? (
+                <PdfThumbnail
+                  file={item.file}
+                  alt={item.name}
+                  className="w-100 h-100 position-absolute top-0 start-0"
+                  pageNumber={1} // You can change this to display a different page
+                />
+              ) : (
+                <NextImage
+                  src={item.file}
+                  alt={item.name}
+                  className="card-img-top rounded-0"
+                  fill
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "top",
+                  }}
+                  errorContent
+                />
+              )}
+            </div>
+
+            <div className="card-body d-flex flex-column">
+              <h5 className="card-title">{item.name}</h5>
+            </div>
+
+            <div className="card-footer text-body-secondary">
+              <div className="row justify-content-center align-items-center g-2">
+                <div className="col-8 small">{formatDate(item.issue_date)}</div>
+                <div className="col-4 text-end">
+                  <Dropdown
+                    color="primary"
+                    size="sm"
+                    items={generateCertDropdownItems(item)}
+                    fullWidth
+                  >
+                    Lihat
+                  </Dropdown>
+                </div>
+              </div>
+            </div>
+          </CardBlank>
+        );
+      }}
     />
   );
 
   const uniqueCertificates = Array.from(
-    new Set(certificateItems.map((item) => item.issuer)),
+    new Set(sortedCertificates.map((item) => item.type)),
   );
   console.log("Category in tabs: ", uniqueCertificates);
 
@@ -102,14 +161,14 @@ export default function Resume() {
     {
       id: "all",
       title: "Semua",
-      content: renderCards(certificateItems),
+      content: renderCards(sortedCertificates),
     },
     // Post with category filter
-    ...uniqueCertificates.map((issuer) => ({
-      id: issuer.toLowerCase().replace(/\s+/g, "-"),
-      title: issuer,
+    ...uniqueCertificates.map((type) => ({
+      id: type.toLowerCase().replace(/\s+/g, "-"),
+      title: type,
       content: renderCards(
-        certificateItems.filter((item) => item.issuer === issuer),
+        sortedCertificates.filter((item) => item.type === type),
       ),
     })),
   ];
@@ -126,16 +185,18 @@ export default function Resume() {
         dataToggle: "modal",
         dataTarget: `modal-cert-${item.id}`,
       },
-      { type: "divider", label: "" },
     ];
     // Add item if url of credential is included
     if (item.credential_url) {
-      items.push({
-        label: "Kunjungi Link",
-        href: item.credential_url,
-        newTab: true,
-        icon: "patch-check",
-      });
+      items.push(
+        { type: "divider", label: "" },
+        {
+          label: "Kunjungi Link",
+          href: item.credential_url,
+          newTab: true,
+          icon: "patch-check",
+        },
+      );
     }
     return items;
   };
@@ -371,26 +432,47 @@ export default function Resume() {
         <NavTab title="Sertifikat" id="certificate-tab" items={tabItems} />
       </section>
       {/* Modals */}
-      {certificateItems.map((item) => (
-        <Modal
-          key={item.id}
-          id={`modal-cert-${item.id}`}
-          buttonItems={modalButtonItems}
-          title={item.name}
-          size="lg"
-          fullscreen
-        >
-          <NextImage
-            src={item.file}
-            alt={item.name}
-            type="fluid"
-            width={0}
-            height={0}
-            sizes="100vw"
-            className={styles.certificateImage}
-          />
-        </Modal>
-      ))}
+      {sortedCertificates.map((item) => {
+        const isPdf = item.file.trim().toLowerCase().endsWith(".pdf");
+        return (
+          <Modal
+            key={item.id}
+            id={`modal-cert-${item.id}`}
+            buttonItems={modalButtonItems}
+            title={item.name}
+            size="lg"
+            fullscreen
+          >
+            {isPdf ? (
+              <object
+                data={item.file}
+                type="application/pdf"
+                width="100%"
+                height="100%"
+                aria-label={`PDF viewer for ${item.name}`}
+              >
+                <div className="alert alert-warning m-3" role="alert">
+                  Browser Anda tidak mendukung penampil PDF. Anda bisa{" "}
+                  <a href={item.file} className="alert-link">
+                    mengunduh file PDF
+                  </a>{" "}
+                  untuk melihatnya.
+                </div>
+              </object>
+            ) : (
+              <NextImage
+                src={item.file}
+                alt={item.name}
+                type="fluid"
+                width={0}
+                height={0}
+                sizes="100vw"
+                className={styles.certificateImage}
+              />
+            )}
+          </Modal>
+        );
+      })}
     </AppLayout>
   );
 }
