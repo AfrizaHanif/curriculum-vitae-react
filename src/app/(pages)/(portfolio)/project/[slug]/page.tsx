@@ -7,6 +7,8 @@ import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import SlugNavigation from "@/components/ui/customs/slug-navigation";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
@@ -52,6 +54,21 @@ export default async function SelectedProject({
   if (slug !== item.slug) {
     permanentRedirect(`/project/${encodeURIComponent(item.slug)}`);
   }
+
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Hubungi Saya",
+      color: "primary",
+      href: `/contact`,
+    },
+    {
+      label: "Lihat Proyek Lain",
+      color: "secondary",
+      href: `/project`,
+      outline: true,
+    },
+  ];
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -141,6 +158,19 @@ export default async function SelectedProject({
           </div>
         </aside>
       </main>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Tertarik dengan Proyek Ini?"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="project"
+        >
+          Jika Anda memiliki pertanyaan atau ingin berdiskusi tentang proyek
+          ini, jangan ragu untuk menghubungi saya. Atau kembali ke daftar proyek
+          lainnya
+        </Heroes>
+      </section>
     </AppLayout>
   );
 }

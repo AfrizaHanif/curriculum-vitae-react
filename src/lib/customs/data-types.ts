@@ -5,7 +5,7 @@ interface BaseFeatureData {
   location: string;
   address: string;
   status: "Planning" | "Ongoing" | "Stopped" | "Finished";
-  description?: string;
+  description?: string[];
   latitude?: number;
   longitude?: number;
   start_period: Date;

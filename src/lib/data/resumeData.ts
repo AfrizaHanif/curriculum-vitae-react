@@ -18,8 +18,9 @@ export const educationItems: ResumeFeatureItem[] = [
         major: "Sistem Informasi",
         gpa: 3.26,
         status: "Finished",
-        description:
+        description: [
           "Fokus pada pengembangan perangkat lunak dan analisis sistem, dengan proyek akhir membangun sistem pendukung keputusan untuk evaluasi kinerja karyawan.",
+        ],
         start_period: new Date("2021-08-01"),
         finish_period: new Date("2025-03-01"),
         latitude: -7.311713,
@@ -41,8 +42,10 @@ export const experienceItems: ResumeFeatureItem[] = [
       {
         type: "experience",
         title: "Intern Web Developer",
-        description:
-          "Bertanggung jawab dalam merancang dan membangun aplikasi pelayanan perpustakaan untuk meningkatkan efisiensi layanan. Terlibat dalam seluruh siklus pengembangan, mulai dari pengumpulan kebutuhan hingga implementasi.",
+        description: [
+          "Mengintegrasikan komponen frontend (HTML/CSS) dengan backend Laravel untuk memastikan konsistensi UI dan kinerja sistem yang cepat",
+          "Mengembangkan aplikasi perpustakaan berbasis web full-stack menggunakan Laravel (PHP) dan MySQL, mengimplementasikan fitur CRUD, user authentication, dan manajemen transaksi peminjaman buku",
+        ],
         location: "BPS Jawa Timur",
         address:
           "Jl. Raya Kendangsari Industri No.43-44, Kendangsari, Kec. Tenggilis Mejoyo, Surabaya, Jawa Timur 60292",
@@ -64,6 +67,10 @@ export const experienceItems: ResumeFeatureItem[] = [
       {
         type: "experience",
         title: "Intern Frontend Developer",
+        description: [
+          "Melakukan debugging mendalam pada aplikasi Satu Data",
+          "Mengidentifikasi dan memperbaiki beberapa bug terkait tampilan pada aplikasi tersebut",
+        ],
         location: "Kominfo Jawa Timur",
         address:
           "Jl. Ahmad Yani No.242-244, Gayungan, Kec. Gayungan, Surabaya, Jawa Timur 60235",

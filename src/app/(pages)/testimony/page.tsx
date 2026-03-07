@@ -7,6 +7,8 @@ import jumbotronImage from "../../../assets/images/jumbotron/testimonial.jpg";
 import Alert from "@/components/ui/bootstrap/alert";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -16,6 +18,15 @@ export const metadata: Metadata = {
 };
 
 export default function Testimony() {
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Hubungi Saya",
+      color: "primary",
+      href: `/contact`,
+    },
+  ];
+
   // JSON-LD Structured Data
   const jsonLd = {
     "@context": "https://schema.org",
@@ -72,6 +83,18 @@ export default function Testimony() {
         ) : (
           <Alert color={"danger"}>Tidak ada testimoni yang tersedia.</Alert>
         )}
+      </section>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Hubungi Saya"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="contact"
+        >
+          Yakin untuk bekerja sama? Hubungi saya sekarang untuk memulai proyek
+          Anda
+        </Heroes>
       </section>
     </AppLayout>
   );

@@ -85,6 +85,7 @@ export interface HeroesButtonItem {
   color: AllowedColorsStatus;
   href?: string;
   newTab?: boolean;
+  outline?: boolean;
 }
 
 // Breadcrumb

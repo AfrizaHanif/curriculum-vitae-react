@@ -13,7 +13,11 @@ import {
   educationItems,
   experienceItems,
 } from "@/lib/data/resumeData";
-import { DropdownItem, ModalButtonItem } from "@/lib/bootstrap-types";
+import {
+  DropdownItem,
+  HeroesButtonItem,
+  ModalButtonItem,
+} from "@/lib/bootstrap-types";
 import Modal from "@/components/ui/bootstrap/modal";
 import { formatDate, formatDateRange, sortItemsByDateKey } from "@/lib/utils";
 import { isEducationData, isExperienceData } from "@/lib/customs/type-guards";
@@ -27,6 +31,7 @@ import NavTab from "@/components/ui/bootstrap/nav-tab";
 import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import CardBlank from "@/components/ui/bootstrap/card-blank";
 import Dropdown from "@/components/ui/bootstrap/dropdown";
+import Heroes from "@/components/ui/bootstrap/heroes";
 // import Loading from "@/components/ui/bootstrap/loading";
 // import { useLoading } from "@/hooks/use-loading";
 
@@ -201,6 +206,33 @@ export default function Resume() {
     return items;
   };
 
+  const getStatusName = (status?: string) => {
+    if (status === "Ongoing") {
+      return "Sedang Berlangsung";
+    } else if (status === "Finished") {
+      return "Telah Selesai";
+    } else if (status === "Planning") {
+      return "Sedang Direncanakan";
+    } else if (status === "Stopped") {
+      return "Telah Berhenti";
+    }
+  };
+
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Buka Portfolio",
+      color: "primary",
+      href: `/portfolio`,
+    },
+    {
+      label: "Hubungi Saya",
+      color: "secondary",
+      href: `/contact`,
+      outline: true,
+    },
+  ];
+
   // if (isLoading) {
   //   return <Loading />;
   // }
@@ -278,8 +310,19 @@ export default function Resume() {
                   <div key={i}>
                     <div className="row gy-4 g-md-2">
                       <div className="col-12 col-md-5">
-                        {dataItem.description ?? "Tidak ada deskripsi"}
-                        <table className="table mt-3">
+                        <h6>Deskripsi</h6>
+                        {/* {dataItem.description ?? "Tidak ada deskripsi"} */}
+                        {(dataItem.description?.length ?? 0) > 1 ? (
+                          <ul>
+                            {dataItem.description?.map((item, index) => (
+                              <li key={index}>{item}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <>{dataItem.description}</>
+                        )}
+                        <h6 className="mt-3">Detail</h6>
+                        <table className="table">
                           <tbody>
                             <tr>
                               <th
@@ -288,7 +331,7 @@ export default function Resume() {
                               >
                                 Status
                               </th>
-                              <td>{dataItem.status}</td>
+                              <td>{getStatusName(dataItem.status)}</td>
                             </tr>
                             <tr>
                               <th
@@ -366,8 +409,19 @@ export default function Resume() {
                   <div key={i}>
                     <div className="row gy-4 g-md-2">
                       <div className="col-12 col-md-5">
-                        {dataItem.description}
-                        <table className="table mt-3">
+                        <h6>Deskripsi</h6>
+                        {/* {dataItem.description ?? "Tidak ada deskripsi"} */}
+                        {(dataItem.description?.length ?? 0) > 1 ? (
+                          <ul>
+                            {dataItem.description?.map((item, index) => (
+                              <li key={index}>{item}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <>{dataItem.description}</>
+                        )}
+                        <h6 className="mt-3">Detail</h6>
+                        <table className="table">
                           <tbody>
                             <tr>
                               <th
@@ -376,7 +430,7 @@ export default function Resume() {
                               >
                                 Status
                               </th>
-                              <td>{dataItem.status}</td>
+                              <td>{getStatusName(dataItem.status)}</td>
                             </tr>
                             <tr>
                               <th
@@ -473,6 +527,18 @@ export default function Resume() {
           </Modal>
         );
       })}
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Lihat Portofolio"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="portfolio"
+        >
+          Tertarik dengan pengalaman saya? Lihat proyek-proyek yang telah saya
+          kerjakan, atau hubungi saya jika Anda punya pertanyaan atau ide proyek
+        </Heroes>
+      </section>
     </AppLayout>
   );
 }

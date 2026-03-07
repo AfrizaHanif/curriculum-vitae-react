@@ -7,6 +7,8 @@ import { setupItems } from "@/lib/data/profileData";
 import jumbotronImage from "../../../../assets/images/jumbotron/setup.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -42,6 +44,21 @@ export default function Setup() {
     ),
   }));
   console.log("Items of Accordion: ", accordionItems.length);
+
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Baca Blog",
+      color: "primary",
+      href: `/blog`,
+    },
+    {
+      label: "Ke Beranda",
+      color: "secondary",
+      href: `/`,
+      outline: true,
+    },
+  ];
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -101,6 +118,18 @@ export default function Setup() {
             openItemIndex={0}
           />
         </div>
+      </section>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Lihat Postingan Blog"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="blog"
+        >
+          Tertarik dengan alat yang saya gunakan? Baca tulisan saya di blog atau
+          kembali ke beranda
+        </Heroes>
       </section>
     </AppLayout>
   );

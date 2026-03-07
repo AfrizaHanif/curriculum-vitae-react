@@ -9,6 +9,8 @@ import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import SlugNavigation from "@/components/ui/customs/slug-navigation";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
@@ -55,6 +57,21 @@ export default async function SelectedPost({
     const { redirect } = await import("next/navigation");
     redirect(`/blog/${encodeURIComponent(item.slug)}`);
   }
+
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Baca Artikel Lain",
+      color: "primary",
+      href: `/blog`,
+    },
+    {
+      label: "Tentang Penulis",
+      color: "secondary",
+      href: `/profile`,
+      outline: true,
+    },
+  ];
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -140,6 +157,18 @@ export default async function SelectedPost({
           </div>
         </aside>
       </main>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Suka dengan Artikel Ini?"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="blog"
+        >
+          Jangan lewatkan artikel menarik lainnya di blog saya, atau pelajari
+          lebih lanjut tentang penulisnya
+        </Heroes>
+      </section>
     </AppLayout>
   );
 }

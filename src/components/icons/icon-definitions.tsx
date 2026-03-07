@@ -1,6 +1,6 @@
 const IconDefinitions = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="d-none">
-    <symbol id="bootstrap" viewBox="0 0 118 94">
+    <symbol id="bootstrap" fill="currentColor" viewBox="0 0 118 94">
       <title>Bootstrap</title>
       <path
         fillRule="evenodd"
@@ -77,6 +77,9 @@ const IconDefinitions = () => (
         fillRule="evenodd"
         d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"
       />
+    </symbol>
+    <symbol id="signpost-split-fill" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M7 16h2V6h5a1 1 0 0 0 .8-.4l.975-1.3a.5.5 0 0 0 0-.6L14.8 2.4A1 1 0 0 0 14 2H9v-.586a1 1 0 0 0-2 0V7H2a1 1 0 0 0-.8.4L.225 8.7a.5.5 0 0 0 0 .6l.975 1.3a1 1 0 0 0 .8.4h5z" />
     </symbol>
   </svg>
 );

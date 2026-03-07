@@ -11,7 +11,7 @@ import {
 } from "@/lib/data/portfolioData";
 import { notFound, redirect } from "next/navigation";
 import ProjectGallery from "@/components/ui/customs/project-gallery";
-import { DropdownItem } from "@/lib/bootstrap-types";
+import { DropdownItem, HeroesButtonItem } from "@/lib/bootstrap-types";
 import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
@@ -19,6 +19,7 @@ import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import { techIcons } from "@/lib/data/techIcons";
 import SlugNavigation from "@/components/ui/customs/slug-navigation";
+import Heroes from "@/components/ui/bootstrap/heroes";
 
 // INFO: Different than project and blog page, this page are splitted out into 2 (layout.tsx and page.tsx). This page is a client component
 
@@ -54,6 +55,21 @@ export default function SelectedPortfolio({
   const filteredFeatures = featureItems.filter(
     (feature) => feature.portfolio_id === item.id,
   );
+
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Hubungi Saya",
+      color: "primary",
+      href: `/contact`,
+    },
+    {
+      label: "Lihat Proyek Lain",
+      color: "secondary",
+      href: `/project`,
+      outline: true,
+    },
+  ];
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -200,6 +216,19 @@ export default function SelectedPortfolio({
           </div>
         </aside>
       </main>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Tertarik untuk Berkolaborasi?"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="contact"
+        >
+          Jika Anda menyukai proyek ini dan ingin mendiskusikan bagaimana kita
+          bisa bekerja sama, jangan ragu untuk menghubungi saya. Atau, Anda bisa
+          melihat proyek saya yang lain
+        </Heroes>
+      </section>
     </AppLayout>
   );
 }

@@ -13,6 +13,8 @@ import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import { useState } from "react";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 export default function Project() {
   // Set useState for replacing element
@@ -114,6 +116,21 @@ export default function Project() {
     })),
   ];
 
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Portofolio Utama",
+      color: "primary",
+      href: `/portfolio`,
+    },
+    {
+      label: "Lihat Resume",
+      color: "secondary",
+      href: `/resume`,
+      outline: true,
+    },
+  ];
+
   // JSON-LD Structured Data
   const jsonLd = {
     "@context": "https://schema.org",
@@ -168,6 +185,18 @@ export default function Project() {
       {/* List of Project (Cards) */}
       <section aria-label="Daftar Proyek">
         <NavTab id="project-tab" items={tabItems} />
+      </section>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Lihat Portfolio"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="portfolio"
+        >
+          Lihat proyek unggulan saya di halaman portofolio utama atau pelajari
+          latar belakang saya
+        </Heroes>
       </section>
     </AppLayout>
   );

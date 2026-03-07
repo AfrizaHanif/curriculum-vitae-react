@@ -10,6 +10,7 @@ type HeroesProps = ComponentPropsWithoutRef<"div"> & {
   title?: string;
   buttonItem?: HeroesButtonItem[];
   img?: string;
+  icon?: string;
   children: ReactNode;
   as?: ElementType;
 };
@@ -19,6 +20,7 @@ export default function Heroes({
   title,
   buttonItem,
   img,
+  icon,
   children,
   as: Tag = "div",
   ...props
@@ -26,6 +28,16 @@ export default function Heroes({
   if (type === "center") {
     return (
       <Tag className="px-4 py-5 my-5 text-center" {...props}>
+        <svg
+          className="d-block mx-auto mb-4"
+          xmlns="http://www.w3.org/2000/svg"
+          width="72"
+          height="57"
+          viewBox="0 0 118 94"
+          role="img"
+        >
+          <use xlinkHref={`#${icon ? icon : "bootstrap"}`} />
+        </svg>
         <h1 className="display-5 fw-bold text-body-emphasis">{title}</h1>
         <div className="col-lg-6 mx-auto">
           <p className="lead mb-4">{children}</p>
@@ -39,6 +51,7 @@ export default function Heroes({
                   className={`px-4 ${
                     index === (buttonItem?.length ?? 0) - 1 ? "" : "gap-3"
                   }`}
+                  outline={item.outline}
                 >
                   {item.label}
                 </Button>
@@ -65,6 +78,7 @@ export default function Heroes({
                   className={`px-4 ${
                     index === (buttonItem?.length ?? 0) - 1 ? "" : "me-sm-3"
                   }`}
+                  outline={item.outline}
                 >
                   {item.label}
                 </Button>
@@ -122,6 +136,7 @@ export default function Heroes({
                     className={`px-4 ${
                       index === (buttonItem?.length ?? 0) - 1 ? "" : "me-md-2"
                     }`}
+                    outline={item.outline}
                   >
                     {item.label}
                   </Button>

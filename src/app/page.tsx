@@ -1,20 +1,17 @@
 "use client";
 
 import AppLayout from "@/components/layouts/layout";
-import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import { useState, useEffect } from "react";
 import myPhoto from "@/assets/images/profile.jpg";
 import { portfolioItems } from "@/lib/data/portfolioData";
-import Link from "next/link";
 import jumbotronImage from "../assets/images/jumbotron/home.jpg";
 import { profileItem } from "@/lib/data/profileData";
 import { educationItems } from "@/lib/data/resumeData";
 import { isEducationData } from "@/lib/customs/type-guards";
-import Button from "@/components/ui/bootstrap/button";
-import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import Heroes from "@/components/ui/bootstrap/heroes";
 
 // Get Data from JSON (Single)
 const userProfile = profileItem[0];
@@ -69,6 +66,21 @@ export default function Home() {
       label: "Lihat",
       color: "primary",
       href: `/portfolio/${featuredPortfolio.slug}`,
+    },
+  ];
+
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Lihat Portfolio",
+      color: "primary",
+      href: `/portfolio`,
+    },
+    {
+      label: "Hubungi Saya",
+      color: "secondary",
+      href: `/contact`,
+      outline: true,
     },
   ];
 
@@ -135,39 +147,17 @@ export default function Home() {
         {truncateText(featuredPortfolio.description, 150)}
       </Heroes>
 
-      {/* Sub Jumbotron */}
-      <div className="row align-items-md-stretch gy-4">
-        <div className="col-md-6">
-          <Jumbotron backgroundColor="tertiary" className="h-100">
-            <h2>My Portfolio</h2>
-            <p>
-              Jelajahi kumpulan proyek terbaru saya yang menampilkan keahlian
-              saya dalam pengembangan dan desain web. Lihat bagaimana saya
-              mengubah ide menjadi kenyataan.
-            </p>
-            <Link href={"/portfolio"}>
-              <Button color="secondary" outline>
-                View Portfolio
-              </Button>
-            </Link>
-          </Jumbotron>
-        </div>
-        <div className="col-md-6">
-          <Jumbotron backgroundColor="tertiary" className="h-100">
-            <h2>Let&apos;s Connect</h2>
-            <p>
-              Punya proyek dalam pikiran, pertanyaan, atau sekadar ingin
-              menyapa? Saya senang mendengarnya. Mari kita ciptakan sesuatu yang
-              hebat bersama-sama.
-            </p>
-            <Link href={"/contact"}>
-              <Button color="secondary" outline>
-                Contact Me
-              </Button>
-            </Link>
-          </Jumbotron>
-        </div>
-      </div>
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Siap untuk Langkah Selanjutnya?"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="signpost-split-fill"
+        >
+          Jelajahi kumpulan proyek saya atau hubungi saya jika Anda punya
+          pertanyaan atau ide proyek
+        </Heroes>
+      </section>
     </AppLayout>
   );
 }

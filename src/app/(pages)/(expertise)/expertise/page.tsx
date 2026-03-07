@@ -4,12 +4,13 @@ import Feature from "@/components/ui/bootstrap/feature";
 import Modal from "@/components/ui/bootstrap/modal";
 import { expertiseItems } from "@/lib/data/expertiseData";
 import { portfolioItems } from "@/lib/data/portfolioData";
-import { ModalButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem, ModalButtonItem } from "@/lib/bootstrap-types";
 import { Metadata } from "next";
 import Link from "next/link";
 import jumbotronImage from "../../../../assets/images/jumbotron/expertise.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import Heroes from "@/components/ui/bootstrap/heroes";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -26,6 +27,21 @@ export default function Expertise() {
       type: "button",
       color: "secondary",
       dismiss: true,
+    },
+  ];
+
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Lihat Portofolio",
+      color: "primary",
+      href: `/portfolio`,
+    },
+    {
+      label: "Hubungi Saya",
+      color: "secondary",
+      href: `/contact`,
+      outline: true,
     },
   ];
 
@@ -123,6 +139,18 @@ export default function Expertise() {
             </Modal>
           );
         })}
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Lihat Penerapannya"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="portfolio"
+        >
+          Ingin melihat bagaimana saya menerapkan keahlian ini? Lihat
+          proyek-proyek yang telah saya kerjakan, atau hubungi saya
+        </Heroes>
+      </section>
     </AppLayout>
   );
 }

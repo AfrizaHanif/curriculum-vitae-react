@@ -15,6 +15,8 @@ import { Metadata } from "next";
 import jumbotronImage from "../../../../assets/images/jumbotron/home.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -58,6 +60,15 @@ const profileDetails = {
 export default function Profile() {
   console.log("Profile data:", userProfile);
   console.log("Detailed Profile:", profileDetails);
+
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Buka Resume",
+      color: "primary",
+      href: `/resume`,
+    },
+  ];
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -157,13 +168,26 @@ export default function Profile() {
       </section>
 
       {/* Hobbies */}
-      <Feature
-        id="hobby"
-        items={hobbyItems}
-        type="hanging"
-        title="Hobi & Minat"
-        itemPerRow={4}
-      />
+      <section aria-label="Hobi">
+        <Feature
+          id="hobby"
+          items={hobbyItems}
+          type="hanging"
+          title="Hobi & Minat"
+          itemPerRow={4}
+        />
+      </section>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Lihat Resume"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="resume"
+        >
+          Lihat resume untuk melihat pendidikan dan pengalaman kerja saya
+        </Heroes>
+      </section>
     </AppLayout>
   );
 }

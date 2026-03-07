@@ -22,6 +22,18 @@ const ResumeDataItem: React.FC<ResumeDataItemProps> = ({
     }
   };
 
+  const getStatusName = (status?: string) => {
+    if (status === "Ongoing") {
+      return "Sedang Berlangsung";
+    } else if (status === "Finished") {
+      return "Telah Selesai";
+    } else if (status === "Planning") {
+      return "Sedang Direncanakan";
+    } else if (status === "Stopped") {
+      return "Telah Berhenti";
+    }
+  };
+
   return (
     <div className="resume-item">
       {/* You can access common properties directly */}
@@ -36,7 +48,8 @@ const ResumeDataItem: React.FC<ResumeDataItemProps> = ({
             dataItem.status,
           )}`}
         >
-          {dataItem.status}
+          {/* {dataItem.status} */}
+          {getStatusName(dataItem.status)}
         </span>
       </h3>
       {dataItem.type === "education" && (

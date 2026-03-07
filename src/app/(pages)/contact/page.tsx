@@ -6,6 +6,8 @@ import ContactForm from "./contact-form";
 import jumbotronImage from "../../../assets/images/jumbotron/contact.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import Heroes from "@/components/ui/bootstrap/heroes";
+import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 const userProfile = profileItem[0];
 
@@ -80,6 +82,21 @@ export default function Contact() {
   //   },
   // ];
 
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Buka Portfolio",
+      color: "primary",
+      href: `/portfolio`,
+    },
+    {
+      label: "Ke Beranda",
+      color: "secondary",
+      href: `/`,
+      outline: true,
+    },
+  ];
+
   // JSON-LD Structured Data
   const jsonLd = {
     "@context": "https://schema.org",
@@ -124,6 +141,18 @@ export default function Contact() {
           <ContactForm />
         </section>
       </div>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Terima Kasih!"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="signpost-split-fill"
+        >
+          Terima kasih telah menghubungi saya! Sementara itu, silakan jelajahi
+          portofolio saya atau kembali ke beranda
+        </Heroes>
+      </section>
     </AppLayout>
   );
 }

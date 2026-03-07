@@ -37,6 +37,21 @@ export default function Blog() {
     },
   ];
 
+  // Item of Next Page Navigation (Heroes)
+  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
+    {
+      label: "Tentang Saya",
+      color: "primary",
+      href: `/about`,
+    },
+    {
+      label: "Hubungi Saya",
+      color: "secondary",
+      href: `/contact`,
+      outline: true,
+    },
+  ];
+
   // JSON-LD Structured Data for Blog
   const jsonLd = {
     "@context": "https://schema.org",
@@ -106,6 +121,18 @@ export default function Blog() {
             </Card>
           )}
         />
+      </section>
+
+      {/* Next Page Navigation */}
+      <section aria-label="Next Page">
+        <Heroes
+          title="Pelajari tentang Saya"
+          buttonItem={nextPageHeroesButtonItem}
+          icon="about"
+        >
+          Suka dengan tulisan saya? Pelajari lebih lanjut tentang saya atau
+          hubungi saya untuk diskusi
+        </Heroes>
       </section>
     </AppLayout>
   );
