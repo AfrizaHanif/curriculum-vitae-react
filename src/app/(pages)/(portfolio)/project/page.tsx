@@ -3,6 +3,7 @@
 import AppLayout from "@/components/layouts/layout";
 import Button from "@/components/ui/bootstrap/button";
 import CardBlank from "@/components/ui/bootstrap/card-blank";
+import Alert from "@/components/ui/bootstrap/alert";
 import NavTab from "@/components/ui/bootstrap/nav-tab";
 import NextImage from "@/components/ui/next/next-image";
 import { projectItems } from "@/lib/data/portfolioData";
@@ -15,6 +16,22 @@ import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
+
+const STATUS_COLORS: Record<string, string> = {
+  Planning: "text-bg-secondary",
+  Active: "text-bg-primary",
+  Delayed: "text-bg-warning",
+  Cancelled: "text-bg-danger",
+  Finished: "text-bg-success",
+};
+
+const STATUS_TEXT: Record<string, string> = {
+  Planning: "Dalam Rencana",
+  Active: "Aktif",
+  Delayed: "Ditunda",
+  Cancelled: "Dibatalkan",
+  Finished: "Selesai",
+};
 
 export default function Project() {
   // Set useState for replacing element
@@ -57,6 +74,16 @@ export default function Project() {
               }}
               errorContent
             />
+            {/* Status Badge */}
+            {item.status && (
+              <span
+                className={`position-absolute top-0 end-0 badge m-2 shadow-sm ${
+                  STATUS_COLORS[item.status] || "text-bg-secondary"
+                }`}
+              >
+                {STATUS_TEXT[item.status] || "Unknown"}
+              </span>
+            )}
           </div>
           {/* Short content */}
           <div className="card-body d-flex flex-column">
@@ -161,6 +188,15 @@ export default function Project() {
         backgroundImg={jumbotronImage.src}
         className="my-3"
       />
+
+      {/* Status Alert */}
+      <section className="container-fluid mb-3">
+        <Alert color="info">
+          <i className="bi bi-info-circle-fill me-2"></i>
+          Proyek di halaman ini mungkin dapat ditunda, dilanjutkan, atau
+          dibatalkan sewaktu-waktu.
+        </Alert>
+      </section>
 
       {/* Sorting Controls */}
       <section className="container-fluid mb-3" aria-label="Sorting Controls">

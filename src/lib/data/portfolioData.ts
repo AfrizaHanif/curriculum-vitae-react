@@ -300,7 +300,7 @@ export const projectItems = [
     type: "Aplikasi Web",
     image: "/images/portfolios/PRO-001.png",
     start_period: "2025-03-01",
-    status: "Ongoing",
+    status: "Delayed",
     description: "Test",
     tags: ["Estate"],
     technology: ["Laravel", "PHP"],
