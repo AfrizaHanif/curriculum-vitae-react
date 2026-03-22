@@ -1,6 +1,6 @@
 import AppLayout from "@/components/layouts/layout";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
-import { blogItems } from "@/lib/data/blogData";
+import { getAllBlogItems, getBlogItem } from "@/lib/data/services";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import NextImage from "@/components/ui/next/next-image";
@@ -16,7 +16,8 @@ import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 export function generateStaticParams() {
   // Pre-render pages for both slugs and IDs to handle redirects
-  return blogItems.flatMap((p) => [{ slug: p.slug }, { slug: p.id }]);
+  const posts = getAllBlogItems();
+  return posts.flatMap((p) => [{ slug: p.slug }, { slug: p.id }]);
 }
 
 // Set Props for metadata
@@ -27,10 +28,7 @@ type Props = {
 // Title and Descriptions of page (Using Metadata)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
-  const slug = decodeURIComponent(resolvedParams.slug);
-  const item = blogItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
-  );
+  const item = getBlogItem(resolvedParams.slug);
   if (!item) return { title: "Post Not Found" };
   return {
     title: { absolute: `${item.title} | Muhammad Afriza Hanif` },
@@ -46,14 +44,11 @@ export default async function SelectedPost({
 }) {
   // `params` may be a Promise in some Next.js versions; await it before use
   const resolvedParams = await params;
-  const slug = decodeURIComponent(resolvedParams.slug); // support id or slug in the URL
-  const item = blogItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
-  );
+  const item = getBlogItem(resolvedParams.slug);
   console.log("Item of selected post of blog: ", item);
   if (!item) return notFound();
 
-  if (slug !== item.slug) {
+  if (decodeURIComponent(resolvedParams.slug) !== item.slug) {
     const { redirect } = await import("next/navigation");
     redirect(`/blog/${encodeURIComponent(item.slug)}`);
   }
@@ -151,7 +146,11 @@ export default async function SelectedPost({
         <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Menu button */}
-            <SlugNavigation items={blogItems} item={item} backURL="blog" />
+            <SlugNavigation
+              items={getAllBlogItems()}
+              item={item}
+              backURL="blog"
+            />
             {/* Details */}
             <DetailItem type={"Blog"} item={item} />
           </div>

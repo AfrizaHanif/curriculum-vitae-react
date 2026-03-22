@@ -28,7 +28,7 @@ export const portfolioItems = [
     start_period: "2023-01-01",
     finish_period: "2023-07-02",
     description:
-      "Saya mengembangkan aplikasi manajemen perpustakaan digital untuk BPS Provinsi Jawa Timur menggunakan PHP dan Laravel. Fokus utama proyek ini adalah mentransformasi proses pelayanan manual menjadi sistem yang terintegrasi untuk meningkatkan efisiensi kerja pegawai dan kecepatan layanan konsumen",
+      "Saya mengembangkan aplikasi manajemen perpustakaan digital untuk BPS Provinsi Jawa Timur menggunakan PHP dan Laravel. Fokus utama proyek ini adalah mentransformasi proses pelayanan manual menjadi sistem yang terintegrasi untuk meningkatkan efisiensi kerja pegawai dan kecepatan layanan konsumen.",
     tags: ["Kerja Praktik", "Aplikasi Web", "BPS", "Perpustakaan"],
     technology: ["Laravel", "PHP", "Bootstrap"],
     repository: "https://repository.dinamika.ac.id/id/eprint/7167/",
@@ -95,7 +95,6 @@ export const repositoryItems = [
     icon: "code-slash",
     href: "https://github.com/AfrizaHanif/tugas_akhir_s1/",
   },
-  ,
   {
     id: "REP-004",
     portfolio_id: "POR-002",
@@ -117,21 +116,21 @@ export const featureItems = [
     portfolio_id: "POR-001",
     title: "Export detail buku ke PDF",
     description:
-      "Pengguna dapat export detail buku ke file PDF yang dapat disimpan oleh pengguna",
+      "Pengguna dapat mengekspor detail buku ke file PDF yang dapat disimpan oleh pengguna",
   },
   {
     id: "FEA-003",
     portfolio_id: "POR-001",
     title: "Import data dari Excel",
     description:
-      "Pegawai PST dapat melakukan import buku dan daftar isi dari Excel untuk memudahkan penambahan data",
+      "Pegawai PST dapat melakukan impor buku dan daftar isi dari Excel untuk memudahkan penambahan data",
   },
   {
     id: "FEA-004",
     portfolio_id: "POR-002",
     title: "Dashboard interaktif",
     description:
-      "Kepegawaian, dan kepala BPS Jawa Timur dapat melihat status-status data secara interaktif di halaman dashboard",
+      "Kepegawaian dan Kepala BPS Jawa Timur dapat melihat status-status data secara interaktif di halaman dashboard",
   },
   {
     id: "FEA-005",
@@ -145,7 +144,7 @@ export const featureItems = [
     portfolio_id: "POR-002",
     title: "Import data dari Excel",
     description:
-      "Kepegawaian dapat mengimport data Excel ke aplikasi untuk memudahkan pemasukkan nilai untuk pengambilan keputusan",
+      "Kepegawaian dapat mengimpor data Excel ke aplikasi untuk memudahkan pemasukan nilai untuk pengambilan keputusan",
   },
 ];
 
@@ -185,12 +184,12 @@ export const caseStudyItems = [
     lessons: [
       "Dari proyek ini, saya akan mempelajari lebih dalam mengenai Laravel dan Bootstrap",
       "Saya akan meningkatkan tampilan halaman yang lebih menarik",
-      "Saya akan melakukan ekspesimen CRUD hanya dalam satu halaman",
+      "Saya akan melakukan eksperimen CRUD hanya dalam satu halaman",
     ],
     result: [
       "Pegawai PST dapat mencatat dan menampilkan daftar buku, daftar isi, pegawai, dan transaksi peminjaman dan pengembalian",
       "Dengan adanya aplikasi yang telah saya buat, pegawai PST akan terbantu dalam mencari buku dan daftar isi yang dibutuhkan oleh pegawai lain tanpa harus berpindah dari halaman ke halaman lain",
-      "Pegawai PST dapat melakukan import / memasukkan data-data buku dan daftar isi dari file Excel agar pegawai PST tidak perlu melakukan input manual ketika server tersebut bermasalah atau pindah server",
+      "Pegawai PST dapat melakukan impor / memasukkan data-data buku dan daftar isi dari file Excel agar pegawai PST tidak perlu melakukan input manual ketika server tersebut bermasalah atau pindah server",
     ],
     video: "",
   },
@@ -226,11 +225,11 @@ export const caseStudyItems = [
       "Pada proyek ini membutuhkan waktu lama untuk mempelajari metode SAW untuk digunakan pada aplikasi ini",
     ],
     lessons: [
-      "Dari proyek yang saya kerjakan, untuk kedepannya saya akan mempelajari cara mempersingkat kodingan agar terlihat lebih ringkas",
+      "Dari proyek yang saya kerjakan, untuk ke depannya saya akan mempelajari cara mempersingkat kode program agar terlihat lebih ringkas",
     ],
     result: [
       "Kepegawaian dapat mengelola data karyawan, pengguna, kriteria, dan periode dalam satu halaman saja",
-      "Dengan adanya aplikasi yang telah saya buat, pengguna dapat melakukan pemasukan data karyawan dan data nilai menggunakan import untuk mempercepat proses saat melakukan pemasukan kedua data tersebut",
+      "Dengan adanya aplikasi yang telah saya buat, pengguna dapat melakukan pemasukan data karyawan dan data nilai menggunakan impor untuk mempercepat proses saat melakukan pemasukan kedua data tersebut",
       "Proyek ini dapat melakukan analisis SAW dan menghasilkan laporan (Lap. Karyawan, Lap. Hasil Analisis SAW, Lap. Nilai Akhir, Lap. Nilai Pegawai, Lap. Karyawan Terbaik, Sertifikat Karyawan Terbaik)",
       "Total waktu responsif pada aplikasi yang telah saya buat sekitar 01.79 Menit dibandingkan dengan waktu sebelum adanya aplikasi tersebut sekitar 4 sampai 5 minggu",
     ],
@@ -255,7 +254,7 @@ export const diagramCSItems = [
 ];
 export const solutionCSItems = [
   {
-    id: "SOl-001-001",
+    id: "SOL-001-001",
     case_study_id: "CAS-001",
     title: "Penggunaan Bootstrap sebagai alat desain Frontend",
     context:
@@ -263,7 +262,7 @@ export const solutionCSItems = [
     visual: "",
   },
   {
-    id: "SOl-001-002",
+    id: "SOL-001-002",
     case_study_id: "CAS-001",
     title: "Aksesibilitas untuk non-pegawai PST",
     context:
@@ -271,7 +270,7 @@ export const solutionCSItems = [
     visual: "",
   },
   {
-    id: "SOl-002-001",
+    id: "SOL-002-001",
     case_study_id: "CAS-002",
     title: "Menggantikan cara tradisional menjadi aplikasi web",
     context:
@@ -279,7 +278,7 @@ export const solutionCSItems = [
     visual: "",
   },
   {
-    id: "SOl-002-002",
+    id: "SOL-002-002",
     case_study_id: "CAS-002",
     title:
       "Menggunakan Simple Additive Weighting (SAW) sebagai metode pemilihan keputusan untuk perhitungan karyawan terbaik",
@@ -301,9 +300,42 @@ export const projectItems = [
     image: "/images/portfolios/PRO-001.png",
     start_period: "2025-03-01",
     status: "Delayed",
-    description: "Test",
+    description:
+      "Proyek aplikasi web untuk manajemen dan informasi perumahan Delta Sari Indah dan Baru.",
     tags: ["Estate"],
     technology: ["Laravel", "PHP"],
     sourcecode: "example.com",
+  },
+  {
+    id: "PRO-002",
+    title: "Curriculum Vitae API",
+    slug: "curriculum-vitae-api",
+    category: "Personal Project",
+    subcategory: "Backend Development",
+    type: "API",
+    image: "/images/portfolios/PRO-002.png",
+    start_period: "2026-03-10",
+    status: "Active",
+    description:
+      "Proyek API yang dirancang untuk menyediakan data bagi aplikasi web di masa mendatang. Saat ini sedang dalam tahap perencanaan dan arsitektur.",
+    tags: ["API", "Backend"],
+    technology: ["Laravel", "MySQL"],
+    isPrivate: true,
+  },
+  {
+    id: "PRO-003",
+    title: "CV and Resume Generator",
+    slug: "cv-and-resume-generator",
+    category: "Personal Project",
+    subcategory: "Full-Stack Development",
+    type: "Aplikasi Web",
+    image: "/images/portfolios/PRO-003.png",
+    start_period: "2026-03-22",
+    status: "Planning",
+    description:
+      "Sebuah aplikasi untuk membuat CV dan resume secara otomatis dari data yang dimasukkan pengguna.",
+    tags: ["CV", "Resume"],
+    technology: ["Laravel", "PHP", "Bootstrap", "React"],
+    isPrivate: true,
   },
 ];

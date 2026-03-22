@@ -1,7 +1,6 @@
 "use client";
 
 import AppLayout from "@/components/layouts/layout";
-import { blogItems } from "@/lib/data/blogData";
 import { formatDate, sortItems } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import jumbotronImage from "../../../assets/images/jumbotron/blog.jpg";
@@ -11,20 +10,24 @@ import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/lib/bootstrap-types";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import { getAllBlogItems } from "@/lib/data/services";
 
 export default function Blog() {
   console.info("This page are being sorted from newest post");
 
+  // Get all project items from the data service
+  const allPosts = getAllBlogItems();
+
   // Get Random Post
   // Initialize with the first item to ensure server/client match during hydration
-  const [featuredPost, setFeaturedPost] = useState(blogItems[0]);
+  const [featuredPost, setFeaturedPost] = useState(allPosts[0]);
 
   useEffect(() => {
     // Randomize on the client side after mount
-    const randomIndex = Math.floor(Math.random() * blogItems.length);
+    const randomIndex = Math.floor(Math.random() * allPosts.length);
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFeaturedPost(blogItems[randomIndex]);
-  }, []);
+    setFeaturedPost(allPosts[randomIndex]);
+  }, [allPosts]);
 
   console.log("Featured Post: " + featuredPost.title);
 
@@ -61,7 +64,7 @@ export default function Blog() {
     url: "https://afrizahanif.com/blog",
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: blogItems.map((item, index) => ({
+      itemListElement: allPosts.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
         url: `https://afrizahanif.com/blog/${item.slug}`,
@@ -98,7 +101,7 @@ export default function Blog() {
       {/* List of Posts (Cards) */}
       <section aria-label="Daftar Artikel">
         <PaginatedList
-          items={sortItems(blogItems, {
+          items={sortItems(allPosts, {
             sortOrder: "newest",
             titleKey: "title",
             primaryDateKey: "date",

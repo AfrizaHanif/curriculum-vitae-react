@@ -2,7 +2,7 @@ import AppLayout from "@/components/layouts/layout";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
 import { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
-import { projectItems } from "@/lib/data/portfolioData";
+import { getAllProjectItems, getProjectItem } from "@/lib/data/services";
 import DetailItem from "@/components/ui/customs/detail-item";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
@@ -14,8 +14,9 @@ import { HeroesButtonItem } from "@/lib/bootstrap-types";
 
 // (IMPORTANT) This is exclusively for page with dynamic ID / Slug
 export function generateStaticParams() {
+  const projects = getAllProjectItems();
   // Pre-render pages for both slugs and IDs to handle redirects
-  return projectItems.flatMap((p) => [{ slug: p.slug }, { slug: p.id }]);
+  return projects.flatMap((p) => [{ slug: p.slug }, { slug: p.id }]);
 }
 
 // Set Props for metadata
@@ -26,10 +27,7 @@ type Props = {
 // Title and Description of Page (Metadata)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
-  const slug = decodeURIComponent(resolvedParams.slug);
-  const item = projectItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
-  );
+  const item = getProjectItem(resolvedParams.slug);
   if (!item) return { title: "Project Item Not Found" };
   return {
     title: { absolute: `${item.title} | Muhammad Afriza Hanif` },
@@ -44,14 +42,11 @@ export default async function SelectedProject({
   params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
-  const slug = decodeURIComponent(resolvedParams.slug);
-  const item = projectItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
-  );
+  const item = getProjectItem(resolvedParams.slug);
   console.log("Item of selected project: ", item);
   if (!item) return notFound();
 
-  if (slug !== item.slug) {
+  if (decodeURIComponent(resolvedParams.slug) !== item.slug) {
     permanentRedirect(`/project/${encodeURIComponent(item.slug)}`);
   }
 
@@ -144,12 +139,35 @@ export default async function SelectedProject({
             </h2>
             <p className="lead">{item.description}</p>
           </section>
+          {/* Explanation for private projects */}
+          {item.isPrivate && (
+            <section
+              id="private-project-explanation"
+              aria-labelledby="private-project-explanation-heading"
+              className="mt-4"
+            >
+              <h2 id="private-project-explanation-heading" className="lh-1">
+                Tentang Proyek Ini
+              </h2>
+              <p>
+                Karena proyek ini bersifat pribadi, kode sumber tidak dapat
+                diakses secara publik. Halaman ini bertujuan untuk memberikan
+                gambaran tentang proyek, termasuk tujuan, teknologi yang
+                digunakan, dan tantangan yang dihadapi selama pengembangan.
+              </p>
+              <p className="fst-italic">
+                (Di sini Anda dapat menambahkan penjelasan yang lebih rinci,
+                diagram arsitektur, atau cuplikan kode untuk menunjukkan
+                keahlian Anda tanpa harus membuka seluruh repositori).
+              </p>
+            </section>
+          )}
         </article>
         <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Menu button */}
             <SlugNavigation
-              items={projectItems}
+              items={getAllProjectItems()}
               item={item}
               backURL="project"
             />

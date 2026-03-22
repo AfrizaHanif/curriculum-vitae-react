@@ -6,7 +6,7 @@ import CardBlank from "@/components/ui/bootstrap/card-blank";
 import Alert from "@/components/ui/bootstrap/alert";
 import NavTab from "@/components/ui/bootstrap/nav-tab";
 import NextImage from "@/components/ui/next/next-image";
-import { projectItems } from "@/lib/data/portfolioData";
+import { getAllProjectItems } from "@/lib/data/services";
 import { formatDate, sortItems, SortOrder } from "@/lib/utils";
 import Link from "next/link";
 import jumbotronImage from "../../../../assets/images/jumbotron/project.jpg";
@@ -37,8 +37,11 @@ export default function Project() {
   // Set useState for replacing element
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
 
+  // Get all project items from the data service
+  const allProjects = getAllProjectItems();
+
   // Sort items based on selection
-  const sortedItems = sortItems(projectItems, {
+  const sortedItems = sortItems(allProjects, {
     sortOrder,
     titleKey: "title",
     primaryDateKey: "start_period",
@@ -46,7 +49,7 @@ export default function Project() {
   console.log("Sort selected: ", sortOrder);
 
   // Render cards for card item
-  const renderCards = (items: typeof projectItems) => (
+  const renderCards = (items: ReturnType<typeof getAllProjectItems>) => (
     <PaginatedList
       items={items}
       itemsPerPage={9}
@@ -121,7 +124,7 @@ export default function Project() {
 
   // Extract unique categories from project items
   const uniqueCategories = Array.from(
-    new Set(projectItems.map((item) => item.category)),
+    new Set(allProjects.map((item) => item.category)),
   );
   console.log("Category in tabs: ", uniqueCategories);
 
@@ -167,7 +170,7 @@ export default function Project() {
     url: "https://afrizahanif.com/project",
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: projectItems.map((item, index) => ({
+      itemListElement: allProjects.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
         url: `https://afrizahanif.com/project/${item.slug}`,
