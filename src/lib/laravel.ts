@@ -47,7 +47,7 @@ export async function fetchLaravel<T>(
   path: string,
   options: FetchLaravelOptions = {},
 ): Promise<T> {
-  const { skipAuth, retries = 0, retryDelay = 1000, ...fetchOptions } = options;
+  const { skipAuth, retries = 3, retryDelay = 2000, ...fetchOptions } = options;
 
   // Prepare headers
   const headers = new Headers(fetchOptions.headers);

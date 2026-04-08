@@ -68,6 +68,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: "Diagnostic: Test API Connectivity"
+        run: |
+          echo "Testing connection to API..."
+          curl -I -m 10 ${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/blogs || echo "⚠️ API is unreachable via curl"
+          nslookup api.afrizahanif.com || echo "⚠️ DNS resolution failed"
+
       - name: Run Tests
         run: npm test || echo "No tests specified"
 
