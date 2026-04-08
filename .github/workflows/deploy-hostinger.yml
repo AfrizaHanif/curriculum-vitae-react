@@ -66,13 +66,14 @@ jobs:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           SFTP_PORT: 65002
         run: |
-          echo "Attempting Enable Maintenance Mode via SSH Key..."
-          timeout 300 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
+          echo "Attempting Enable Maintenance Mode via SSH Key (timeout 60s)..."
+          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
+            set sftp:connect-program \"ssh -a -x -o StrictHostKeyChecking=no\";
             set sftp:auto-confirm yes;
             set cmd:fail-exit on;
-            set net:timeout 10; 
-            set net:max-retries 2; 
-            cd "${{ vars.REMOTE_PATH }}";
+            set net:timeout 5; 
+            set net:max-retries 1; 
+            mkdir -p "${{ vars.REMOTE_PATH }}"; cd "${{ vars.REMOTE_PATH }}";
             put public/maintenance.html -o maintenance.html;
             put public/.htaccess.maintenance -o .htaccess;
             quit" || {
@@ -124,13 +125,14 @@ jobs:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           SFTP_PORT: 65002
         run: |
-          echo "Attempting Disable Maintenance Mode via SSH Key..."
-          timeout 300 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
+          echo "Attempting Disable Maintenance Mode via SSH Key (timeout 60s)..."
+          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
+            set sftp:connect-program \"ssh -a -x -o StrictHostKeyChecking=no\";
             set sftp:auto-confirm yes;
             set cmd:fail-exit on;
-            set net:timeout 10; 
-            set net:max-retries 2; 
-            cd "${{ vars.REMOTE_PATH }}";
+            set net:timeout 5; 
+            set net:max-retries 1; 
+            mkdir -p "${{ vars.REMOTE_PATH }}"; cd "${{ vars.REMOTE_PATH }}";
             rm -f maintenance.html;
             put public/.htaccess -o .htaccess;
             quit" || {
