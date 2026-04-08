@@ -3,10 +3,13 @@ name: Build & Deploy to Hostinger
 on:
   push:
     branches: [main, master, staging]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # Dynamically pick 'production' or 'staging' based on the branch
     environment:
       name: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && 'production' || 'staging' }}
@@ -31,7 +34,13 @@ jobs:
 
           echo "Checking Secrets (Confirmation only, no values printed):"
           [ -n "${{ secrets.FTP_HOST }}" ] && echo "  ✓ FTP_HOST is loaded" || echo "  ✗ FTP_HOST is MISSING"
+          [ -n "${{ secrets.SSH_PRIVATE_KEY }}" ] && echo "  ✓ SSH_PRIVATE_KEY is loaded" || echo "  ✗ SSH_PRIVATE_KEY is MISSING"
           [ -n "${{ secrets.FTP_PASSWORD }}" ] && echo "  ✓ FTP_PASSWORD is loaded" || echo "  ✗ FTP_PASSWORD is MISSING"
+
+      - name: Setup SSH Keys
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Cache dependencies and Next.js build cache
         uses: actions/cache@v4
@@ -55,16 +64,29 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
         run: |
-          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "
-            set cmd:fail-exit on; 
+          echo "Attempting Enable Maintenance Mode via SSH Key..."
+          timeout 300 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
+            set sftp:auto-confirm yes;
+            set cmd:fail-exit on;
             set net:timeout 10; 
             set net:max-retries 2; 
-            set ssl:verify-certificate no; 
             cd "${{ vars.REMOTE_PATH }}";
             put public/maintenance.html -o maintenance.html;
             put public/.htaccess.maintenance -o .htaccess;
-            quit" || (echo "✗ Failed to enable maintenance mode"; exit 1)
+            quit" || {
+              echo "⚠️ SSH Key failed, falling back to SFTP Password..."
+              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
+                set sftp:auto-confirm yes;
+                set cmd:fail-exit on;
+                set net:timeout 10; 
+                set net:max-retries 2; 
+                cd "${{ vars.REMOTE_PATH }}";
+                put public/maintenance.html -o maintenance.html;
+                put public/.htaccess.maintenance -o .htaccess;
+                quit" || (echo "✗ Failed to enable maintenance mode even with password"; exit 1)
+            }
           echo "✓ Maintenance mode enabled"
 
       - name: Build
@@ -75,21 +97,24 @@ jobs:
           # NEXT_PUBLIC_ANALYTICS_ID: ${{ secrets.ANALYTICS_ID }}
         run: npm run build
 
-      - name: Deploy via lftp
+      - name: Push to Deployment Branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: out # The folder the action should deploy.
+          branch: deploy # The branch the action should deploy to.
+          clean: true # Automatically remove deleted files from the target branch
+          single-commit: true # Keeps the deployment branch history clean
+
+      - name: Remote Pull via Hostinger Webhook
+        if: success() # Only trigger if previous steps succeeded
         env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
+          HOSTINGER_WEBHOOK_URL: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK_URL }}
         run: |
-          timeout 600 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "
-            set cmd:fail-exit on; 
-            set net:timeout 10; 
-            set net:max-retries 2; 
-            set ssl:verify-certificate no; 
-            cd "${{ vars.REMOTE_PATH }}";
-            mirror -R --verbose --delete --parallel=5 --exclude=.htaccess* --exclude=maintenance.html --exclude-glob .* --exclude-glob domains/ --exclude-glob api/ --exclude-glob staging-api/ --exclude-glob project/ out/ ./;
-            quit" || (echo "✗ Deployment failed"; exit 1)
-          echo "✓ Deployment completed"
+          echo "🛰️ Sending signal to Hostinger to pull 'deploy' branch..."
+          curl -X POST "$HOSTINGER_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{"ref": "refs/heads/deploy"}' || echo "⚠️ Webhook trigger failed"
+          sleep 5 # Give Hostinger a few seconds to process the pull
 
       - name: Disable Maintenance Mode
         if: success()
@@ -97,14 +122,27 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
         run: |
-          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "
-            set cmd:fail-exit on; 
+          echo "Attempting Disable Maintenance Mode via SSH Key..."
+          timeout 300 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
+            set sftp:auto-confirm yes;
+            set cmd:fail-exit on;
             set net:timeout 10; 
             set net:max-retries 2; 
-            set ssl:verify-certificate no; 
             cd "${{ vars.REMOTE_PATH }}";
             rm -f maintenance.html;
             put public/.htaccess -o .htaccess;
-            quit" || (echo "✗ Failed to disable maintenance mode"; exit 1)
+            quit" || {
+              echo "⚠️ SSH Key failed, falling back to SFTP Password..."
+              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
+                set sftp:auto-confirm yes;
+                set cmd:fail-exit on;
+                set net:timeout 10; 
+                set net:max-retries 2; 
+                cd "${{ vars.REMOTE_PATH }}";
+                rm -f maintenance.html;
+                put public/.htaccess -o .htaccess;
+                quit" || (echo "✗ Failed to disable maintenance mode even with password"; exit 1)
+            }
           echo "✓ Maintenance mode disabled - Site is live"
