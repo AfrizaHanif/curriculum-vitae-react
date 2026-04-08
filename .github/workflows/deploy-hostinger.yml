@@ -64,7 +64,7 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
+          SFTP_PORT: 21
         run: |
           echo "Attempting Enable Maintenance Mode via SSH Key (timeout 60s)..."
           timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
@@ -123,7 +123,7 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
+          SFTP_PORT: 21
         run: |
           echo "Attempting Disable Maintenance Mode via SSH Key (timeout 60s)..."
           timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
