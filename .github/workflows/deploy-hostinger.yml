@@ -113,7 +113,7 @@ jobs:
           echo "🛰️ Sending signal to Hostinger to pull 'deploy' branch..."
           curl -X POST "$HOSTINGER_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
-            -d '{"ref": "refs/heads/deploy"}' || echo "⚠️ Webhook trigger failed"
+            -d '{"ref": "refs/heads/deploy"}' || (echo "⚠️ Webhook trigger failed"; exit 1)
           sleep 5 # Give Hostinger a few seconds to process the pull
 
       - name: Disable Maintenance Mode
