@@ -85,7 +85,7 @@ jobs:
             set net:timeout 10; 
             set net:max-retries 2; 
             set ssl:verify-certificate no; 
-            mirror -R --verbose --delete --parallel=5 --exclude=.htaccess* --exclude=maintenance.html out/ ${{ vars.REMOTE_PATH }}/; 
+            mirror -R --verbose --delete --parallel=5 --exclude=.htaccess* --exclude=maintenance.html --exclude-glob .* --exclude-glob domains/ out/ ${{ vars.REMOTE_PATH }}/; 
             quit" || (echo "✗ Deployment failed"; exit 1)
           echo "✓ Deployment completed"
 

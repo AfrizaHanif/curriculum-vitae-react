@@ -70,9 +70,36 @@ Proyek ini mendukung hierarki file environment Next.js. Secara default, variabel
 Tambahkan konfigurasi berikut pada file `.env` pilihan Anda:
 
 ```env
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000 # URL API Laravel Anda
-NEXT_PUBLIC_APP_URL=http://localhost:3000     # URL aplikasi Next.js Anda (untuk Sanctum)
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000 atau https://api.yoursite.com # URL API Laravel Anda
+NEXT_PUBLIC_APP_URL=http://localhost:3000 atau https://yoursite.com # URL aplikasi Next.js Anda (untuk Sanctum)
 ```
+
+## Konfigurasi Deployment (GitHub Actions) 🚀
+
+Aplikasi ini menggunakan GitHub Actions (`deploy-hostinger.yml`) untuk otomatisasi build dan deploy ke Hostinger via FTP. Anda perlu mengatur **Secrets** dan **Variables** di repositori GitHub Anda (**Settings > Secrets and variables > Actions**).
+
+### GitHub Actions Variables
+
+| Nama Variable | Deskripsi                             | Contoh / Cara Cari                 |
+| :------------ | :------------------------------------ | :--------------------------------- |
+| REMOTE_PATH   | Path absolut folder tujuan di server. | domains/domainanda.com/public_html |
+
+**Cara mencari REMOTE_PATH di Hostinger:**
+
+1. Buka **File Manager** di hPanel.
+2. Masuk ke folder tempat website Anda berada (biasanya `public_html`).
+3. Klik kanan pada folder atau lihat breadcrumb. Jika menggunakan FTP root, path biasanya dimulai dari `domains/....`
+4. Anda juga bisa mengunggah file PHP berisi `<?php echo getcwd(); ?>` untuk melihat path absolut lengkap.
+
+### GitHub Actions Secrets
+
+| Nama Secret  | Deskripsi                                           |
+| :----------- | :-------------------------------------------------- |
+| FTP_HOST     | Hostname FTP Hostinger (misal: ftp.domainanda.com). |
+| FTP_USERNAME | Username akun FTP Anda.                             |
+| FTP_PASSWORD | Password akun FTP Anda.                             |
+
+> Tips: Karena workflow menggunakan Environments (production & staging), Anda disarankan membuat Environment di GitHub agar variabel REMOTE_PATH bisa berbeda antara situs live dan situs testing.
 
 ### Endpoint API
 
