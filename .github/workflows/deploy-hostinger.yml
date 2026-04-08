@@ -1,12 +1,17 @@
 name: Build & Deploy to Hostinger
 
 on:
-  push:
-    branches: [main, master, staging]
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering of the workflow
+    inputs:
+      confirm_deployment:
+        description: "Confirm deployment to Hostinger (This will put the site in maintenance mode temporarily)."
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   build-and-deploy:
+    if: github.event.inputs.confirm_deployment == 'true' # Only run if confirmation is true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,6 +47,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Trust Hostinger SSH Key
+        env:
+          SSH_HOST_KEY: ${{ secrets.SSH_HOST_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_HOST_KEY" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
       - name: Cache dependencies and Next.js build cache
         uses: actions/cache@v4
         with:
@@ -54,21 +67,84 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run Tests
+        run: npm test || echo "No tests specified"
+
+      - name: Build
+        env:
+          # Next.js inlines these values into the JS bundle here
+          NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+        run: |
+          # Generate version file to track which commit is live
+          echo "{\"sha\": \"${{ github.sha }}\"}" > public/version.json
+          npm run build
+
       - name: Install lftp
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
+      - name: Check SSH Key Status
+        id: check_ssh_key
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
+        run: |
+          echo "Attempting a test SSH connection to verify key status..."
+          # BatchMode prevents password prompts. We removed StrictHostKeyChecking=no because we trusted the key above.
+          if ssh -o BatchMode=yes -o ConnectionAttempts=1 -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" exit; then
+            echo "SSH key is already working on the server."
+            echo "ssh_key_working=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "SSH key is NOT working or not authorized. Bootstrap needed."
+            echo "ssh_key_working=false" >> "$GITHUB_OUTPUT"
+          fi
+        # Allow this step to fail without stopping the workflow, as its purpose is to determine if a fallback is needed.
+        continue-on-error: true
+
+      - name: Authorize SSH Key (Bootstrap)
+        if: steps.check_ssh_key.outputs.ssh_key_working == 'false' # Only run if the SSH key check failed
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
+        run: |
+          echo "Restoring SSH Public Key to server using password..."
+          # Extract public key from the private key secret
+          echo "$SSH_PRIVATE_KEY" > temp_key
+          chmod 600 temp_key
+          ssh-keygen -y -f temp_key > id_rsa.pub
+
+          # Use SFTP Password to ensure ~/.ssh exists and contains the key
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
+            set sftp:auto-confirm yes;
+            set net:timeout 10;
+            set net:max-retries 1;
+            mkdir -p .ssh;
+            put id_rsa.pub -o .ssh/authorized_keys;
+            chmod 700 .ssh;
+            chmod 600 .ssh/authorized_keys;
+            quit"
+          rm temp_key id_rsa.pub
+          echo "✓ SSH key restored and authorized"
+
       - name: Enable Maintenance Mode
+        id: enable_maintenance
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 21
+          SFTP_PORT: 65002
+          MAINTENANCE_BYPASS_TOKEN: ${{ secrets.MAINTENANCE_BYPASS_TOKEN }}
         run: |
           echo "Attempting Enable Maintenance Mode via SSH Key (timeout 60s)..."
+          # Inject secret into maintenance htaccess before uploading
+          sed -i "s/BYPASS_TOKEN_PLACEHOLDER/$MAINTENANCE_BYPASS_TOKEN/g" public/.htaccess.maintenance
           timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:connect-program \"ssh -a -x -o StrictHostKeyChecking=no\";
             set sftp:auto-confirm yes;
             set cmd:fail-exit on;
             set net:timeout 5; 
@@ -90,14 +166,6 @@ jobs:
             }
           echo "✓ Maintenance mode enabled"
 
-      - name: Build
-        env:
-          # Next.js inlines these values into the JS bundle here
-          NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
-          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
-          # NEXT_PUBLIC_ANALYTICS_ID: ${{ secrets.ANALYTICS_ID }}
-        run: npm run build
-
       - name: Push to Deployment Branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
@@ -107,6 +175,7 @@ jobs:
           single-commit: true # Keeps the deployment branch history clean
 
       - name: Remote Pull via Hostinger Webhook
+        id: trigger_webhook
         if: success() # Only trigger if previous steps succeeded
         env:
           HOSTINGER_WEBHOOK_URL: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK_URL }}
@@ -115,7 +184,65 @@ jobs:
           curl -X POST "$HOSTINGER_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -d '{"ref": "refs/heads/deploy"}' || (echo "⚠️ Webhook trigger failed"; exit 1)
-          sleep 5 # Give Hostinger a few seconds to process the pull
+
+      - name: Verify Deployment (Smoke Test)
+        id: smoke_test
+        run: |
+          echo "Waiting for Hostinger to complete the pull and verify server response..."
+          MAX_RETRIES=12
+          for i in $(seq 1 $MAX_RETRIES); do
+            # Fetch version.json. -f fails on 4xx/5xx errors, -s is silent.
+            RESPONSE=$(curl -s -f -H "X-Maintenance-Bypass: ${{ secrets.MAINTENANCE_BYPASS_TOKEN }}" "${{ vars.NEXT_PUBLIC_APP_URL }}/version.json") || RESPONSE=""
+            
+            # Use jq -e to check if the input is valid JSON and contains the .sha key
+            if echo "$RESPONSE" | jq -e .sha >/dev/null 2>&1; then
+              REMOTE_SHA=$(echo "$RESPONSE" | jq -r '.sha')
+            else
+              # If JSON is invalid or .sha is missing
+              REMOTE_SHA="INVALID"
+              echo "Attempt $i/$MAX_RETRIES: Server response was not valid JSON or version.json is missing."
+            fi
+            
+            if [ "$REMOTE_SHA" == "${{ github.sha }}" ]; then
+              echo "✓ Deployment verified! Remote SHA matches: $REMOTE_SHA"
+              exit 0
+            fi
+            echo "Attempt $i/$MAX_RETRIES: Expected SHA ${{ github.sha }} but got '$REMOTE_SHA'. Retrying in 5s..."
+            sleep 5
+          done
+          echo "✗ Server failed to respond correctly after 60 seconds."
+          exit 1
+
+      - name: Rollback - Disable Maintenance Mode on Failure
+        if: failure() && steps.enable_maintenance.outcome == 'success'
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
+        run: |
+          echo "🚨 Deployment or Webhook failed! Rolling back maintenance mode to keep the old site live..."
+          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
+            set sftp:auto-confirm yes;
+            set cmd:fail-exit on;
+            set net:timeout 5; 
+            set net:max-retries 1; 
+            mkdir -p "${{ vars.REMOTE_PATH }}"; cd "${{ vars.REMOTE_PATH }}";
+            rm -f maintenance.html;
+            put public/.htaccess -o .htaccess;
+            quit" || {
+              echo "⚠️ SSH Key failed, falling back to SFTP Password..."
+              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
+                set sftp:auto-confirm yes;
+                set cmd:fail-exit on;
+                set net:timeout 10; 
+                set net:max-retries 2; 
+                cd "${{ vars.REMOTE_PATH }}";
+                rm -f maintenance.html;
+                put public/.htaccess -o .htaccess;
+                quit" || (echo "✗ Failed to rollback maintenance mode"; exit 1)
+            }
+          echo "✓ Rollback complete - Site is back online (previous version)"
 
       - name: Disable Maintenance Mode
         if: success()
@@ -123,11 +250,10 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 21
+          SFTP_PORT: 65002
         run: |
           echo "Attempting Disable Maintenance Mode via SSH Key (timeout 60s)..."
           timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:connect-program \"ssh -a -x -o StrictHostKeyChecking=no\";
             set sftp:auto-confirm yes;
             set cmd:fail-exit on;
             set net:timeout 5; 

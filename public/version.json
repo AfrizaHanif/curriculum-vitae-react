@@ -1,0 +1,1 @@
+echo "{\"sha\": \"${{ github.sha }}\"}" > public/version.json
