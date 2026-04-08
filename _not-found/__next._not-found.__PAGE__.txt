@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[12275,["/_next/static/chunks/48ff183b61f5a033.js","/_next/static/chunks/088a44491145608a.js","/_next/static/chunks/4b32e733588f800e.js","/_next/static/chunks/7da0995560ae78c2.js"],"default"]
+3:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/d2be314c3ece3fbe.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+:HL["/_next/static/chunks/f23720db4e53dca5.css","style"]
+0:{"buildId":"WbE1aSkOzHtpeZ_JMb97l","rsc":["$","$1","c",{"children":[["$","$L2",null,{"showBreadcrumb":false,"children":["$","div",null,{"className":"container py-5 text-center","children":[["$","h1",null,{"className":"display-4","children":"404 — Page not found"}],["$","p",null,{"className":"lead","children":"The page you are looking for could not be found."}]]}]}],[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/f23720db4e53dca5.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/088a44491145608a.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/4b32e733588f800e.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/7da0995560ae78c2.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"loading":null,"isPartial":false}
+5:null

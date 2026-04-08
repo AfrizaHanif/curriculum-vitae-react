@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Allow access to maintenance.html and version.json directly
+  RewriteCond %{REQUEST_URI} !/maintenance.html$ [NC]
+  RewriteCond %{REQUEST_URI} !/version.json$ [NC]
+
+  # 2. Bypass maintenance if the secret header matches (injected by workflow)
+  RewriteCond %{HTTP:X-Maintenance-Bypass} !=BYPASS_TOKEN_PLACEHOLDER
+
+  # 3. Redirect all other traffic to maintenance.html with a 503 status
+  RewriteRule ^(.*)$ /maintenance.html [R=503,L]
+</IfModule>
+
+ErrorDocument 503 /maintenance.html
