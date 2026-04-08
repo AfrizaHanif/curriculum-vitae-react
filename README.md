@@ -7,23 +7,32 @@
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Project Description
+## Deskripsi Proyek
 
-This project is a responsive and interactive curriculum vitae (CV) or resume website. It's designed to showcase professional experience, skills, and portfolio projects in a modern web format.
+Proyek ini adalah website curriculum vitae (CV) atau resume yang responsif dan interaktif. Didesain untuk menampilkan pengalaman profesional, keahlian, dan proyek portofolio dalam format web modern.
 
-## Technologies Used
+## Teknologi yang Digunakan
 
-| Technology      | Description          |
-| --------------- | -------------------- |
-| Next.js         | React Framework      |
-| React           | UI Library           |
-| React Leaflet   | Maps                 |
-| Bootstrap       | CSS Framework        |
-| React Bootstrap | Bootstrap Components |
+| Teknologi       | Deskripsi          |
+| --------------- | ------------------ |
+| Next.js         | React Framework    |
+| React           | UI Library         |
+| Laravel (API)   | Backend API        |
+| React Leaflet   | Peta (Maps)        |
+| Bootstrap       | CSS Framework      |
+| React Bootstrap | Komponen Bootstrap |
+| TypeScript      | Static Typing      |
+| Sass            | CSS Preprocessor   |
 
-## Getting Started
+## Memulai
 
-First, run the development server:
+### Prasyarat
+
+- **Node.js**: Versi 18.x atau terbaru.
+- **Laravel Backend**: Pastikan API Laravel sudah berjalan dan dapat diakses.
+- **Package Manager**: npm, yarn, pnpm, atau bun.
+
+Pertama, jalankan server pengembangan:
 
 ```bash
 npm run dev
@@ -35,52 +44,103 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000) di browser Anda untuk melihat hasilnya.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Anda dapat mulai mengedit halaman dengan memodifikasi `app/page.tsx`. Halaman akan diperbarui secara otomatis saat Anda mengedit file tersebut.
 
 ---
 
-## Production config (Analytics, reCAPTCHA & Formspree) 🔧
+## Konfigurasi API
 
-This project supports two ways to provide production values for Google Analytics, reCAPTCHA, and Formspree:
+Proyek ini dikonfigurasi untuk mengambil data secara dinamis dari API Laravel.
 
-1. Environment variables at build time (recommended when you can set envs on the host)
-2. A runtime JSON file in `public/` (useful on shared hosting where you can't set envs)
+### Environment Variables
+
+Proyek ini mendukung hierarki file environment Next.js. Secara default, variabel dimuat dengan urutan prioritas berikut:
+
+1. `.env.local` (Prioritas tertinggi, tidak di-commit)
+2. `.env.development` (Pengaturan khusus development)
+3. `.env` (Nilai default)
+
+**Saran penggunaan:**
+
+- Gunakan `.env.development` untuk URL API standar tim/lokal yang umum.
+- Gunakan `.env.local` untuk menimpa pengaturan tersebut secara spesifik di komputer Anda atau untuk menyimpan kunci rahasia.
+
+Tambahkan konfigurasi berikut pada file `.env` pilihan Anda:
+
+```env
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000 # URL API Laravel Anda
+NEXT_PUBLIC_APP_URL=http://localhost:3000     # URL aplikasi Next.js Anda (untuk Sanctum)
+```
+
+### Endpoint API
+
+Aplikasi ini memiliki beberapa endpoint utama dari Laravel:
+
+| Method | Endpoint          | Deskripsi                                       |
+| :----- | :---------------- | :---------------------------------------------- |
+| `GET`  | `/api/profile`    | Mengambil data profil dan ringkasan pribadi.    |
+| `GET`  | `/api/resume`     | Mengambil data pendidikan dan pengalaman kerja. |
+| `GET`  | `/api/portfolios` | Mengambil daftar lengkap item portfolio.        |
+| `GET`  | `/api/projects`   | Mengambil daftar proyek sampingan/personal.     |
+| `GET`  | `/api/blogs`      | Mengambil daftar artikel / postingan blog.      |
+
+### Struktur Data JSON
+
+Sesuai dengan implementasi di `src/lib/laravel.ts`, aplikasi ini mengharapkan data dikumpulkan dalam properti data (standar Laravel API Resources).
+
+**Contoh Response (Portfolios):**
+
+```json
+{
+  "data": [
+    {
+      "id": "POR-001",
+      "title": "Judul Proyek",
+      "slug": "judul-proyek",
+      "category": "Proyek Akademik",
+      "image": "/images/portfolios/POR-001.png",
+      "technology": ["Laravel", "React"],
+      "description": "Deskripsi singkat proyek..."
+    }
+  ]
+}
+```
+
+**Catatan Implementasi:**
+
+- Jika API Laravel mengembalikan error (Selain 200 (non-200)), sistem akan mencatat error di console dan melempar `Error`
+- Fungsi fetchLaravel secara otomatis melakukan unwrapping pada properti `data`, sehingga di komponen Anda bisa langsung mengakses array atau objek utamanya.
+- Pastikan Laravel Anda sudah mengizinkan CORS dari domain frontend.
+
+### Mekanisme Fallback (Data Lokal)
+
+Aplikasi ini menggunakan sistem fetch dengan fitur fallback. Jika API tidak dapat dijangkau atau URL tidak diatur, aplikasi akan secara otomatis menggunakan data lokal yang tersedia di `src/lib/data/` untuk memastikan website tetap berjalan.
+
+## Konfigurasi Produksi (Analytics, reCAPTCHA & Formspree) 🔧
+
+Proyek ini mendukung dua cara untuk menyediakan nilai produksi untuk Google Analytics, reCAPTCHA, dan Formspree:
+
+1. Menggunakan environment variables (.env) saat build (direkomendasikan jika Anda bisa mengatur env di host)
+2. File JSON runtime di `public/` (berguna di shared hosting di mana Anda tidak bisa mengatur env)
 
 ### 1) Build-time env vars
 
-- Dev: set your dev keys in `.env.local`:
+- Dev: atur kunci dev anda di `.env.local`:
 
 ```env
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your_dev_site_key
 NEXT_PUBLIC_FORMSPREE_FORM_ID=your_dev_form_id_or_url
 ```
 
-- Prod: set `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` and `NEXT_PUBLIC_FORMSPREE_FORM_ID` in your production environment or in a `.env.production` and run `npm run build` on the production host.
+- Prod: atur `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` dan `NEXT_PUBLIC_FORMSPREE_FORM_ID` di .env Anda (`.env.production`) dan jalankan `npm run build`.
 
-> Note: Next.js inlines `NEXT_PUBLIC_*` values at build time — changing those values requires a rebuild.
+> Catatan: Next.js menyisipkan nilai `NEXT_PUBLIC_*` pada saat build — mengubah nilai tersebut memerlukan build ulang.
 
-### 2) Runtime config (`public/site-config.json`) — no rebuild needed
+### 2) Konfigurasi Runtime (`public/site-config.json`) — tanpa build ulang
 
-Create a `public/site-config.json` file (upload via FTP or Hostinger File Manager) with this structure:
+Buat file `public/site-config.json` (upload melalui FTP or Hostinger File Manager) dengan struktur berikut:
 
 ```json
 {
@@ -90,9 +150,9 @@ Create a `public/site-config.json` file (upload via FTP or Hostinger File Manage
 }
 ```
 
-- The client can fetch this file at runtime and override any env-based defaults. By default the app only loads the runtime file in production so development uses your `.env.local` values. This is ideal for shared hosting (no ability to set Node env vars) because you can replace the file without rebuilding the app.
+- Klien dapat mengambil file tersebut saat runtime dan menimpa pengaturan default berbasis env. Secara default, aplikasi hanya memuat file runtime di lingkungan produksi sehingga pengembangan menggunakan nilai `.env.local` Anda. Ini bermanfaat untuk shared hosting (tidak ada kemampuan untuk mengatur .env Node) karena Anda dapat mengganti file tanpa membangun ulang aplikasi.
 
-- Example client-side snippet (e.g. in the contact form component):
+- Contoh kodingan sisi klien (Sebagai contoh, pada komponen formulir kontak):
 
 ```ts
 useEffect(() => {
@@ -108,16 +168,91 @@ useEffect(() => {
 }, []);
 ```
 
-**Note:** `googleAnalyticsId` is loaded at build time via `layout.tsx`. If you change this ID in `site-config.json`, you must **rebuild** the app for the change to take effect.
+**Catatan:** `googleAnalyticsId` dimuat saat proses build melalui `layout.tsx`. Jika Anda mengubah ID ini di `site-config.json`, Anda harus **membangun ulang** aplikasi agar perubahan tersebut berlaku.
 
-### Hostinger (shared hosting) quick steps
+### Setup Hostinger (shared hosting)
 
-- Upload `public/site-config.json` to your site's `public/` (document root) using Hostinger File Manager or FTP.
-- No rebuild needed — the client will fetch the file at runtime.
-- To update the production keys later, replace the uploaded `site-config.json` file.
+- Upload `public/site-config.json` ke folder `public/` (document root) pada situs anda menggunakan Hostinger File Manager atau FTP.
+- Tidak perlu melakukan rebuild (Build ulang) — client akan mengambil file tersebut saat runtime.
+- Untuk memperbarui kunci produksi di kemudian hari, ganti file `site-config.json` yang telah diunggah.
 
-### Important notes ⚠️
+### Catatan Penting ⚠️
 
-- reCAPTCHA site keys are public values (safe in client code), but **keep the reCAPTCHA secret key on a server** and never expose it in client-side code.
-- Make sure each reCAPTCHA site key is configured to accept the corresponding domain (localhost for dev, your live domain for prod).
-- Formspree IDs may be provided as full URLs — the client can extract the ID with `.split('/').pop()`.
+- reCAPTCHA site keys adalah kunci yang dapat dilihat oleh publik (Aman di client), tetapi **wajib simpan kunci rahasia (secret key) di server** dan jangan pernah mengeksposnya di kode client-side.
+- Pastikan setiap kunci situs reCAPTCHA dikonfigurasi untuk menerima domain yang sesuai (localhost untuk development (local), domain asli untuk production (live site)).
+- ID Formspree dapat diberikan sebagai URL lengkap — klien dapat mengekstrak ID dengan `.split('/').pop()`.
+
+---
+
+## Struktur Folder Utama 📂
+
+- `src/app/`: Routing dan halaman aplikasi (Next.js App Router).
+- `src/lib/laravel.ts`: Wrapper API Fetch untuk komunikasi dengan backend Laravel.
+- `src/lib/data/`: Data statis (fallback) jika API tidak tersedia.
+- `src/types/`: Definisi interface TypeScript untuk data API.
+- `public/`: Asset statis (gambar, favicon) dan konfigurasi runtime.
+
+## Script Tersedia
+
+| Command         | Deskripsi                                         |
+| :-------------- | :------------------------------------------------ |
+| `npm run dev`   | Menjalankan server pengembangan.                  |
+| `npm run build` | Membuat build produksi yang dioptimalkan.         |
+| `npm run start` | Menjalankan aplikasi hasil build produksi.        |
+| `npm run lint`  | Memeriksa kesalahan pengetikan atau standar kode. |
+
+---
+
+## Dokumentasi Teknis: Mekanisme Fetch with Fallback 🛡️
+
+Proyek ini mengimplementasikan strategi "Hybrid Data Source" untuk memastikan website selalu dapat diakses oleh pengunjung, baik saat backend sedang aktif maupun tidak.
+
+### 1. Arsitektur Helper `fetchLaravel`
+
+Fungsi utama berada di `src/lib/laravel.ts`. Helper ini adalah wrapper di atas standar `fetch` API dengan fitur:
+
+- **Otentikasi Otomatis**: Mendukung Laravel Sanctum dengan meneruskan cookie di sisi server (SSR) dan header `X-XSRF-TOKEN` di sisi klien.
+- **Retry Mechanism**: Mencoba kembali permintaan hingga 3 kali jika terjadi kegagalan jaringan sebelum benar-benar menyerah.
+- **Auto-Unwrapping**: Secara otomatis mengambil properti `.data` dari respon Laravel API Resource.
+- **Server & Client Ready**: Berjalan lancar di Server Components maupun Client Components.
+
+### 2. Logika Fallback
+
+Aplikasi ini menggunakan helper `fetchWithFallback` untuk menangani logika percobaan fetch dan transisi ke data statis secara otomatis.
+
+**Contoh Implementasi:**
+
+```typescript
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { fetchLaravel } from "@/lib/laravel";
+import { blogItems } from "@/lib/data/blogData";
+
+const { data, error } = await fetchWithFallback<BlogItem[]>(
+  fetchLaravel<BlogItem[]>("api/blogs"),
+  blogItems, // Fallback bersifat opsional
+  "Pesan error kustom",
+);
+```
+
+### 3. Keunggulan Tipe Data (Overloading)
+
+Helper ini mendukung _function overloading_ di TypeScript:
+
+- **Jika fallback diberikan**: Tipe data hasil (`data`) dijamin sesuai dengan tipe data yang diminta (`T`).
+- **Jika fallback tidak diberikan**: Tipe data hasil (`data`) akan menjadi `T | undefined`.
+
+Hal ini memungkinkan komponen untuk tetap aman secara tipe data tanpa perlu pengecekan manual yang berulang jika data statis sudah disediakan sebagai cadangan.
+
+### 4. Keuntungan Strategi Ini
+
+- **Zero Downtime**: Website tidak akan menampilkan halaman error jika backend Laravel Anda sedang maintenance atau mati.
+- **Performa Cepat**: Saat fase pengembangan atau jika API lambat, data lokal memberikan respon instan.
+- **SEO Optimal**: Karena Next.js mencoba melakukan fetch di sisi server, crawler mesin pencari tetap mendapatkan konten lengkap meskipun API sedang tidak stabil (menggunakan fallback).
+
+### 5. Penanganan Error
+
+Sistem menggunakan class `LaravelError` khusus untuk menangkap:
+
+- Status kode HTTP (404, 500, dsb).
+- Pesan error spesifik dari Laravel (Validation errors).
+- Data tambahan yang dikirimkan oleh API untuk keperluan debugging.

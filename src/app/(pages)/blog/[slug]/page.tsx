@@ -1,7 +1,6 @@
 import AppLayout from "@/components/layouts/layout";
 import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
-import { getAllBlogItems, getBlogItem } from "@/lib/data/services";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Metadata } from "next";
 import NextImage from "@/components/ui/next/next-image";
 import SanitizedContent from "@/components/ui/react/sanitized-content";
@@ -10,14 +9,33 @@ import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import SlugNavigation from "@/components/ui/customs/slug-navigation";
 import Heroes from "@/components/ui/bootstrap/heroes";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem } from "@/types/bootstrap-types";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { fetchLaravel } from "@/lib/laravel";
+import { BlogItem } from "@/types/customs/data-type";
+import { blogItems } from "@/lib/data/blogData";
+import ErrorToast from "@/components/home/error-toast";
+import { resolveAssetUrl } from "@/lib/assets";
 
 // NOTE: This component / page are using async await to make the params are to be resolved for metadata. Do not modify / remove unless you know the risk
 
-export function generateStaticParams() {
-  // Pre-render pages for both slugs and IDs to handle redirects
-  const posts = getAllBlogItems();
-  return posts.flatMap((p) => [{ slug: p.slug }, { slug: p.id }]);
+export async function generateStaticParams() {
+  try {
+    const posts = await fetchLaravel<BlogItem[]>("api/blogs", {
+      skipAuth: true,
+    });
+    // For 'output: export', we must ensure generateStaticParams returns paths
+    // even if the API is unavailable during build time.
+    const data =
+      posts && Array.isArray(posts) && posts.length > 0 ? posts : blogItems;
+
+    // Pre-render pages for both slugs and IDs to handle redirects
+    return data.flatMap((p) => [{ slug: p.slug }, { slug: String(p.id) }]);
+  } catch (error) {
+    console.error("Error generating static params for blog:", error);
+    // Fallback to local data to ensure the build succeeds
+    return blogItems.flatMap((p) => [{ slug: p.slug }, { slug: String(p.id) }]);
+  }
 }
 
 // Set Props for metadata
@@ -28,7 +46,27 @@ type Props = {
 // Title and Descriptions of page (Using Metadata)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
-  const item = getBlogItem(resolvedParams.slug);
+
+  const [blogResult] = await Promise.all([
+    fetchWithFallback<BlogItem>(
+      fetchLaravel<BlogItem>(`api/blogs/${resolvedParams.slug}`, {
+        next: {
+          revalidate: 3600,
+          tags: ["blog", `blog-${resolvedParams.slug}`],
+        },
+        skipAuth: true,
+      }),
+      blogItems.find(
+        (b) =>
+          b.slug === resolvedParams.slug ||
+          String(b.id) === resolvedParams.slug,
+      ) as BlogItem,
+      "Gagal memuat detail Blog.",
+      (data) => !!data && typeof data === "object" && "slug" in data, // Validator
+    ),
+  ]);
+
+  const item = blogResult.data;
   if (!item) return { title: "Post Not Found" };
   return {
     title: { absolute: `${item.title} | Muhammad Afriza Hanif` },
@@ -44,13 +82,43 @@ export default async function SelectedPost({
 }) {
   // `params` may be a Promise in some Next.js versions; await it before use
   const resolvedParams = await params;
-  const item = getBlogItem(resolvedParams.slug);
-  console.log("Item of selected post of blog: ", item);
+
+  const [blogResult, listResult] = await Promise.all([
+    fetchWithFallback<BlogItem>(
+      fetchLaravel<BlogItem>(`api/blogs/${resolvedParams.slug}`, {
+        next: {
+          revalidate: 3600,
+          tags: ["blog", `blog-${resolvedParams.slug}`],
+        },
+        skipAuth: true,
+      }),
+      blogItems.find(
+        (b) =>
+          b.slug === resolvedParams.slug ||
+          String(b.id) === resolvedParams.slug,
+      ) as BlogItem,
+      "Gagal memuat detail Blog terbaru.",
+      (data) => !!data && typeof data === "object" && "slug" in data, // Validator
+    ),
+    fetchWithFallback<BlogItem[]>(
+      fetchLaravel<BlogItem[]>("api/blogs", {
+        next: { revalidate: 3600, tags: ["blog"] },
+        skipAuth: true,
+      }),
+      blogItems,
+      "Gagal memuat daftar Blog.",
+      (data) => Array.isArray(data),
+    ),
+  ]);
+
+  const item = blogResult.data;
+  const blogList = listResult.data;
+  const fetchErrorMessage = blogResult.error || listResult.error;
+
   if (!item) return notFound();
 
   if (decodeURIComponent(resolvedParams.slug) !== item.slug) {
-    const { redirect } = await import("next/navigation");
-    redirect(`/blog/${encodeURIComponent(item.slug)}`);
+    permanentRedirect(`/blog/${encodeURIComponent(item.slug)}`);
   }
 
   // Item of Next Page Navigation (Heroes)
@@ -68,6 +136,11 @@ export default async function SelectedPost({
     },
   ];
 
+  // Resolve image for JSON-LD and Metadata consistency
+  const resolvedImage =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (item.image as any)?.src || (item.image ? resolveAssetUrl(item.image) : "");
+
   // JSON-LD Structured Data
   const jsonLd = {
     "@context": "https://schema.org",
@@ -76,8 +149,7 @@ export default async function SelectedPost({
         "@type": "BlogPosting",
         headline: item.title,
         description: item.summary,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        image: (item.image as any)?.src || item.image,
+        image: resolvedImage,
         url: `https://afrizahanif.com/blog/${item.slug}`,
         author: {
           "@type": "Person",
@@ -132,7 +204,7 @@ export default async function SelectedPost({
             style={{ aspectRatio: "16 / 9" }}
           >
             <NextImage
-              src={item.image}
+              src={resolveAssetUrl(item.image)}
               alt={item.title}
               className="rounded-3"
               fill
@@ -146,11 +218,7 @@ export default async function SelectedPost({
         <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
           <div className="sticky-lg-top" style={{ top: "1rem" }}>
             {/* Menu button */}
-            <SlugNavigation
-              items={getAllBlogItems()}
-              item={item}
-              backURL="blog"
-            />
+            <SlugNavigation items={blogList} item={item} backURL="blog" />
             {/* Details */}
             <DetailItem type={"Blog"} item={item} />
           </div>
@@ -168,6 +236,9 @@ export default async function SelectedPost({
           lebih lanjut tentang penulisnya
         </Heroes>
       </section>
+
+      {/* Error Toast Notification */}
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

@@ -11,15 +11,28 @@ import ColorModeToggle from "../ui/bootstrap/color-mode-toggle";
 import { getPathname, isActiveLink } from "@/lib/utils";
 import { headerItems } from "@/lib/data/headerData";
 import Button from "../ui/bootstrap/button";
-
-// Get Data from JSON (Single)
-const userProfile = profileItem[0];
+import { fetchLaravel } from "@/lib/laravel";
+import { ProfileItem } from "@/types/customs/data-type";
+import { useFetchWithFallback } from "@/hooks/use-fetch-with-fallback";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [maxNavItems, setMaxNavItems] = useState(9);
+
+  // Fetch Profile Data (Client-Side with Retry & Fallback)
+  const { data: userProfiles } = useFetchWithFallback<ProfileItem[]>(
+    () =>
+      fetchLaravel<ProfileItem[]>("api/profiles", {
+        skipAuth: true,
+        retries: 3,
+      }),
+    profileItem,
+    "Gagal memuat profil header",
+    (data) => Array.isArray(data) && data.length > 0,
+  );
+  const userProfile = userProfiles[0];
 
   // Handle search
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {

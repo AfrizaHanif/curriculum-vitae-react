@@ -1,4 +1,4 @@
-import { ModalButtonItem } from "@/lib/bootstrap-types";
+import { ModalButtonItem } from "@/types/bootstrap-types";
 import { AllowedSizeModal } from "@/types/common";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 
@@ -33,7 +33,7 @@ export default function Modal({
       tabIndex={-1}
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
-      data-bs-backdrop={isStatic && "static"}
+      data-bs-backdrop={isStatic ? "static" : undefined}
       {...props}
     >
       <div

@@ -1,4 +1,4 @@
-import { SelectItem } from "@/lib/bootstrap-types";
+import { SelectItem } from "@/types/bootstrap-types";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 
 type SelectProps = ComponentPropsWithoutRef<"select"> & {

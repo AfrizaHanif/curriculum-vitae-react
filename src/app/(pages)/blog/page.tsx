@@ -1,44 +1,42 @@
-"use client";
-
 import AppLayout from "@/components/layouts/layout";
-import { formatDate, sortItems } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { sortItems } from "@/lib/utils";
 import jumbotronImage from "../../../assets/images/jumbotron/blog.jpg";
-import Card from "@/components/ui/bootstrap/card";
-import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import Heroes from "@/components/ui/bootstrap/heroes";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem } from "@/types/bootstrap-types";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
-import { getAllBlogItems } from "@/lib/data/services";
+import FeaturedBlog from "./featured-blog";
+import BlogList from "./blog-list";
+import { BlogItem } from "@/types/customs/data-type";
+import { fetchLaravel } from "@/lib/laravel";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { blogItems } from "@/lib/data/blogData";
+import ErrorToast from "@/components/home/error-toast";
 
-export default function Blog() {
+export default async function Blog() {
+  const [blogResult] = await Promise.all([
+    fetchWithFallback<BlogItem[]>(
+      fetchLaravel<BlogItem[]>("api/blogs", {
+        next: { revalidate: 3600, tags: ["blog"] },
+        skipAuth: true,
+      }),
+      blogItems, // Static Fallback
+      "Gagal memuat data Blog terbaru.", // Error Message
+      (data) => Array.isArray(data), // Relaxed Validator: allows empty list if API is healthy
+    ),
+  ]);
+
+  const fetchErrorMessage = blogResult.error;
+  const allPosts = blogResult.data;
+
   console.info("This page are being sorted from newest post");
 
-  // Get all project items from the data service
-  const allPosts = getAllBlogItems();
-
-  // Get Random Post
-  // Initialize with the first item to ensure server/client match during hydration
-  const [featuredPost, setFeaturedPost] = useState(allPosts[0]);
-
-  useEffect(() => {
-    // Randomize on the client side after mount
-    const randomIndex = Math.floor(Math.random() * allPosts.length);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFeaturedPost(allPosts[randomIndex]);
-  }, [allPosts]);
-
-  console.log("Featured Post: " + featuredPost.title);
-
-  // Item of Featured Portfolio (Heroes)
-  const heroesButtonItem: HeroesButtonItem[] = [
-    {
-      label: "Lihat",
-      color: "primary",
-      href: `/blog/${featuredPost.slug}`,
-    },
-  ];
+  // Sort items on server side as it is static for this page
+  const sortedPosts = sortItems(allPosts, {
+    sortOrder: "newest",
+    titleKey: "title",
+    primaryDateKey: "date",
+  });
 
   // Item of Next Page Navigation (Heroes)
   const nextPageHeroesButtonItem: HeroesButtonItem[] = [
@@ -87,43 +85,21 @@ export default function Blog() {
       />
 
       {/* Featured Post Heroes */}
-      <section aria-label="Featured Post">
-        <Heroes
-          type="responsive"
-          title={featuredPost.title}
-          img={featuredPost.image}
-          buttonItem={heroesButtonItem}
-        >
-          {featuredPost.summary}
-        </Heroes>
-      </section>
+      {allPosts.length > 0 && (
+        <section aria-label="Featured Post">
+          <FeaturedBlog items={allPosts} />
+        </section>
+      )}
 
       {/* List of Posts (Cards) */}
       <section aria-label="Daftar Artikel">
-        <PaginatedList
-          items={sortItems(allPosts, {
-            sortOrder: "newest",
-            titleKey: "title",
-            primaryDateKey: "date",
-          })}
-          itemsPerPage={9}
-          renderItem={(item) => (
-            <Card
-              key={item.id}
-              header={formatDate(item.date)}
-              image={item.image}
-              footer={`Oleh ${item.author}`}
-              url={`/blog/${item.slug}`}
-              buttonName="Lihat"
-              insideGroup
-              fullHeight
-              clickable
-            >
-              <h5 className="card-title">{item.title}</h5>
-              <p>{item.summary}</p>
-            </Card>
-          )}
-        />
+        {allPosts.length > 0 ? (
+          <BlogList items={sortedPosts} />
+        ) : (
+          <div className="text-center py-5">
+            <p className="lead">Belum ada artikel yang diterbitkan saat ini.</p>
+          </div>
+        )}
       </section>
 
       {/* Next Page Navigation */}
@@ -137,6 +113,8 @@ export default function Blog() {
           hubungi saya untuk diskusi
         </Heroes>
       </section>
+
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

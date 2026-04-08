@@ -1,7 +1,18 @@
 // import { PortfolioItem } from "../types";
 
+import {
+  CaseStudyItem,
+  DiagramCSItem,
+  FeatureItem,
+  FeatureProjectItem,
+  PortfolioItem,
+  ProjectItem,
+  RepositoryItem,
+  SolutionCSItem,
+} from "@/types/customs/data-type";
+
 // Portfolios
-export const portfolioItems = [
+export const portfolioItems: PortfolioItem[] = [
   {
     id: "POR-001",
     title:
@@ -10,20 +21,20 @@ export const portfolioItems = [
     category: "Proyek Akademik",
     subcategory: "Full-Stack Development",
     type: "Aplikasi Web",
-    image: "/images/portfolios/POR-001.png",
+    image: "images/portfolios/POR-001.png",
     gallery: [
-      "/images/portfolios/gallery/IMG-001-001.png",
-      "/images/portfolios/gallery/IMG-001-002.png",
-      "/images/portfolios/gallery/IMG-001-003.png",
-      "/images/portfolios/gallery/IMG-001-004.png",
-      "/images/portfolios/gallery/IMG-001-005.png",
-      "/images/portfolios/gallery/IMG-001-006.png",
-      "/images/portfolios/gallery/IMG-001-007.png",
-      "/images/portfolios/gallery/IMG-001-008.png",
-      "/images/portfolios/gallery/IMG-001-009.png",
-      "/images/portfolios/gallery/IMG-001-010.png",
-      "/images/portfolios/gallery/IMG-001-011.png",
-      "/images/portfolios/gallery/IMG-001-012.png",
+      "images/portfolios/gallery/IMG-001-001.png",
+      "images/portfolios/gallery/IMG-001-002.png",
+      "images/portfolios/gallery/IMG-001-003.png",
+      "images/portfolios/gallery/IMG-001-004.png",
+      "images/portfolios/gallery/IMG-001-005.png",
+      "images/portfolios/gallery/IMG-001-006.png",
+      "images/portfolios/gallery/IMG-001-007.png",
+      "images/portfolios/gallery/IMG-001-008.png",
+      "images/portfolios/gallery/IMG-001-009.png",
+      "images/portfolios/gallery/IMG-001-010.png",
+      "images/portfolios/gallery/IMG-001-011.png",
+      "images/portfolios/gallery/IMG-001-012.png",
     ],
     start_period: "2023-01-01",
     finish_period: "2023-07-02",
@@ -42,20 +53,20 @@ export const portfolioItems = [
     category: "Proyek Akademik",
     subcategory: "Full-Stack Development",
     type: "Aplikasi Web",
-    image: "/images/portfolios/POR-002.png",
+    image: "images/portfolios/POR-002.png",
     gallery: [
-      "/images/portfolios/gallery/IMG-002-001.png",
-      "/images/portfolios/gallery/IMG-002-002.png",
-      "/images/portfolios/gallery/IMG-002-003.png",
-      "/images/portfolios/gallery/IMG-002-004.png",
-      "/images/portfolios/gallery/IMG-002-005.png",
-      "/images/portfolios/gallery/IMG-002-006.png",
-      "/images/portfolios/gallery/IMG-002-007.png",
-      "/images/portfolios/gallery/IMG-002-008.png",
-      "/images/portfolios/gallery/IMG-002-009.png",
-      "/images/portfolios/gallery/IMG-002-010.png",
-      "/images/portfolios/gallery/IMG-002-011.png",
-      "/images/portfolios/gallery/IMG-002-012.png",
+      "images/portfolios/gallery/IMG-002-001.png",
+      "images/portfolios/gallery/IMG-002-002.png",
+      "images/portfolios/gallery/IMG-002-003.png",
+      "images/portfolios/gallery/IMG-002-004.png",
+      "images/portfolios/gallery/IMG-002-005.png",
+      "images/portfolios/gallery/IMG-002-006.png",
+      "images/portfolios/gallery/IMG-002-007.png",
+      "images/portfolios/gallery/IMG-002-008.png",
+      "images/portfolios/gallery/IMG-002-009.png",
+      "images/portfolios/gallery/IMG-002-010.png",
+      "images/portfolios/gallery/IMG-002-011.png",
+      "images/portfolios/gallery/IMG-002-012.png",
     ],
     start_period: "2024-10-01",
     finish_period: "2025-01-01",
@@ -73,7 +84,7 @@ export const portfolioItems = [
     repository_type: "Document",
   },
 ];
-export const repositoryItems = [
+export const repositoryItems: RepositoryItem[] = [
   {
     id: "REP-001",
     portfolio_id: "POR-001",
@@ -103,7 +114,7 @@ export const repositoryItems = [
     href: "https://ojs.unikom.ac.id/index.php/jati/article/view/15243/",
   },
 ];
-export const featureItems = [
+export const featureItems: FeatureItem[] = [
   {
     id: "FEA-001",
     portfolio_id: "POR-001",
@@ -149,7 +160,7 @@ export const featureItems = [
 ];
 
 // Case Studies
-export const caseStudyItems = [
+export const caseStudyItems: CaseStudyItem[] = [
   {
     id: "CAS-001",
     portfolio_id: "POR-001",
@@ -164,7 +175,9 @@ export const caseStudyItems = [
       "Keterbatasan Fungsionalitas: Fitur-fitur yang tersedia belum mencakup seluruh proses bisnis yang dibutuhkan, sehingga masih diperlukan proses manual di luar sistem",
       "Ketiadaan Modul Pelaporan: Sistem belum memiliki fitur manajemen laporan, yang mengakibatkan sulitnya proses pengambilan keputusan berbasis data bagi pihak manajemen",
     ],
-    goal: "Merancang Bangun Aplikasi Pelayanan Perpustakaan Pada Badan Pusat Statistik Provinsi Jawa Timur",
+    goal: [
+      "Merancang Bangun Aplikasi Pelayanan Perpustakaan Pada Badan Pusat Statistik Provinsi Jawa Timur",
+    ],
     benefits: [
       "Mempermudah pengguna untuk mengakses daftar buku dan daftar isi dengan cepat",
       "Mempermudah dan mempercepat pengguna untuk melakukan pengisian peminjaman dan pengembalian buku",
@@ -186,7 +199,7 @@ export const caseStudyItems = [
       "Saya akan meningkatkan tampilan halaman yang lebih menarik",
       "Saya akan melakukan eksperimen CRUD hanya dalam satu halaman",
     ],
-    result: [
+    results: [
       "Pegawai PST dapat mencatat dan menampilkan daftar buku, daftar isi, pegawai, dan transaksi peminjaman dan pengembalian",
       "Dengan adanya aplikasi yang telah saya buat, pegawai PST akan terbantu dalam mencari buku dan daftar isi yang dibutuhkan oleh pegawai lain tanpa harus berpindah dari halaman ke halaman lain",
       "Pegawai PST dapat melakukan impor / memasukkan data-data buku dan daftar isi dari file Excel agar pegawai PST tidak perlu melakukan input manual ketika server tersebut bermasalah atau pindah server",
@@ -227,7 +240,7 @@ export const caseStudyItems = [
     lessons: [
       "Dari proyek yang saya kerjakan, untuk ke depannya saya akan mempelajari cara mempersingkat kode program agar terlihat lebih ringkas",
     ],
-    result: [
+    results: [
       "Kepegawaian dapat mengelola data karyawan, pengguna, kriteria, dan periode dalam satu halaman saja",
       "Dengan adanya aplikasi yang telah saya buat, pengguna dapat melakukan pemasukan data karyawan dan data nilai menggunakan impor untuk mempercepat proses saat melakukan pemasukan kedua data tersebut",
       "Proyek ini dapat melakukan analisis SAW dan menghasilkan laporan (Lap. Karyawan, Lap. Hasil Analisis SAW, Lap. Nilai Akhir, Lap. Nilai Pegawai, Lap. Karyawan Terbaik, Sertifikat Karyawan Terbaik)",
@@ -236,23 +249,23 @@ export const caseStudyItems = [
     video: "",
   },
 ];
-export const diagramCSItems = [
+export const diagramCSItems: DiagramCSItem[] = [
   {
     id: "DIA-001",
     case_study_id: "CAS-001",
-    context: "/images/portfolios/case-study/CAS-001-Context.jpg",
-    dfd_0: "/images/portfolios/case-study/CAS-001-DFD0.jpg",
-    pdm: "/images/portfolios/case-study/CAS-001-PDM.jpg",
+    context: "images/portfolios/case-study/CAS-001-Context.jpg",
+    dfd_0: "images/portfolios/case-study/CAS-001-DFD0.jpg",
+    pdm: "images/portfolios/case-study/CAS-001-PDM.jpg",
   },
   {
     id: "DIA-002",
     case_study_id: "CAS-002",
-    context: "/images/portfolios/case-study/CAS-002-Context.png",
-    dfd_0: "/images/portfolios/case-study/CAS-002-DFD0.png",
-    pdm: "/images/portfolios/case-study/CAS-002-PDM.png",
+    context: "images/portfolios/case-study/CAS-002-Context.png",
+    dfd_0: "images/portfolios/case-study/CAS-002-DFD0.png",
+    pdm: "images/portfolios/case-study/CAS-002-PDM.png",
   },
 ];
-export const solutionCSItems = [
+export const solutionCSItems: SolutionCSItem[] = [
   {
     id: "SOL-001-001",
     case_study_id: "CAS-001",
@@ -289,53 +302,85 @@ export const solutionCSItems = [
 ];
 
 // Other Projects
-export const projectItems = [
+export const projectItems: ProjectItem[] = [
   {
-    id: "PRO-001",
+    id: "PRJ-001",
     title: "Web Delta Sari (Indah dan Baru)",
     slug: "web-delta-sari-indah-dan-baru",
     category: "Personal Project",
     subcategory: "Full-Stack Development",
     type: "Aplikasi Web",
-    image: "/images/portfolios/PRO-001.png",
+    image: "images/projects/PRJ-001.jpg",
     start_period: "2025-03-01",
     status: "Delayed",
     description:
       "Proyek aplikasi web untuk manajemen dan informasi perumahan Delta Sari Indah dan Baru.",
     tags: ["Estate"],
     technology: ["Laravel", "PHP"],
-    sourcecode: "example.com",
+    source_code: "example.com",
   },
   {
-    id: "PRO-002",
+    id: "PRJ-002",
     title: "Curriculum Vitae API",
     slug: "curriculum-vitae-api",
     category: "Personal Project",
     subcategory: "Backend Development",
     type: "API",
-    image: "/images/portfolios/PRO-002.png",
+    image: "images/projects/PRJ-002.jpg",
     start_period: "2026-03-10",
     status: "Active",
     description:
       "Proyek API yang dirancang untuk menyediakan data bagi aplikasi web di masa mendatang. Saat ini sedang dalam tahap perencanaan dan arsitektur.",
     tags: ["API", "Backend"],
     technology: ["Laravel", "MySQL"],
-    isPrivate: true,
+    is_private: true,
   },
   {
-    id: "PRO-003",
+    id: "PRJ-003",
     title: "CV and Resume Generator",
     slug: "cv-and-resume-generator",
     category: "Personal Project",
     subcategory: "Full-Stack Development",
     type: "Aplikasi Web",
-    image: "/images/portfolios/PRO-003.png",
+    image: "images/projects/PRJ-003.jpg",
     start_period: "2026-03-22",
     status: "Planning",
     description:
       "Sebuah aplikasi untuk membuat CV dan resume secara otomatis dari data yang dimasukkan pengguna.",
     tags: ["CV", "Resume"],
     technology: ["Laravel", "PHP", "Bootstrap", "React"],
-    isPrivate: true,
+  },
+];
+
+export const featureProjectItems: FeatureProjectItem[] = [
+  {
+    id: "FEP-001",
+    project_id: "PRJ-001",
+    title: "Desain Informatif dan Interaktif",
+    progress: 0,
+  },
+  {
+    id: "FEP-002",
+    project_id: "PRJ-002",
+    title: "Autentikasi Laravel Sanctum",
+    description:
+      "Implementasi sistem autentikasi menggunakan Laravel Sanctum untuk keamanan aplikasi",
+    progress: 95,
+  },
+  {
+    id: "FEP-003",
+    project_id: "PRJ-002",
+    title: "Endpoint Data API",
+    description:
+      "Implementasi endpoint untuk mengakses dan memanipulasi data melalui API",
+    progress: 75,
+  },
+  {
+    id: "FEP-004",
+    project_id: "PRJ-003",
+    title: "Pembuatan CV dan Resume Secara Instan",
+    description:
+      "Fitur untuk membuat CV dan resume secara otomatis dari data yang dimasukkan pengguna dalam satu klik",
+    progress: 0,
   },
 ];

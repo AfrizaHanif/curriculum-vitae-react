@@ -3,7 +3,7 @@ import CardBlank from "../bootstrap/card-blank";
 import { formatDate, formatDateRange } from "@/lib/utils";
 import Dropdown from "../bootstrap/dropdown";
 import ShareButton from "./share-button";
-import { DropdownItem } from "@/lib/bootstrap-types";
+import { DropdownItem } from "@/types/bootstrap-types";
 import { AllowedColorsStatus } from "@/types/common";
 import Button from "../bootstrap/button";
 import Link from "next/link";
@@ -18,7 +18,8 @@ type ItemData = {
   date?: string;
   tags?: string[];
   technology?: string[];
-  [key: string]: unknown;
+  status?: string;
+  // [key: string]: unknown;
 };
 
 type DetailProps = ComponentPropsWithoutRef<"div"> & {
@@ -43,6 +44,22 @@ export default function DetailItem({
   as,
   ...props
 }: DetailProps) {
+  const statusColors: Record<string, string> = {
+    Planning: "text-bg-secondary",
+    Active: "text-bg-primary",
+    Delayed: "text-bg-warning",
+    Cancelled: "text-bg-danger",
+    Finished: "text-bg-success",
+  };
+
+  const statusText: Record<string, string> = {
+    Planning: "Dalam Rencana",
+    Active: "Aktif",
+    Delayed: "Ditunda",
+    Cancelled: "Dibatalkan",
+    Finished: "Selesai",
+  };
+
   return (
     <CardBlank as={as} className={`p-3 ${className || ""}`} {...props}>
       {/* Title of detail item */}
@@ -57,6 +74,18 @@ export default function DetailItem({
       <dl className="row">
         {(type === "Portfolio" || type === "Project") && (
           <>
+            {item.status && (
+              <>
+                <dt className="col-4 mb-2 text-body-secondary">Status</dt>
+                <dd className="col-8">
+                  <span
+                    className={`badge ${statusColors[item.status] || "text-bg-secondary"}`}
+                  >
+                    {statusText[item.status] || item.status}
+                  </span>
+                </dd>
+              </>
+            )}
             <dt className="col-4 mb-2 text-body-secondary">Kategori</dt>
             <dd className="col-8">{item.category}</dd>
             <dt className="col-4 mb-2 text-body-secondary">Tipe</dt>

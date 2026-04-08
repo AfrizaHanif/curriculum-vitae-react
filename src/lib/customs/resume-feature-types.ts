@@ -25,10 +25,3 @@ export interface ExperienceFeatureData extends BaseFeatureData {
 }
 
 export type DataFeatureItem = EducationFeatureData | ExperienceFeatureData;
-
-export interface SetupItem {
-  name: string;
-  category: string;
-  description: string;
-  why?: string;
-}

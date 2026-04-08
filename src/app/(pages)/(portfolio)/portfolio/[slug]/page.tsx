@@ -1,42 +1,153 @@
-"use client";
-
-import { use } from "react";
 import AppLayout from "@/components/layouts/layout";
-import BreadcrumbSetter from "@/components/utility/breadcrumb-setter";
 import {
   portfolioItems,
   repositoryItems,
   featureItems,
   caseStudyItems,
 } from "@/lib/data/portfolioData";
+import {
+  PortfolioItem,
+  RepositoryItem,
+  FeatureItem,
+  CaseStudyItem,
+} from "@/types/customs/data-type";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { fetchLaravel } from "@/lib/laravel";
 import { notFound, redirect } from "next/navigation";
-import ProjectGallery from "@/components/ui/customs/project-gallery";
-import { DropdownItem, HeroesButtonItem } from "@/lib/bootstrap-types";
-import DetailItem from "@/components/ui/customs/detail-item";
+import { Metadata } from "next";
+import { DropdownItem } from "@/types/bootstrap-types";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
-import CardGroup from "@/components/ui/bootstrap/card-group";
-import Card from "@/components/ui/bootstrap/card";
-import { techIcons } from "@/lib/data/techIcons";
-import SlugNavigation from "@/components/ui/customs/slug-navigation";
-import Heroes from "@/components/ui/bootstrap/heroes";
+import PortfolioDetail from "./portfolio-detail";
+import ErrorToast from "@/components/home/error-toast";
+import { resolveAssetUrl } from "@/lib/assets";
 
-// INFO: Different than project and blog page, this page are splitted out into 2 (layout.tsx and page.tsx). This page is a client component
+export async function generateStaticParams() {
+  try {
+    const portfolios = await fetchLaravel<PortfolioItem[]>("api/portfolios", {
+      skipAuth: true,
+    });
+    // Ensure build succeeds even if API is offline
+    const data =
+      portfolios && Array.isArray(portfolios) && portfolios.length > 0
+        ? portfolios
+        : portfolioItems;
 
-export default function SelectedPortfolio({
+    return data.flatMap((p) => [{ slug: p.slug }, { slug: String(p.id) }]);
+  } catch (error) {
+    console.error("Error generating static params for portfolio:", error);
+    return portfolioItems.flatMap((p) => [
+      { slug: p.slug },
+      { slug: String(p.id) },
+    ]);
+  }
+}
+
+type Props = {
+  params: { slug: string } | Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const [portfolioResult] = await Promise.all([
+    fetchWithFallback<PortfolioItem>(
+      fetchLaravel<PortfolioItem>(`api/portfolios/${slug}`, {
+        next: { revalidate: 3600, tags: ["portfolio", `portfolio-${slug}`] },
+        skipAuth: true,
+      }),
+      portfolioItems.find(
+        (p) => p.slug === slug || String(p.id) === slug,
+      ) as PortfolioItem,
+      "Gagal memuat detail Portofolio.",
+      (data) => !!data && typeof data === "object" && "slug" in data,
+    ),
+  ]);
+
+  const item = portfolioResult.data;
+  if (!item) return { title: "Portfolio Item Not Found" };
+  return {
+    title: { absolute: `${item.title} | Muhammad Afriza Hanif` },
+    description: item.description,
+    alternates: { canonical: `/portfolio/${item.slug}` },
+  };
+}
+
+export default async function SelectedPortfolio({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  //
-  const { slug: rawSlug } = use(params);
+  const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
-  // Find portfolio item by slug (case-insensitive) or ID
-  const item = portfolioItems.find(
-    (p) => p.slug.toLowerCase() === slug.toLowerCase() || p.id === slug,
-  );
-  console.log("Item of selected portfolio: ", item);
-  if (!item) return notFound(); // Check if item are not found
+
+  const [
+    portfolioResult,
+    listResult,
+    repoResult,
+    featureResult,
+    caseStudyResult,
+  ] = await Promise.all([
+    fetchWithFallback<PortfolioItem>(
+      fetchLaravel<PortfolioItem>(`api/portfolios/${slug}`, {
+        next: { revalidate: 3600, tags: ["portfolio", `portfolio-${slug}`] },
+        skipAuth: true,
+      }),
+      portfolioItems.find(
+        (p) => p.slug === slug || String(p.id) === slug,
+      ) as PortfolioItem,
+      "Gagal memuat detail Portofolio terbaru.",
+      (data) => !!data && typeof data === "object" && "slug" in data,
+    ),
+    fetchWithFallback<PortfolioItem[]>(
+      fetchLaravel<PortfolioItem[]>("api/portfolios", {
+        next: { revalidate: 3600, tags: ["portfolio"] },
+        skipAuth: true,
+      }),
+      portfolioItems,
+      "Gagal memuat daftar Portofolio.",
+      (data) => Array.isArray(data),
+    ),
+    // Fetch Related Repositories
+    fetchWithFallback<RepositoryItem[]>(
+      fetchLaravel<RepositoryItem[]>("api/repositories", {
+        next: { revalidate: 3600, tags: ["repository"] },
+        skipAuth: true,
+      }),
+      repositoryItems,
+      "Gagal memuat data Repositori.",
+      (data) => Array.isArray(data),
+    ),
+    // Fetch Related Features
+    fetchWithFallback<FeatureItem[]>(
+      fetchLaravel<FeatureItem[]>("api/features", {
+        next: { revalidate: 3600, tags: ["feature"] },
+        skipAuth: true,
+      }),
+      featureItems,
+      "Gagal memuat data Fitur.",
+      (data) => Array.isArray(data),
+    ),
+    // Fetch Related Case Studies
+    fetchWithFallback<CaseStudyItem[]>(
+      fetchLaravel<CaseStudyItem[]>("api/case-studies", {
+        next: { revalidate: 3600, tags: ["case-study"] },
+        skipAuth: true,
+      }),
+      caseStudyItems,
+      "Gagal memuat data Studi Kasus.",
+      (data) => Array.isArray(data),
+    ),
+  ]);
+
+  const item = portfolioResult.data;
+  const allPortfolios = listResult.data;
+  const fetchErrorMessage =
+    portfolioResult.error ||
+    listResult.error ||
+    repoResult.error ||
+    featureResult.error;
+
+  if (!item) return notFound();
 
   // Redirect to canonical slug if the request was for an ID or a non-canonical case
   if (slug !== item.slug) {
@@ -44,32 +155,24 @@ export default function SelectedPortfolio({
   }
 
   // Item of repository
-  const filteredRepositoryItems: DropdownItem[] = repositoryItems
+  const filteredRepositoryItems: DropdownItem[] = repoResult.data
     .filter((repo) => repo?.portfolio_id === item.id)
     .map((repo) => ({ ...repo, newTab: true })) as DropdownItem[];
 
   // Check if case study exists
-  const hasCaseStudy = caseStudyItems.some((cs) => cs.portfolio_id === item.id);
+  const hasCaseStudy = caseStudyResult.data.some(
+    (cs) => cs.portfolio_id === item.id,
+  );
 
   // Get Data of Feature
-  const filteredFeatures = featureItems.filter(
+  const filteredFeatures = featureResult.data.filter(
     (feature) => feature.portfolio_id === item.id,
   );
 
-  // Item of Next Page Navigation (Heroes)
-  const nextPageHeroesButtonItem: HeroesButtonItem[] = [
-    {
-      label: "Hubungi Saya",
-      color: "primary",
-      href: `/contact`,
-    },
-    {
-      label: "Lihat Proyek Lain",
-      color: "secondary",
-      href: `/project`,
-      outline: true,
-    },
-  ];
+  // Resolve image for JSON-LD and Metadata consistency
+  const resolvedImage =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (item.image as any)?.src || (item.image ? resolveAssetUrl(item.image) : "");
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -80,8 +183,7 @@ export default function SelectedPortfolio({
         name: item.title,
         description: item.description,
         url: `https://afrizahanif.com/portfolio/${item.slug}`,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        image: (item.image as any)?.src || item.image, // Handle StaticImageData or string
+        image: resolvedImage,
         keywords: `${item.category}, ${item.subcategory}`,
       },
       {
@@ -115,120 +217,24 @@ export default function SelectedPortfolio({
       {/* Structured Data */}
       <JsonLd data={jsonLd} />
 
-      {/* Set Title into Breadcrumb */}
-      <BreadcrumbSetter title={item.title} />
-
-      {/* Jumbotron */}
+      {/* Jumbotron - Can remain in Server Component if it is static display */}
       <JumbotronTitle
         title={item.title}
         description={`${item.category} - ${item.subcategory}`}
         className="my-3"
       />
 
-      {/* Contents */}
-      <main className="row justify-content-center g-2">
-        {/* Main */}
-        <article className="col-12 col-lg-8 order-2 order-lg-1">
-          {/* Gallery */}
-          <section id="project-gallery">
-            <ProjectGallery
-              mainImage={item.image}
-              images={item.gallery}
-              altText={item.title}
-            />
-          </section>
-          {/* Description */}
-          <section
-            id="project-description"
-            aria-labelledby="project-description-heading"
-            className="mt-4"
-          >
-            <h2 id="project-description-heading" className="lh-1">
-              Deskripsi Proyek
-            </h2>
-            <p className="lead">{item.description}</p>
-          </section>
-          {/* Key Features */}
-          {filteredFeatures.length > 0 && (
-            <section id="project-features" className="mt-4">
-              <h3 className="h4 mb-3">Fitur Utama</h3>
-              <ul className="list-group list-group-flush">
-                {filteredFeatures.map((feature) => (
-                  <li
-                    key={feature.id}
-                    className="list-group-item bg-transparent px-0 d-flex align-items-start"
-                  >
-                    <i className="bi bi-check-circle-fill text-success me-2 mt-1"></i>
-                    <div>
-                      <span className="fw-semibold">{feature.title}</span>
-                      <p className="mb-0 small text-body-secondary">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {/* Technology Used */}
-          {item.technology && item.technology.length > 0 && (
-            <section id="technology-used" className="mt-4">
-              <h3 className="h4 mb-3">Teknologi yang Digunakan</h3>
-              <CardGroup cardPerRow={4}>
-                {item.technology.map((tech, index) => (
-                  <Card key={index} insideGroup>
-                    <div className="d-flex flex-column align-items-center">
-                      {techIcons[tech] && (
-                        <div
-                          style={{ width: "40px", height: "24px" }}
-                          className="mb-4"
-                        >
-                          {techIcons[tech]}
-                        </div>
-                      )}
-                      <span>{tech}</span>
-                    </div>
-                  </Card>
-                ))}
-              </CardGroup>
-            </section>
-          )}
-        </article>
-        {/* Sidebar */}
-        <aside className="col-12 col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
-          <div className="sticky-lg-top" style={{ top: "1rem" }}>
-            {/* Menu button */}
-            <SlugNavigation
-              items={portfolioItems}
-              item={item}
-              backURL="portfolio"
-            />
-            {/* Details */}
-            <DetailItem
-              type={"Portfolio"}
-              item={item}
-              repositoryItems={filteredRepositoryItems}
-              caseStudyLink={
-                hasCaseStudy ? `/portfolio/${item.slug}/case-study/` : undefined
-              }
-              shareable
-            />
-          </div>
-        </aside>
-      </main>
+      {/* Client Side Interactive Content */}
+      <PortfolioDetail
+        item={item}
+        allItems={allPortfolios}
+        repositoryItems={filteredRepositoryItems}
+        hasCaseStudy={hasCaseStudy}
+        features={filteredFeatures}
+      />
 
-      {/* Next Page Navigation */}
-      <section aria-label="Next Page">
-        <Heroes
-          title="Tertarik untuk Berkolaborasi?"
-          buttonItem={nextPageHeroesButtonItem}
-          icon="contact"
-        >
-          Jika Anda menyukai proyek ini dan ingin mendiskusikan bagaimana kita
-          bisa bekerja sama, jangan ragu untuk menghubungi saya. Atau, Anda bisa
-          melihat proyek saya yang lain
-        </Heroes>
-      </section>
+      {/* Error Notification */}
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

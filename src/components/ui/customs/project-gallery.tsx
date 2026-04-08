@@ -8,10 +8,11 @@ import {
 } from "react";
 import NextImage from "../next/next-image";
 import NextImageModal from "./next-image-modal";
+import { resolveAssetUrl } from "@/lib/assets";
 
 type ProjectGalleryProps = ComponentPropsWithoutRef<"div"> & {
   mainImage: string;
-  images: string[];
+  images?: string[];
   altText: string;
   thumbnailsPerRow?: number;
   modalId?: string;
@@ -49,7 +50,7 @@ export default function ProjectGallery({
       {/* Main Image Display */}
       <div className="position-relative mb-3" style={{ aspectRatio: "16 / 9" }}>
         <NextImageModal
-          src={selectedImage}
+          src={resolveAssetUrl(selectedImage)}
           alt={altText}
           className="rounded-3"
           fill
@@ -83,7 +84,7 @@ export default function ProjectGallery({
                 onClick={() => setSelectedImage(img)}
               >
                 <NextImage
-                  src={img}
+                  src={resolveAssetUrl(img)}
                   alt={`Thumbnail ${index + 1} for ${altText}`}
                   className={`rounded-2 ${
                     selectedImage === img

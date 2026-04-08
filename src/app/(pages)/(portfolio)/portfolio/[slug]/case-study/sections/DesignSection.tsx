@@ -1,6 +1,7 @@
 // import Image from "next/image";
 import { diagramCSItems } from "@/lib/data/portfolioData";
 import NextImageModal from "@/components/ui/customs/next-image-modal";
+import { resolveAssetUrl } from "@/lib/assets";
 
 type DiagramItem = (typeof diagramCSItems)[number];
 
@@ -19,7 +20,7 @@ export default function DesignSection({ diagram }: DesignSectionProps) {
         <div id="context-diagram" style={{ scrollMarginTop: "4rem" }}>
           <h5>Context Diagram</h5>
           <NextImageModal
-            src={diagram.context}
+            src={resolveAssetUrl(diagram.context)}
             alt="Context Diagram"
             width={0}
             height={0}
@@ -35,7 +36,7 @@ export default function DesignSection({ diagram }: DesignSectionProps) {
         <div id="dfd-0" style={{ scrollMarginTop: "4rem" }}>
           <h5>DFD Level 0</h5>
           <NextImageModal
-            src={diagram.dfd_0}
+            src={resolveAssetUrl(diagram.dfd_0)}
             alt="DFD Level 0"
             width={0}
             height={0}
@@ -51,7 +52,7 @@ export default function DesignSection({ diagram }: DesignSectionProps) {
         <div id="pdm" style={{ scrollMarginTop: "4rem" }}>
           <h5>Physical Diagram Model</h5>
           <NextImageModal
-            src={diagram.pdm}
+            src={resolveAssetUrl(diagram.pdm)}
             alt="Framework"
             width={0}
             height={0}

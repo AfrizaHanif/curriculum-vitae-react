@@ -30,7 +30,7 @@ export default function NextImageModal({
   as: Tag = "div",
   ...props
 }: NextImageModalProps) {
-  const [imgSrc, setImgSrc] = useState(src);
+  const [imgSrc, setImgSrc] = useState(src || FALLBACK_SRC);
   const uniqueId = useId();
   // Generate a safe ID if one isn't provided. We remove colons because they can interfere with Bootstrap's query selectors.
   const modalTargetId = modalId
@@ -46,7 +46,8 @@ export default function NextImageModal({
   }`.trim();
 
   useEffect(() => {
-    setImgSrc(src);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setImgSrc(src || FALLBACK_SRC);
   }, [src]);
 
   return (

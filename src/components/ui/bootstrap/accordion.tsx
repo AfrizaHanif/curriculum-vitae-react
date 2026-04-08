@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, ElementType } from "react";
 import AccordionItemNew from "./accordion-item";
 import clsx from "clsx";
-import { AccordionItem } from "@/lib/bootstrap-types";
+import { AccordionItem } from "@/types/bootstrap-types";
 
 type AccordionProps = ComponentPropsWithoutRef<"div"> & {
   id: string;

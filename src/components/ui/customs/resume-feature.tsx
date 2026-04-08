@@ -29,7 +29,7 @@ export default function ResumeFeature({
         {title && <h2 className="pb-2 border-bottom">{title}</h2>}
         <div className={`row g-4 py-5 row-cols-1 row-cols-lg-${itemPerRow}`}>
           {items.map((item) => (
-            <div key={item.key} className="feature col">
+            <div key={item.id} className="feature col">
               <div className="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
                 <svg className="bi" width="1em" height="1em" aria-hidden="true">
                   <use href={`#${item.icon}`}></use>
@@ -45,17 +45,17 @@ export default function ResumeFeature({
                   <ResumeDataItem key={index} dataItem={dataItem} />
                 ),
               )}
-              {item.buttonLabel && (
+              {item.button && (
                 <Button
                   as="a"
-                  href={item.href}
+                  href={item.button.href}
                   color="primary"
                   className="icon-link"
-                  dataToggle={item.dataToggle}
-                  dataTarget={item.dataTarget}
-                  dataTitle={item.dataTitle}
+                  dataToggle={item.button.dataToggle}
+                  dataTarget={item.button.dataTarget}
+                  dataTitle={item.button.dataTitle}
                 >
-                  {item.buttonLabel || "Learn more"}
+                  {item.button.label}
                   <svg className="bi" aria-hidden="true">
                     <use href="#chevron-right"></use>
                   </svg>
@@ -76,7 +76,7 @@ export default function ResumeFeature({
         {title && <h2 className="pb-2 border-bottom">{title}</h2>}
         <div className={`row g-4 py-5 row-cols-1 row-cols-lg-${itemPerRow}`}>
           {items.map((item) => (
-            <div key={item.key} className="col d-flex align-items-start">
+            <div key={item.id} className="col d-flex align-items-start">
               <div className="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
                 <svg className="bi" width="1em" height="1em" aria-hidden="true">
                   <use href={`#${item.icon}`}></use>
@@ -92,16 +92,16 @@ export default function ResumeFeature({
                     <ResumeDataItem key={index} dataItem={dataItem} />
                   ),
                 )}
-                {item.buttonLabel && (
+                {item.button && (
                   <Button
                     as="a"
-                    href={item.href}
+                    href={item.button.href}
                     color="primary"
-                    dataToggle={item.dataToggle}
-                    dataTarget={item.dataTarget}
-                    dataTitle={item.dataTitle}
+                    dataToggle={item.button.dataToggle}
+                    dataTarget={item.button.dataTarget}
+                    dataTitle={item.button.dataTitle}
                   >
-                    {item.buttonLabel || "Primary button"}
+                    {item.button.label}
                   </Button>
                 )}
               </div>

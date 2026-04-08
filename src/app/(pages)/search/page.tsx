@@ -13,6 +13,7 @@ import { formatDateRange } from "@/lib/utils";
 import jumbotronImage from "../../../assets/images/jumbotron/search.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
+import { resolveAssetUrl } from "@/lib/assets";
 
 function SearchResults() {
   // Retrieve query parameters from the url
@@ -66,7 +67,7 @@ function SearchResults() {
                   {item.category}
                 </div>
                 <NextImage
-                  src={item.image}
+                  src={resolveAssetUrl(item.image)}
                   alt={item.title}
                   className="card-img-top rounded-0"
                   width={500}

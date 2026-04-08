@@ -1,6 +1,6 @@
 import Link from "next/link";
 import "./breadcrumb.css";
-import { BreadcrumbItem } from "@/lib/bootstrap-types";
+import { BreadcrumbItem } from "@/types/bootstrap-types";
 
 interface BreadcrumbProps {
   items: BreadcrumbItem[];

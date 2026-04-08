@@ -1,4 +1,4 @@
-import { CheckItem } from "@/lib/bootstrap-types";
+import { CheckItem } from "@/types/bootstrap-types";
 import { ComponentPropsWithoutRef } from "react";
 
 type CheckProps = ComponentPropsWithoutRef<"input"> & {

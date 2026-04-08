@@ -8,7 +8,11 @@ import Alert from "@/components/ui/bootstrap/alert";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import Heroes from "@/components/ui/bootstrap/heroes";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem } from "@/types/bootstrap-types";
+import { TestimonyItem } from "@/types/customs/data-type";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { fetchLaravel } from "@/lib/laravel";
+import ErrorToast from "@/components/home/error-toast";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -17,7 +21,21 @@ export const metadata: Metadata = {
     "Koleksi testimoni-testimoni dari proyek yang telah saya kerjakan",
 };
 
-export default function Testimony() {
+export default async function Testimony() {
+  const [testimonyResult] = await Promise.all([
+    fetchWithFallback<TestimonyItem[]>(
+      fetchLaravel<TestimonyItem[]>("api/testimonies", {
+        next: { revalidate: 3600, tags: ["profile"] },
+        skipAuth: true,
+      }),
+      testimonyItems, // Static Fallback
+      "Gagal memuat data Keahlian terbaru.", // Error Message
+      (data) => Array.isArray(data), // Relaxed Validator
+    ),
+  ]);
+
+  const fetchErrorMessage = testimonyResult.error;
+
   // Item of Next Page Navigation (Heroes)
   const nextPageHeroesButtonItem: HeroesButtonItem[] = [
     {
@@ -40,7 +58,7 @@ export default function Testimony() {
       itemListElement: testimonyItems.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name: `${item.name} - ${item.title}`,
+        name: `${item.name} - ${item.role}`,
       })),
     },
   };
@@ -59,7 +77,7 @@ export default function Testimony() {
       />
 
       {/* Alert (Temporary) */}
-      <Alert color={"warning"}>
+      <Alert color={"warning"} withIcon>
         Halaman ini masih dalam tahap pengembangan
       </Alert>
       {/* Cards of Testimony */}
@@ -74,14 +92,16 @@ export default function Testimony() {
                   </blockquote>
                   <figcaption className="blockquote-footer">
                     <span className="fw-bold">{item.name}</span> (
-                    <cite title="Source Title">{item.title}</cite>)
+                    <cite title="Source Title">{item.role}</cite>)
                   </figcaption>
                 </figure>
               </Card>
             ))}
           </CardGroup>
         ) : (
-          <Alert color={"danger"}>Tidak ada testimoni yang tersedia.</Alert>
+          <Alert color={"danger"} withIcon>
+            Tidak ada testimoni yang tersedia.
+          </Alert>
         )}
       </section>
 
@@ -96,6 +116,8 @@ export default function Testimony() {
           Anda
         </Heroes>
       </section>
+
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

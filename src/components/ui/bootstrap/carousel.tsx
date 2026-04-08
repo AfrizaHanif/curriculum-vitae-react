@@ -1,4 +1,5 @@
-import { CarouselItem } from "@/lib/bootstrap-types";
+import { resolveAssetUrl } from "@/lib/assets";
+import { CarouselItem } from "@/types/bootstrap-types";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
@@ -51,7 +52,11 @@ export default function Carousel({
             }`}
             key={item.title}
           >
-            <img src={item.image} className="d-block w-100" alt="..." />
+            <img
+              src={resolveAssetUrl(item.image)}
+              className="d-block w-100"
+              alt="..."
+            />
             <div className="carousel-caption d-none d-md-block">
               <h5>{item.title}</h5>
               <p>{item.desc}</p>

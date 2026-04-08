@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import "./heroes.css";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem } from "@/types/bootstrap-types";
 import Button from "./button";
 import Link from "next/link";
 import NextImage from "../next/next-image";

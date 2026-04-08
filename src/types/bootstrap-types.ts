@@ -67,13 +67,17 @@ export interface SelectItem {
 
 // Feature
 export interface FeatureItem {
-  key: string;
+  id: string;
   icon: string;
   title?: string;
   description?: ReactNode;
+  button?: FeatureButtonItem;
+}
+
+export interface FeatureButtonItem {
+  label: string;
   href?: string;
   newTab?: boolean;
-  buttonLabel?: string;
   dataToggle?: "modal" | "offcanvas";
   dataTarget?: string;
   dataTitle?: string;

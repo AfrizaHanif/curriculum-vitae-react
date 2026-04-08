@@ -2,11 +2,14 @@ name: Build & Deploy to Hostinger
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, staging]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # Dynamically pick 'production' or 'staging' based on the branch
+    environment:
+      name: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && 'production' || 'staging' }}
 
     steps:
       - name: Checkout
@@ -17,6 +20,18 @@ jobs:
         with:
           node-version: "20.9.0" # Next.js requires Node >= 20.9.0
           cache: "npm"
+
+      - name: Check Environment Configuration
+        run: |
+          echo "Deploying to: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && 'production' || 'staging' }}"
+          echo "Checking Variables (Publicly visible in logs if repo is public):"
+          [ -n "${{ vars.NEXT_PUBLIC_BACKEND_URL }}" ] && echo "  ✓ NEXT_PUBLIC_BACKEND_URL is set" || echo "  ✗ NEXT_PUBLIC_BACKEND_URL is MISSING"
+          [ -n "${{ vars.NEXT_PUBLIC_APP_URL }}" ] && echo "  ✓ NEXT_PUBLIC_APP_URL is set" || echo "  ✗ NEXT_PUBLIC_APP_URL is MISSING"
+          [ -n "${{ vars.REMOTE_PATH }}" ] && echo "  ✓ REMOTE_PATH is set" || echo "  ✗ REMOTE_PATH is MISSING"
+
+          echo "Checking Secrets (Confirmation only, no values printed):"
+          [ -n "${{ secrets.FTP_HOST }}" ] && echo "  ✓ FTP_HOST is loaded" || echo "  ✗ FTP_HOST is MISSING"
+          [ -n "${{ secrets.FTP_PASSWORD }}" ] && echo "  ✓ FTP_PASSWORD is loaded" || echo "  ✗ FTP_PASSWORD is MISSING"
 
       - name: Cache dependencies and Next.js build cache
         uses: actions/cache@v4
@@ -30,18 +45,33 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
       - name: Enable Maintenance Mode
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lftp
-          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit on; set net:timeout 10; set net:max-retries 2; set ssl:verify-certificate no; put public/maintenance.html -o /domains/afrizahanif.com/public_html/maintenance.html; put public/.htaccess.maintenance -o /domains/afrizahanif.com/public_html/.htaccess; quit" || (echo "✗ Failed to enable maintenance mode"; exit 1)
+          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "
+            set cmd:fail-exit on; 
+            set net:timeout 10; 
+            set net:max-retries 2; 
+            set ssl:verify-certificate no; 
+            put public/maintenance.html -o ${{ vars.REMOTE_PATH }}/maintenance.html; 
+            put public/.htaccess.maintenance -o ${{ vars.REMOTE_PATH }}/.htaccess; 
+            quit" || (echo "✗ Failed to enable maintenance mode"; exit 1)
           echo "✓ Maintenance mode enabled"
 
       - name: Build
+        env:
+          # Next.js inlines these values into the JS bundle here
+          NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+          # NEXT_PUBLIC_ANALYTICS_ID: ${{ secrets.ANALYTICS_ID }}
         run: npm run build
 
       - name: Deploy via lftp
@@ -50,9 +80,13 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lftp
-          timeout 600 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit on; set net:timeout 10; set net:max-retries 2; set ssl:verify-certificate no; mirror -R --verbose --delete --parallel=5 --exclude=.htaccess* --exclude=maintenance.html out/ /domains/afrizahanif.com/public_html/; quit" || (echo "✗ Deployment failed"; exit 1)
+          timeout 600 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "
+            set cmd:fail-exit on; 
+            set net:timeout 10; 
+            set net:max-retries 2; 
+            set ssl:verify-certificate no; 
+            mirror -R --verbose --delete --parallel=5 --exclude=.htaccess* --exclude=maintenance.html out/ ${{ vars.REMOTE_PATH }}/; 
+            quit" || (echo "✗ Deployment failed"; exit 1)
           echo "✓ Deployment completed"
 
       - name: Disable Maintenance Mode
@@ -62,7 +96,12 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lftp
-          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit on; set net:timeout 10; set net:max-retries 2; set ssl:verify-certificate no; rm -f /domains/afrizahanif.com/public_html/maintenance.html; put public/.htaccess -o /domains/afrizahanif.com/public_html/.htaccess; quit" || (echo "✗ Failed to disable maintenance mode"; exit 1)
+          timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_HOST" -e "
+            set cmd:fail-exit on; 
+            set net:timeout 10; 
+            set net:max-retries 2; 
+            set ssl:verify-certificate no; 
+            rm -f ${{ vars.REMOTE_PATH }}/maintenance.html; 
+            put public/.htaccess -o ${{ vars.REMOTE_PATH }}/.htaccess; 
+            quit" || (echo "✗ Failed to disable maintenance mode"; exit 1)
           echo "✓ Maintenance mode disabled - Site is live"

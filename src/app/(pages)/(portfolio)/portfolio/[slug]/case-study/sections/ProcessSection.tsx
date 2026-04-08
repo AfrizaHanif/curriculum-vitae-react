@@ -5,6 +5,7 @@ import {
   solutionCSItems,
 } from "@/lib/data/portfolioData";
 import NextImageModal from "@/components/ui/customs/next-image-modal";
+import { resolveAssetUrl } from "@/lib/assets";
 
 type PortfolioItem = (typeof portfolioItems)[number];
 type CaseStudyItem = (typeof caseStudyItems)[number];
@@ -59,7 +60,7 @@ export default function ProcessSection({
                   {item.visual && (
                     <>
                       <NextImageModal
-                        src={item.visual}
+                        src={resolveAssetUrl(item.visual)}
                         alt="Context Diagram"
                         width={0}
                         height={0}

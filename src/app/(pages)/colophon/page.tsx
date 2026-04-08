@@ -79,8 +79,7 @@ export default function Colophon() {
                 kode boilerplate.
               </li>
             </ul>
-            <Alert color={"info"}>
-              <i className="bi bi-info-circle-fill me-2"></i>
+            <Alert color="info" withIcon>
               Meskipun menggunakan AI, seluruh arsitektur, logika bisnis, dan
               keputusan desain dikendalikan penuh oleh saya untuk memastikan
               kualitas dan keamanan kode.

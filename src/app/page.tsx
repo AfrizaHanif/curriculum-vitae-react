@@ -1,73 +1,66 @@
-"use client";
-
 import AppLayout from "@/components/layouts/layout";
-import { useState, useEffect } from "react";
-import myPhoto from "@/assets/images/profile.jpg";
+// import myPhoto from "@/images/Profile.jpg";
 import { portfolioItems } from "@/lib/data/portfolioData";
 import jumbotronImage from "../assets/images/jumbotron/home.jpg";
 import { profileItem } from "@/lib/data/profileData";
 import { educationItems } from "@/lib/data/resumeData";
-import { isEducationData } from "@/lib/customs/type-guards";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem } from "@/types/bootstrap-types";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import Heroes from "@/components/ui/bootstrap/heroes";
+import FeaturedHeroesInteractive from "@/components/home/featured-heroes-interactive";
+import { fetchLaravel } from "@/lib/laravel";
+import { PortfolioItem, ProfileItem } from "@/types/customs/data-type";
+import ErrorToast from "@/components/home/error-toast";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { resolveAssetUrl } from "@/lib/assets";
 
-// Get Data from JSON (Single)
-const userProfile = profileItem[0];
-
-export default function Home() {
+export default async function Home() {
   // Local loading state
   // const isLoading = useLoading();
-  // State to hold the randomly selected portfolio item
-  const [featuredPortfolio, setFeaturedPortfolio] = useState(portfolioItems[0]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFeaturedPortfolio(
-      portfolioItems[Math.floor(Math.random() * portfolioItems.length)],
-    );
-  }, []);
-  console.log("Featured Portfolio: ", featuredPortfolio.title);
+  // --- Data Fetching ---
+  // 1. Fetch Profile and Portfolio from Laravel in parallel using the reusable helper
+  const [profileResult, portfolioResult] = await Promise.all([
+    fetchWithFallback<ProfileItem[]>(
+      fetchLaravel<ProfileItem[]>("api/profiles", {
+        next: { revalidate: 3600, tags: ["profile"] },
+        skipAuth: true,
+      }),
+      profileItem, // Static Fallback
+      "Gagal memuat data Profil terbaru.", // Error Message
+      (data) => Array.isArray(data) && data.length > 0, // Validator
+    ),
+    fetchWithFallback<PortfolioItem[]>(
+      fetchLaravel<PortfolioItem[]>("api/portfolios", {
+        next: { revalidate: 3600, tags: ["portfolio"] },
+        skipAuth: true,
+      }),
+      portfolioItems, // Static Fallback
+      "Gagal memuat data Portfolio terbaru.", // Error Message
+      (data) => Array.isArray(data), // Relaxed Validator
+    ),
+  ]);
 
-  // Get latest education data
-  const latestEducation = educationItems
-    .flatMap((item) => item.data || []) // Use flatMap if the item inside of object as data
-    .filter(isEducationData)
-    .sort((a, b) => {
-      const dateA = a.finish_period
-        ? a.finish_period.getTime()
-        : new Date().getTime();
-      const dateB = b.finish_period
-        ? b.finish_period.getTime()
-        : new Date().getTime();
-      return dateB - dateA;
-    })[0];
-  console.log(
-    "Latest Education: " + latestEducation.degree + " " + latestEducation.major,
-  );
+  // 2. Assign Data (Will use fallback if API failed)
+  // Access [0] safely because fallback `profileItem` is also an array
+  const userProfile = profileResult.data[0];
+  const displayedPortfolioItems = portfolioResult.data;
 
-  // Helper function to truncate text
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) {
-      return text;
-    }
-    return text.substring(0, maxLength) + "...";
-  };
+  // 3. Consolidated Error Message
+  const fetchErrorMessage = profileResult.error || portfolioResult.error;
 
-  // Show the Loading component while state is initializing
-  // if (isLoading) {
-  //   return <Loading />;
-  // }
-
-  // Item of Featured Portfolio (Heroes)
-  const heroesButtonItem: HeroesButtonItem[] = [
-    {
-      label: "Lihat",
-      color: "primary",
-      href: `/portfolio/${featuredPortfolio.slug}`,
-    },
-  ];
+  // 3. Calculate latest education
+  // Moved inside component so it runs on request time
+  const latestEducation = [...educationItems].sort((a, b) => {
+    const dateA = a.finish_period
+      ? a.finish_period.getTime()
+      : new Date().getTime();
+    const dateB = b.finish_period
+      ? b.finish_period.getTime()
+      : new Date().getTime();
+    return dateB - dateA;
+  })[0];
 
   // Item of Next Page Navigation (Heroes)
   const nextPageHeroesButtonItem: HeroesButtonItem[] = [
@@ -93,7 +86,7 @@ export default function Home() {
         name: userProfile.fullname,
         jobTitle: userProfile.status,
         url: "https://afrizahanif.com",
-        image: myPhoto.src,
+        image: resolveAssetUrl(userProfile.photo),
       },
       {
         "@type": "WebSite",
@@ -123,6 +116,9 @@ export default function Home() {
       {/* Structured Data */}
       <JsonLd data={jsonLd} />
 
+      {/* Error Toast Notification */}
+      <ErrorToast message={fetchErrorMessage} />
+
       {/* Welcome Jumbotron */}
       <JumbotronTitle
         title={userProfile.fullname}
@@ -134,18 +130,13 @@ export default function Home() {
         backgroundImg={jumbotronImage.src}
         urlButton="/profile"
         labelButton="Ketahui Lebih Lanjut"
-        iconImg={myPhoto.src}
+        iconImg={resolveAssetUrl(userProfile.photo)}
       />
 
       {/* Featured Portfolio Heroes */}
-      <Heroes
-        type="responsive"
-        title={truncateText(featuredPortfolio.title, 40)}
-        img={featuredPortfolio.image}
-        buttonItem={heroesButtonItem}
-      >
-        {truncateText(featuredPortfolio.description, 150)}
-      </Heroes>
+      {displayedPortfolioItems.length > 0 && (
+        <FeaturedHeroesInteractive items={displayedPortfolioItems} />
+      )}
 
       {/* Next Page Navigation */}
       <section aria-label="Next Page">

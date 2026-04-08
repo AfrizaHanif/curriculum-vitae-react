@@ -8,7 +8,11 @@ import jumbotronImage from "../../../../assets/images/jumbotron/setup.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import Heroes from "@/components/ui/bootstrap/heroes";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem } from "@/types/bootstrap-types";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { fetchLaravel } from "@/lib/laravel";
+import { SetupItem } from "@/types/customs/data-type";
+import ErrorToast from "@/components/home/error-toast";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -16,10 +20,24 @@ export const metadata: Metadata = {
   description: "Pelajari peralatan yang saya miliki selama mengerjakan proyek",
 };
 
-export default function Setup() {
+export default async function Setup() {
+  const [setupResult] = await Promise.all([
+    fetchWithFallback<SetupItem[]>(
+      fetchLaravel<SetupItem[]>("api/setups", {
+        next: { revalidate: 3600, tags: ["setup"] },
+        skipAuth: true,
+      }),
+      setupItems, // Static Fallback
+      "Gagal memuat data Peralatan terbaru.", // Error Message
+      (data) => Array.isArray(data), // Relaxed Validator
+    ),
+  ]);
+
+  const fetchErrorMessage = setupResult.error;
+
   // Group items by category to fit AccordionItem structure
   const categories = Array.from(
-    new Set(setupItems.map((item) => item.category)),
+    new Set(setupResult.data.map((item) => item.category)),
   );
   console.log("Categories: ", categories);
 
@@ -29,7 +47,7 @@ export default function Setup() {
     content: (
       <div className="list-group list-group-flush">
         {/* Get items data in every categories */}
-        {setupItems
+        {setupResult.data
           .filter((item) => item.category === category)
           .map((item) => (
             <div key={item.name} className="list-group-item">
@@ -70,7 +88,7 @@ export default function Setup() {
     url: "https://afrizahanif.com/setup",
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: setupItems.map((item, index) => ({
+      itemListElement: setupResult.data.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
         name: item.name,
@@ -92,33 +110,39 @@ export default function Setup() {
       />
 
       {/* Content */}
-      <section className="row justify-content-center g-4">
-        {/* Image of current setup */}
-        <div className="col-12 col-lg-6">
-          <div className="sticky-lg-top" style={{ top: "1rem" }}>
-            <NextImage
-              src={setupImage}
-              alt="Setup Image"
-              className="rounded-3 w-100"
-              style={{
-                aspectRatio: "16 / 9",
-                objectFit: "cover",
-                height: "auto",
-                objectPosition: "top",
-                boxShadow: "5px 5px 8px rgba(0, 0, 0, 0.5)",
-              }}
-            ></NextImage>
+      {setupResult.data.length > 0 ? (
+        <section className="row justify-content-center g-4">
+          {/* Image of current setup */}
+          <div className="col-12 col-lg-6">
+            <div className="sticky-lg-top" style={{ top: "1rem" }}>
+              <NextImage
+                src={setupImage}
+                alt="Setup Image"
+                className="rounded-3 w-100"
+                style={{
+                  aspectRatio: "16 / 9",
+                  objectFit: "cover",
+                  height: "auto",
+                  objectPosition: "top",
+                  boxShadow: "5px 5px 8px rgba(0, 0, 0, 0.5)",
+                }}
+              />
+            </div>
           </div>
+          {/* List of current setup */}
+          <div className="col-12 col-lg-6">
+            <Accordion
+              id="my-new-accordion"
+              items={accordionItems}
+              openItemIndex={0}
+            />
+          </div>
+        </section>
+      ) : (
+        <div className="text-center py-5">
+          <p className="lead">Daftar peralatan belum tersedia.</p>
         </div>
-        {/* List of current setup */}
-        <div className="col-12 col-lg-6">
-          <Accordion
-            id="my-new-accordion"
-            items={accordionItems}
-            openItemIndex={0}
-          />
-        </div>
-      </section>
+      )}
 
       {/* Next Page Navigation */}
       <section aria-label="Next Page">
@@ -131,6 +155,9 @@ export default function Setup() {
           kembali ke beranda
         </Heroes>
       </section>
+
+      {/* Error Toast Notification */}
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

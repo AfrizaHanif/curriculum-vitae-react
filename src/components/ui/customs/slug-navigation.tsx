@@ -6,7 +6,7 @@ import ButtonGroup from "../bootstrap/button-group";
 type NavigationItem = {
   slug: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  // [key: string]: any;
 };
 
 type SlugNavigationProps = ComponentPropsWithoutRef<"div"> & {
@@ -51,7 +51,7 @@ export default function SlugNavigation({
           <ButtonGroup role={"group"} arialabel={"port-nav"}>
             {/* Prev Item */}
             {prevItem ? (
-              <Link href={`/portfolio/${prevItem.slug}`}>
+              <Link href={`/${backURL}/${prevItem.slug}`}>
                 <Button
                   color="secondary"
                   style={{
@@ -72,7 +72,7 @@ export default function SlugNavigation({
             )}
             {/* Next Item */}
             {nextItem ? (
-              <Link href={`/portfolio/${nextItem.slug}`}>
+              <Link href={`/${backURL}/${nextItem.slug}`}>
                 <Button
                   color="secondary"
                   style={{

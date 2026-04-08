@@ -1,123 +1,31 @@
-"use client";
-
 import AppLayout from "@/components/layouts/layout";
-import Button from "@/components/ui/bootstrap/button";
-import CardBlank from "@/components/ui/bootstrap/card-blank";
-import NextImage from "@/components/ui/next/next-image"; // Import the custom NextImage component
-import NavTab from "@/components/ui/bootstrap/nav-tab";
 import { portfolioItems } from "@/lib/data/portfolioData";
-import Link from "next/link";
-import { formatDateRange, sortItems, SortOrder } from "@/lib/utils";
+import { PortfolioItem } from "@/types/customs/data-type";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { fetchLaravel } from "@/lib/laravel";
 import jumbotronImage from "../../../../assets/images/jumbotron/portfolio.jpg";
-import { useState } from "react";
-import PaginatedList from "@/components/ui/bootstrap/paginated-list";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import Heroes from "@/components/ui/bootstrap/heroes";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem } from "@/types/bootstrap-types";
+import PortfolioList from "./portfolio-list";
+import ErrorToast from "@/components/home/error-toast";
 
-export default function Portfolio() {
-  // Set useState for replacing element
-  const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
+export default async function Portfolio() {
+  const [portfolioResult] = await Promise.all([
+    fetchWithFallback<PortfolioItem[]>(
+      fetchLaravel<PortfolioItem[]>("api/portfolios", {
+        next: { revalidate: 3600, tags: ["portfolio"] },
+        skipAuth: true,
+      }),
+      portfolioItems, // Static Fallback
+      "Gagal memuat data Portofolio terbaru.", // Error Message
+      (data) => Array.isArray(data), // Validator
+    ),
+  ]);
 
-  // Sort items based on selection
-  const sortedItems = sortItems(portfolioItems, {
-    sortOrder,
-    titleKey: "title",
-    primaryDateKey: "finish_period",
-    secondaryDateKey: "start_period",
-  });
-  console.log("Sort selected: ", sortOrder);
-
-  // Render cards for card item
-  const renderCards = (items: typeof portfolioItems) => (
-    <PaginatedList
-      items={items}
-      itemsPerPage={9}
-      key={sortOrder}
-      renderItem={(item) => (
-        <CardBlank key={item.id} fullHeight insideGroup>
-          {/* Category and type */}
-          <div className="card-header small fw-semibold text-body-secondary">
-            <span className="text-uppercase">{item.category}</span> -{" "}
-            {item.type}
-          </div>
-          {/* Main image of portfolio */}
-          <div
-            className="position-relative bg-body-tertiary"
-            style={{ aspectRatio: "16 / 9" }}
-          >
-            <NextImage
-              src={item.image}
-              alt={item.title}
-              className="card-img-top rounded-0"
-              fill
-              style={{
-                objectFit: "cover",
-                objectPosition: "top",
-              }}
-              errorContent
-            />
-          </div>
-          {/* Short content */}
-          <div className="card-body d-flex flex-column">
-            <h5 className="card-title">{item.title}</h5>
-            <div className="mt-auto pt-2">
-              {item.tags.map((tag) => (
-                <span key={tag} className="badge text-bg-secondary me-1">
-                  {tag}
-                </span>
-              ))}
-              {item.technology.map((tech) => (
-                <span key={tech} className="badge text-bg-info me-1">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
-          {/* Period date and button */}
-          <div className="card-footer text-body-secondary">
-            <div className="row justify-content-center align-items-center g-2">
-              <div className="col-8 small">
-                {formatDateRange(item.start_period, item.finish_period)}
-              </div>
-              <div className="col-4 text-end">
-                <Link href={`/portfolio/${item.slug}`}>
-                  <Button color="primary" size="sm" stretchedLink>
-                    Lihat
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </CardBlank>
-      )}
-    />
-  );
-
-  // Extract unique categories from portfolio items
-  const uniqueCategories = Array.from(
-    new Set(portfolioItems.map((item) => item.category)),
-  );
-  console.log("Category in tabs: ", uniqueCategories);
-
-  // Items of tab
-  const tabItems = [
-    // All posts (No category filter)
-    {
-      id: "all",
-      title: "Semua",
-      content: renderCards(sortedItems),
-    },
-    // Post with category filter
-    ...uniqueCategories.map((category) => ({
-      id: category.toLowerCase().replace(/\s+/g, "-"),
-      title: category,
-      content: renderCards(
-        sortedItems.filter((item) => item.category === category),
-      ),
-    })),
-  ];
+  const displayedPortfolioItems = portfolioResult.data;
+  const fetchErrorMessage = portfolioResult.error;
 
   // Item of Next Page Navigation (Heroes)
   const nextPageHeroesButtonItem: HeroesButtonItem[] = [
@@ -144,7 +52,7 @@ export default function Portfolio() {
     url: "https://afrizahanif.com/portfolio",
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: portfolioItems.map((item, index) => ({
+      itemListElement: displayedPortfolioItems.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
         url: `https://afrizahanif.com/portfolio/${item.slug}`,
@@ -166,30 +74,14 @@ export default function Portfolio() {
         className="my-3"
       />
 
-      {/* Sorting Controls */}
-      <section className="container-fluid mb-3" aria-label="Sorting Controls">
-        <div className="d-flex justify-content-end align-items-center">
-          <label htmlFor="sortOrder" className="me-2 fw-semibold">
-            Urutkan:
-          </label>
-          <select
-            id="sortOrder"
-            className="form-select w-auto"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-          >
-            <option value="newest">Terbaru</option>
-            <option value="oldest">Terlama</option>
-            <option value="az">Judul (A-Z)</option>
-            <option value="za">Judul (Z-A)</option>
-          </select>
+      {/* Interactive List */}
+      {displayedPortfolioItems.length > 0 ? (
+        <PortfolioList items={displayedPortfolioItems} />
+      ) : (
+        <div className="text-center py-5">
+          <p className="lead">Belum ada portofolio untuk ditampilkan.</p>
         </div>
-      </section>
-
-      {/* List of Portfolio (Cards) */}
-      <section aria-label="Daftar Portfolio">
-        <NavTab id="portfolio-tab" items={tabItems} />
-      </section>
+      )}
 
       {/* Next Page Navigation */}
       <section aria-label="Next Page">
@@ -202,6 +94,9 @@ export default function Portfolio() {
           atau lihat proyek-proyek yang sedang berjalan
         </Heroes>
       </section>
+
+      {/* Error Notification */}
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

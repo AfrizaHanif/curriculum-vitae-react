@@ -1,10 +1,16 @@
-import { FeatureItem } from "../bootstrap-types";
-import { SetupItem } from "../customs/data-types";
+import {
+  HobbyItem,
+  ProfileItem,
+  SkillItem,
+  SocialItem,
+  SetupItem,
+} from "@/types/customs/data-type";
+import { FeatureItem } from "../../types/bootstrap-types";
 
 // Profile
-export const profileItem = [
+export const profileItem: ProfileItem[] = [
   {
-    key: "PRO-001-001",
+    id: "PRO-001-001",
     fullname: "Muhammad Afriza Hanif",
     phone: "+6287777056650",
     current_city: "Sidoarjo",
@@ -17,80 +23,80 @@ export const profileItem = [
     philosophy:
       "Sebagai web programmer, saya meyakini bahwa teknologi harus memberikan solusi yang efisien, aman, dan berkelanjutan. Saya berkomitmen untuk menulis kode yang terstruktur dan mudah dipelihara, mengikuti standar industri, serta beradaptasi dengan perkembangan teknologi dan kebutuhan bisnis. Dalam setiap proyek, saya menjunjung tinggi profesionalisme, komunikasi yang jelas, dan integritas kerja untuk menghasilkan sistem yang fungsional dan berdampak.",
     status: "Fresh Graduate",
-    photo: "assets/images/profile.jpg",
+    photo: "images/Profile.jpg",
   },
 ];
-export const skillItems = [
+export const skillItems: SkillItem[] = [
   {
-    key: "SKI-001",
+    id: "SKI-001",
     name: "Bootstrap",
     level: "Mahir",
     since: 2023,
   },
   {
-    key: "SKI-002",
+    id: "SKI-002",
     name: "Laravel",
     level: "Mahir",
     since: 2022,
   },
   {
-    key: "SKI-003",
+    id: "SKI-003",
     name: "MySQL",
     level: "Menengah",
     since: 2022,
   },
   {
-    key: "SKI-004",
+    id: "SKI-004",
     name: "PHP",
     level: "Mahir",
     since: 2022,
   },
   {
-    key: "SKI-005",
+    id: "SKI-005",
     name: "HTML",
     level: "Mahir",
     since: 2022,
   },
   {
-    key: "SKI-006",
+    id: "SKI-006",
     name: "Angular",
     level: "Pemula",
     since: 2025,
   },
   {
-    key: "SKI-007",
+    id: "SKI-007",
     name: "JavaScript",
     level: "Pemula",
     since: 2025,
   },
   {
-    key: "SKI-008",
+    id: "SKI-008",
     name: "React",
     level: "Pemula",
     since: 2025,
   },
 ];
-export const hobbyItems: FeatureItem[] = [
+export const hobbyItems: (FeatureItem | HobbyItem)[] = [
   {
-    key: "HOB-001",
+    id: "HOB-001",
     title: "Foto-Foto",
     icon: "camera",
   },
   {
-    key: "HOB-002",
+    id: "HOB-002",
     title: "Mendengarkan Musik",
     icon: "music-note",
   },
 ];
-export const socialItems = [
+export const socialItems: SocialItem[] = [
   {
-    key: "SOC-001",
+    id: "SOC-001",
     name: "Linkedin",
     url: "https://linkedin.com/in/afrizahanif",
     icon: "linkedin",
   },
   {
-    key: "SOC-002",
+    id: "SOC-002",
     name: "GitHub",
     url: "https://github.com/AfrizaHanif",
     icon: "github",

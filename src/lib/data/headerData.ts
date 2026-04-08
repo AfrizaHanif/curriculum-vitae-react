@@ -1,4 +1,4 @@
-import { HeaderItem } from "@/lib/bootstrap-types";
+import { HeaderItem } from "@/types/bootstrap-types";
 
 export const headerItems: HeaderItem[] = [
   { label: "Home", icon: "home", href: "/" },

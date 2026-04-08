@@ -8,7 +8,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import Form from "@/components/ui/form";
 import FormInput from "@/components/ui/form/form-input";
 import FormSelect from "@/components/ui/form/form-select";
-import { CheckItem, SelectItem } from "@/lib/bootstrap-types";
+import { CheckItem, SelectItem } from "@/types/bootstrap-types";
 import FormCheck from "@/components/ui/form/form-check";
 import Toast from "@/components/ui/bootstrap/toast";
 

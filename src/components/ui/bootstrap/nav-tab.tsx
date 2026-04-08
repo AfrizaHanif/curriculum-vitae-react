@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef } from "react";
 import clsx from "clsx";
-import { NavTabItem } from "@/lib/bootstrap-types";
+import { NavTabItem } from "@/types/bootstrap-types";
 
 type NavTabProps = ComponentPropsWithoutRef<"div"> & {
   id: string;

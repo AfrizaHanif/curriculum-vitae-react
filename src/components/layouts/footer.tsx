@@ -5,11 +5,36 @@ import { socialItems } from "@/lib/data/profileData";
 import Link from "next/link";
 import logoImage from "../../assets/images/logo/logo-only-white.png";
 import NextImage from "../ui/next/next-image";
+import { ProfileItem, SocialItem } from "@/types/customs/data-type";
+import { fetchLaravel } from "@/lib/laravel";
+import { useFetchWithFallback } from "@/hooks/use-fetch-with-fallback";
 
 // Get Data from JSON (Single)
-const userProfile = profileItem[0];
+// const userProfile = profileItem[0];
 
 export default function Footer() {
+  const { data: userProfiles } = useFetchWithFallback<ProfileItem[]>(
+    () =>
+      fetchLaravel<ProfileItem[]>("api/profiles", {
+        skipAuth: true,
+        retries: 3,
+      }),
+    profileItem,
+    "Gagal memuat profil header",
+    (data) => Array.isArray(data) && data.length > 0,
+  );
+  const userProfile = (userProfiles ?? profileItem)[0];
+  const { data: socialMedia } = useFetchWithFallback<SocialItem[]>(
+    () =>
+      fetchLaravel<SocialItem[]>("api/socials", {
+        skipAuth: true,
+        retries: 3,
+      }),
+    socialItems,
+    "Gagal memuat social footer",
+    (data) => Array.isArray(data) && data.length > 0,
+  );
+
   return (
     <footer className="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
       <div className="col-md-4 d-flex align-items-center">
@@ -41,8 +66,8 @@ export default function Footer() {
       </div>
       <ul className="nav col-md-4 justify-content-end list-unstyled d-flex">
         {/* All social media item */}
-        {socialItems.map((item) => (
-          <li key={item.key} className="ms-3">
+        {(socialMedia ?? socialItems).map((item) => (
+          <li key={item.id} className="ms-3">
             <a
               className="text-body-secondary"
               href={item.url}

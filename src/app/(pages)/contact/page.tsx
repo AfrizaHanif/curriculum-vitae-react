@@ -7,16 +7,43 @@ import jumbotronImage from "../../../assets/images/jumbotron/contact.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import Heroes from "@/components/ui/bootstrap/heroes";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
-
-const userProfile = profileItem[0];
+import { HeroesButtonItem } from "@/types/bootstrap-types";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { ProfileItem, SocialItem } from "@/types/customs/data-type";
+import { fetchLaravel } from "@/lib/laravel";
+import ErrorToast from "@/components/home/error-toast";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
   title: "Hubungi Saya",
 };
 
-export default function Contact() {
+export default async function Contact() {
+  const [profileResult, socialResult] = await Promise.all([
+    fetchWithFallback<ProfileItem[]>(
+      fetchLaravel<ProfileItem[]>("api/profiles", {
+        next: { revalidate: 3600, tags: ["profile"] },
+        skipAuth: true,
+      }),
+      profileItem, // Static Fallback
+      "Gagal memuat data Profil terbaru.", // Error Message
+      (data) => Array.isArray(data) && data.length > 0, // Validator
+    ),
+    fetchWithFallback<SocialItem[]>(
+      fetchLaravel<SocialItem[]>("api/socials", {
+        next: { revalidate: 3600, tags: ["social"] },
+        skipAuth: true,
+      }),
+      socialItems, // Static Fallback
+      "Gagal memuat data Media Sosial terbaru.", // Error Message
+      (data) => Array.isArray(data) && data.length > 0, // Validator
+    ),
+  ]);
+
+  const userProfile = profileResult.data[0];
+
+  const fetchErrorMessage = profileResult.error;
+
   // Items of Accordion's Items
   const contactAccordionItems = [
     {
@@ -46,9 +73,9 @@ export default function Contact() {
         <>
           <p>Kunjungi media sosial saya:</p>
           <div className="list-group">
-            {socialItems.map((item) => (
+            {socialResult.data.map((item) => (
               <a
-                key={item.key}
+                key={item.id}
                 href={item.url}
                 className="list-group-item list-group-item-action"
               >
@@ -153,6 +180,9 @@ export default function Contact() {
           portofolio saya atau kembali ke beranda
         </Heroes>
       </section>
+
+      {/* Error Toast Notification */}
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

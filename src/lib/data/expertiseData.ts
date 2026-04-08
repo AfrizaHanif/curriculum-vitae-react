@@ -1,17 +1,19 @@
-import { FeatureItem } from "../bootstrap-types";
-import { ExpertiseFeatureItem } from "../customs/custom-types";
+import { ExpertiseItem } from "@/types/customs/data-type";
+import { FeatureItem } from "../../types/bootstrap-types";
 
 // Expertises
-export const expertiseItems: ExpertiseFeatureItem[] = [
+export const expertiseItems: ExpertiseItem[] = [
   {
-    key: "EPR-001",
+    id: "EPR-001",
     icon: "code-slash",
     title: "Full-Stack Developer Laravel",
     description:
       "Saya adalah Full-Stack Developer dengan spesialisasi pada framework Laravel, berpengalaman dalam membangun aplikasi web yang scalable, aman, dan user-friendly. Memiliki pemahaman mendalam terhadap arsitektur MVC, RESTful API, dan pengembangan sisi frontend maupun backend.",
-    buttonLabel: "Dibuktikan dalam proyek...",
-    dataToggle: "modal",
-    dataTarget: "EPR-001",
+    // button: {
+    //   label: "Dibuktikan dalam proyek...",
+    //   dataToggle: "modal",
+    //   dataTarget: "EPR-001",
+    // },
     projects: ["POR-001", "POR-002"],
   },
 ];
@@ -45,21 +47,21 @@ export const servicesList = [
 ];
 export const progressList: FeatureItem[] = [
   {
-    key: "1",
+    id: "1",
     icon: "1-square",
     title: "Diskusi & Perencanaan",
     description:
       "Memahami visi, kebutuhan, dan target audiens proyek Anda secara mendalam.",
   },
   {
-    key: "2",
+    id: "2",
     icon: "2-square",
     title: "Pengembangan",
     description:
       "Eksekusi kode dengan standar kualitas tinggi, bersih, dan mudah dipelihara.",
   },
   {
-    key: "3",
+    id: "3",
     icon: "3-square",
     title: "Peluncuran & Support",
     description:

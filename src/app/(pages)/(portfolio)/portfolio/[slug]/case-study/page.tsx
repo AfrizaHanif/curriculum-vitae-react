@@ -1,12 +1,19 @@
 import React from "react";
 import AppLayout from "@/components/layouts/layout";
+import { fetchLaravel } from "@/lib/laravel";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
 import {
-  getAllPortfolioItems,
-  getCaseStudy,
-  getDiagram,
-  getPortfolioItem,
-  getSolutions,
-} from "@/lib/data/services";
+  portfolioItems,
+  caseStudyItems,
+  diagramCSItems,
+  solutionCSItems,
+} from "@/lib/data/portfolioData";
+import {
+  PortfolioItem,
+  CaseStudyItem,
+  DiagramCSItem,
+  SolutionCSItem,
+} from "@/types/customs/data-type";
 import { Metadata } from "next";
 import { notFound, permanentRedirect, redirect } from "next/navigation";
 import ScrollSpy from "@/components/ui/bootstrap/scrollspy";
@@ -19,14 +26,30 @@ import Accordion from "@/components/ui/bootstrap/accordion";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import CaseStudyNavigation from "./case-study-navigation";
 import JsonLd from "@/components/json-ld";
+import ErrorToast from "@/components/home/error-toast";
+import { resolveAssetUrl } from "@/lib/assets";
 
 // (IMPORTANT) This is exclusively for page with dynamic ID / Slug. That include this page inside of ID / Slug
-export function generateStaticParams() {
-  // Pre-render pages for both slugs and IDs to handle redirects
-  return getAllPortfolioItems().flatMap((p) => [
-    { slug: p.slug },
-    { slug: p.id },
-  ]);
+export async function generateStaticParams() {
+  try {
+    const portfolios = await fetchLaravel<PortfolioItem[]>("api/portfolios", {
+      skipAuth: true,
+    });
+    // Ensure build succeeds even if API is offline
+    const data =
+      portfolios && Array.isArray(portfolios) && portfolios.length > 0
+        ? portfolios
+        : portfolioItems;
+
+    // Pre-render pages for both slugs and IDs to handle redirects
+    return data.flatMap((p) => [{ slug: p.slug }, { slug: String(p.id) }]);
+  } catch (error) {
+    console.error("Error generating static params for case study:", error);
+    return portfolioItems.flatMap((p) => [
+      { slug: p.slug },
+      { slug: String(p.id) },
+    ]);
+  }
 }
 
 // Set Props for metadata
@@ -36,12 +59,35 @@ type Props = {
 
 // Title and Description of Page (Metadata)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const resolvedParams = await params;
-  const item = getPortfolioItem(resolvedParams.slug);
+  const { slug } = await params;
+
+  const [portfolioResult] = await Promise.all([
+    fetchWithFallback<PortfolioItem>(
+      fetchLaravel<PortfolioItem>(`api/portfolios/${slug}`, {
+        next: { revalidate: 3600, tags: ["portfolio", `portfolio-${slug}`] },
+        skipAuth: true,
+      }),
+      portfolioItems.find(
+        (p) => p.slug === slug || String(p.id) === slug,
+      ) as PortfolioItem,
+      "Gagal memuat detail Portofolio.",
+      (data) => !!data && typeof data === "object" && "slug" in data,
+    ),
+  ]);
+
+  const item = portfolioResult.data;
   if (!item) return { title: "Portfolio Item Not Found" };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const imageUrl = (item.image as any)?.src || resolveAssetUrl(item.image);
+
   return {
     title: { absolute: `Studi Kasus (${item.title}) | Muhammad Afriza Hanif` },
+    description: item.description,
     alternates: { canonical: `/portfolio/${item.slug}/case-study` },
+    openGraph: {
+      images: imageUrl ? [imageUrl] : [],
+    },
   };
 }
 
@@ -50,10 +96,61 @@ export default async function CaseStudy({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  // Get Data of Portfolio (Slug)
   const resolvedParams = await params;
-  const item = getPortfolioItem(resolvedParams.slug);
-  console.log("Item of selected portfolio (Case Study): ", item);
+
+  const [portfolioResult, caseStudyResult, diagramResult, solutionResult] =
+    await Promise.all([
+      fetchWithFallback<PortfolioItem>(
+        fetchLaravel<PortfolioItem>(`api/portfolios/${resolvedParams.slug}`, {
+          next: {
+            revalidate: 3600,
+            tags: ["portfolio", `portfolio-${resolvedParams.slug}`],
+          },
+          skipAuth: true,
+        }),
+        portfolioItems.find(
+          (p) =>
+            p.slug === resolvedParams.slug ||
+            String(p.id) === resolvedParams.slug,
+        ) as PortfolioItem,
+        "Gagal memuat detail Portofolio terbaru.",
+        (data) => !!data && typeof data === "object" && "slug" in data,
+      ),
+      fetchWithFallback<CaseStudyItem[]>(
+        fetchLaravel<CaseStudyItem[]>("api/case-studies", {
+          next: { revalidate: 3600, tags: ["case-study"] },
+          skipAuth: true,
+        }),
+        caseStudyItems,
+        "Gagal memuat data Studi Kasus.",
+        (data) => Array.isArray(data),
+      ),
+      fetchWithFallback<DiagramCSItem[]>(
+        fetchLaravel<DiagramCSItem[]>("api/diagrams", {
+          next: { revalidate: 3600, tags: ["diagram"] },
+          skipAuth: true,
+        }),
+        diagramCSItems,
+        "Gagal memuat data Diagram.",
+        (data) => Array.isArray(data),
+      ),
+      fetchWithFallback<SolutionCSItem[]>(
+        fetchLaravel<SolutionCSItem[]>("api/solutions", {
+          next: { revalidate: 3600, tags: ["solution"] },
+          skipAuth: true,
+        }),
+        solutionCSItems,
+        "Gagal memuat data Solusi.",
+        (data) => Array.isArray(data),
+      ),
+    ]);
+
+  const item = portfolioResult.data;
+  const fetchErrorMessage =
+    portfolioResult.error ||
+    caseStudyResult.error ||
+    diagramResult.error ||
+    solutionResult.error;
 
   // Check if item are not found
   if (!item) return notFound();
@@ -64,18 +161,22 @@ export default async function CaseStudy({
     permanentRedirect(`/portfolio/${encodeURIComponent(item.slug)}/case-study`);
   }
 
-  // Get Data of Case Study
-  const caseStudy = getCaseStudy(item.id);
+  // Filter data for the specific portfolio
+  const caseStudy = caseStudyResult.data.find(
+    (cs) => cs.portfolio_id === item.id,
+  );
 
   if (!caseStudy) {
     return redirect(`/portfolio/${encodeURIComponent(item.slug)}`);
   }
 
-  // Get Data of Diagram
-  const diagram = getDiagram(caseStudy.id);
-
-  // Get Data of Solution
-  const solution = getSolutions(caseStudy.id);
+  // Get related Diagram and Solutions
+  const diagram = diagramResult.data.find(
+    (d) => d.case_study_id === caseStudy.id,
+  );
+  const solution = (solutionResult.data).filter(
+    (s) => s.case_study_id === caseStudy.id,
+  );
 
   // Check if subsection of section are not empty
   // Diagram
@@ -150,7 +251,7 @@ export default async function CaseStudy({
       title: "Tantangan & Pembelajaran",
       subSections: challengeSubSections,
     },
-    ((caseStudy.result && caseStudy.result.length > 0) || item.image) && {
+    ((caseStudy.results && caseStudy.results.length > 0) || item.image) && {
       id: "results",
       title: "Hasil Akhir",
     },
@@ -213,6 +314,11 @@ export default async function CaseStudy({
     },
   ];
 
+  // Resolve image for JSON-LD and Metadata consistency
+  const resolvedImage =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (item.image as any)?.src || (item.image ? resolveAssetUrl(item.image) : "");
+
   // JSON-LD Structured Data
   const jsonLd = {
     "@context": "https://schema.org",
@@ -221,8 +327,7 @@ export default async function CaseStudy({
         "@type": "Article",
         headline: `Studi Kasus: ${item.title}`,
         description: `Studi kasus mendalam mengenai proyek ${item.title}.`,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        image: (item.image as any)?.src || item.image,
+        image: resolvedImage,
         author: {
           "@type": "Person",
           name: "Muhammad Afriza Hanif",
@@ -308,75 +413,81 @@ export default async function CaseStudy({
       </nav>
 
       {/* ScrollSpy Area */}
-      <main className="row">
-        {/* Navigations */}
-        <aside className="col-lg-4 d-none d-lg-block border-end pe-lg-3">
-          <div
-            className="sticky-lg-top"
-            style={{
-              top: "1rem",
-              maxHeight: "calc(100vh - 2rem)",
-              overflowY: "auto",
-            }}
-          >
-            <nav
-              id="case-study-nav"
-              className="h-100 flex-column align-items-stretch"
+      {caseStudySections.length > 0 ? (
+        <main className="row">
+          {/* Navigations */}
+          <aside className="col-lg-4 d-none d-lg-block border-end pe-lg-3">
+            <div
+              className="sticky-lg-top"
+              style={{
+                top: "1rem",
+                maxHeight: "calc(100vh - 2rem)",
+                overflowY: "auto",
+              }}
             >
-              <nav className="nav nav-pills flex-column">
-                {caseStudySections.map((section) => (
-                  <React.Fragment key={section.id}>
-                    <a className="nav-link" href={`#${section.id}`}>
-                      {section.title}
-                    </a>
-                    {section.subSections && (
-                      <nav className="nav nav-pills flex-column">
-                        {section.subSections.map((sub) => (
-                          <a
-                            key={sub.id}
-                            className="nav-link ms-3 my-1"
-                            href={`#${sub.id}`}
-                          >
-                            {sub.title}
-                          </a>
-                        ))}
-                      </nav>
-                    )}
-                  </React.Fragment>
-                ))}
-              </nav>
-            </nav>
-          </div>
-        </aside>
-        {/* Contents */}
-        <article className="col-12 col-lg-8">
-          <div
-            className="scrollspy-example-2 ps-lg-3"
-            tabIndex={0}
-            role="document"
-          >
-            {caseStudySections.map((section) => (
-              <section
-                key={section.id}
-                id={section.id}
-                className="mb-3"
-                style={{ scrollMarginTop: "4rem" }}
-                aria-labelledby={`${section.id}-heading`}
+              <nav
+                id="case-study-nav"
+                className="h-100 flex-column align-items-stretch"
               >
-                <h2 id={`${section.id}-heading`}>{section.title}</h2>
-                <SectionContent
-                  sectionId={section.id}
-                  sectionTitle={section.title}
-                  item={item}
-                  caseStudy={caseStudy}
-                  diagram={diagram}
-                  solution={solution}
-                />
-              </section>
-            ))}
-          </div>
-        </article>
-      </main>
+                <nav className="nav nav-pills flex-column">
+                  {caseStudySections.map((section) => (
+                    <React.Fragment key={section.id}>
+                      <a className="nav-link" href={`#${section.id}`}>
+                        {section.title}
+                      </a>
+                      {section.subSections && (
+                        <nav className="nav nav-pills flex-column">
+                          {section.subSections.map((sub) => (
+                            <a
+                              key={sub.id}
+                              className="nav-link ms-3 my-1"
+                              href={`#${sub.id}`}
+                            >
+                              {sub.title}
+                            </a>
+                          ))}
+                        </nav>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </nav>
+              </nav>
+            </div>
+          </aside>
+          {/* Contents */}
+          <article className="col-12 col-lg-8">
+            <div
+              className="scrollspy-example-2 ps-lg-3"
+              tabIndex={0}
+              role="document"
+            >
+              {caseStudySections.map((section) => (
+                <section
+                  key={section.id}
+                  id={section.id}
+                  className="mb-3"
+                  style={{ scrollMarginTop: "4rem" }}
+                  aria-labelledby={`${section.id}-heading`}
+                >
+                  <h2 id={`${section.id}-heading`}>{section.title}</h2>
+                  <SectionContent
+                    sectionId={section.id}
+                    sectionTitle={section.title}
+                    item={item}
+                    caseStudy={caseStudy}
+                    diagram={diagram}
+                    solution={solution}
+                  />
+                </section>
+              ))}
+            </div>
+          </article>
+        </main>
+      ) : (
+        <div className="text-center py-5">
+          <p className="lead">Studi kasus belum tersedia untuk proyek ini.</p>
+        </div>
+      )}
 
       {/* Offcanvas */}
       {/* Explanation */}
@@ -396,6 +507,9 @@ export default async function CaseStudy({
       >
         <CaseStudyNavigation sections={caseStudySections} />
       </Offcanvas>
+
+      {/* Error Notification */}
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

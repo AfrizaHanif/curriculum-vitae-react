@@ -70,7 +70,7 @@ export default function Button({
       <button
         className={classes}
         data-bs-toggle={dataToggle}
-        data-bs-target={`#${dataTarget}`}
+        data-bs-target={dataTarget ? `#${dataTarget}` : undefined}
         data-bs-title={dataTitle}
         data-bs-content={dataContent}
         disabled={disabled}
@@ -84,7 +84,7 @@ export default function Button({
       <a
         className={`${classes} ${disabled && "disabled"}`}
         data-bs-toggle={dataToggle}
-        data-bs-target={`#${dataTarget}`}
+        data-bs-target={dataTarget ? `#${dataTarget}` : undefined}
         data-bs-title={dataTitle}
         {...(newTab && newTabClasses)}
         {...(props as ComponentPropsWithoutRef<"a">)}

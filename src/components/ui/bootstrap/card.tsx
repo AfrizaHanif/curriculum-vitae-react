@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import Button from "./button";
 import NextImage from "../next/next-image";
-import { DropdownItem } from "@/lib/bootstrap-types";
+import { DropdownItem } from "@/types/bootstrap-types";
 import Dropdown from "./dropdown";
 
 type BaseCardProps = ComponentPropsWithoutRef<"div"> & {

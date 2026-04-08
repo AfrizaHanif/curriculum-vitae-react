@@ -1,7 +1,7 @@
 import AppLayout from "@/components/layouts/layout";
 import Jumbotron from "@/components/ui/bootstrap/jumbotron";
 import NextImage from "@/components/ui/next/next-image";
-import myPhoto from "@/assets/images/profile.jpg";
+// import myPhoto from "@/images/Profile.jpg";
 import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import Feature from "@/components/ui/bootstrap/feature";
@@ -16,7 +16,13 @@ import jumbotronImage from "../../../../assets/images/jumbotron/home.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import Heroes from "@/components/ui/bootstrap/heroes";
-import { HeroesButtonItem } from "@/lib/bootstrap-types";
+import { HeroesButtonItem, FeatureItem } from "@/types/bootstrap-types";
+import { HobbyItem, ProfileItem, SkillItem } from "@/types/customs/data-type";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { fetchLaravel } from "@/lib/laravel";
+import ErrorToast from "@/components/home/error-toast";
+import { normalizeData } from "@/lib/normalize";
+import { resolveAssetUrl } from "@/lib/assets";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -25,39 +31,85 @@ export const metadata: Metadata = {
     "Pelajari tentang saya beserta keterampilan, filosofi, dan hobi yang saya miliki",
 };
 
-// Get Data from JSON (Single)
-const userProfile = profileItem[0];
+export default async function Profile() {
+  const [profileResult, skillResult, hobbyResult] = await Promise.all([
+    fetchWithFallback<ProfileItem[]>(
+      fetchLaravel<ProfileItem[]>("api/profiles", {
+        next: { revalidate: 3600, tags: ["profile"] },
+        skipAuth: true,
+      }),
+      profileItem, // Static Fallback
+      "Gagal memuat data Profil terbaru.", // Error Message
+      (data) => Array.isArray(data) && data.length > 0, // Validator
+    ),
+    fetchWithFallback<SkillItem[]>(
+      fetchLaravel<SkillItem[]>("api/skills", {
+        next: { revalidate: 3600, tags: ["skill"] },
+        skipAuth: true,
+      }),
+      skillItems, // Static Fallback
+      "Gagal memuat data Skill terbaru.", // Error Message
+      (data) => Array.isArray(data) && data.length > 0, // Validator
+    ),
+    fetchWithFallback<HobbyItem[]>(
+      fetchLaravel<HobbyItem[]>("api/hobbies", {
+        next: { revalidate: 3600, tags: ["hobby"] },
+        skipAuth: true,
+      }),
+      hobbyItems as unknown as HobbyItem[], // Static Fallback
+      "Gagal memuat data Hobi terbaru.", // Error Message
+      (data) => Array.isArray(data) && data.length > 0, // Validator
+    ),
+  ]);
 
-// Birthday and Calculate Age Function
-const birthDate = new Date(userProfile.birthday); // Get data of birthday
-const today = new Date(); // Get date of today
-// Change format depend by local of format date
-const formattedBirthday = birthDate.toLocaleDateString("id-ID", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-});
-let age = today.getFullYear() - birthDate.getFullYear(); // Substract between today and birthday's year
-const monthDifference = today.getMonth() - birthDate.getMonth(); // Substract between today and birthday's month and year
-// Check if difference abnormal (less than 0)
-if (
-  monthDifference < 0 ||
-  (monthDifference === 0 && today.getDate() < birthDate.getDate())
-) {
-  age--; // Calculate if difference not abnormal
-}
+  const userProfile = profileResult.data[0];
 
-// Details of profile for better formatting
-const profileDetails = {
-  "Nama Lengkap": userProfile.fullname,
-  "Tanggal Lahir": formattedBirthday,
-  Umur: `${age} tahun`,
-  Alamat: `${userProfile.current_city}, ${userProfile.current_province}`,
-  Email: userProfile.email,
-  Telepon: userProfile.phone,
-};
+  // Normalize Skills Data: Ensure 'name' property exists (handling API 'title' vs 'name' mismatch)
+  const formattedSkillItems = normalizeData(skillResult.data, {
+    name: ["name", "title"], // Try 'name' first (API), fallback to 'title' (Static)
+  });
 
-export default function Profile() {
+  // The API returns 'name', but the Feature component expects 'title' and a non-optional 'icon'.
+  const formattedHobbyItems: FeatureItem[] = normalizeData<FeatureItem>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    hobbyResult.data as any,
+    { title: ["name", "title"] },
+    { icon: "star" }, // Provide default icon to satisfy FeatureItem interface via defaults parameter
+  );
+
+  // Consolidated Error Message
+  const fetchErrorMessage =
+    profileResult.error || skillResult.error || hobbyResult.error;
+
+  // Birthday and Calculate Age Function
+  const birthDate = new Date(userProfile.birthday); // Get data of birthday
+  const today = new Date(); // Get date of today
+  // Change format depend by local of format date
+  const formattedBirthday = birthDate.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  let age = today.getFullYear() - birthDate.getFullYear(); // Substract between today and birthday's year
+  const monthDifference = today.getMonth() - birthDate.getMonth(); // Substract between today and birthday's month and year
+  // Check if difference abnormal (less than 0)
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--; // Calculate if difference not abnormal
+  }
+
+  // Details of profile for better formatting
+  const profileDetails = {
+    "Nama Lengkap": userProfile.fullname,
+    "Tanggal Lahir": formattedBirthday,
+    Umur: `${age} tahun`,
+    Alamat: `${userProfile.current_city}, ${userProfile.current_province}`,
+    Email: userProfile.email,
+    Telepon: userProfile.phone,
+  };
+
   console.log("Profile data:", userProfile);
   console.log("Detailed Profile:", profileDetails);
 
@@ -83,7 +135,7 @@ export default function Profile() {
       name: userProfile.fullname,
       jobTitle: userProfile.status,
       url: "https://afrizahanif.com",
-      image: myPhoto.src,
+      image: resolveAssetUrl(userProfile.photo),
       sameAs: socialItems.map((item) => item.url), // Links to your social media
     },
   };
@@ -110,7 +162,7 @@ export default function Profile() {
             style={{ minHeight: "300px" }}
           >
             <NextImage
-              src={myPhoto}
+              src={resolveAssetUrl(userProfile.photo)}
               alt="My Profile Photo"
               fill
               style={{ objectFit: "cover" }}
@@ -146,8 +198,8 @@ export default function Profile() {
       {/* Skills */}
       <section aria-label="Keterampilan">
         <CardGroup title="Keterampilan / Keahlian">
-          {skillItems.map((item) => (
-            <Card key={item.key} insideGroup>
+          {formattedSkillItems.map((item) => (
+            <Card key={item.id} insideGroup>
               <h3 className="card-title text-center col">{item.name}</h3>
               <div className="text-center pb-1 text-body-secondary">
                 <i>
@@ -171,10 +223,11 @@ export default function Profile() {
       <section aria-label="Hobi">
         <Feature
           id="hobby"
-          items={hobbyItems}
+          items={formattedHobbyItems}
           type="hanging"
           title="Hobi & Minat"
           itemPerRow={4}
+          iconType="bi"
         />
       </section>
 
@@ -188,6 +241,9 @@ export default function Profile() {
           Lihat resume untuk melihat pendidikan dan pengalaman kerja saya
         </Heroes>
       </section>
+
+      {/* Error Toast Notification */}
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

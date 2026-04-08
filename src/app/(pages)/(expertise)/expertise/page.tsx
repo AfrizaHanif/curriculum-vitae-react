@@ -4,22 +4,45 @@ import Feature from "@/components/ui/bootstrap/feature";
 import Modal from "@/components/ui/bootstrap/modal";
 import { expertiseItems } from "@/lib/data/expertiseData";
 import { portfolioItems } from "@/lib/data/portfolioData";
-import { HeroesButtonItem, ModalButtonItem } from "@/lib/bootstrap-types";
+import {
+  HeroesButtonItem,
+  ModalButtonItem,
+  FeatureItem,
+} from "@/types/bootstrap-types";
 import { Metadata } from "next";
 import Link from "next/link";
 import jumbotronImage from "../../../../assets/images/jumbotron/expertise.jpg";
 import JumbotronTitle from "@/components/ui/customs/jumbotron-title";
 import JsonLd from "@/components/json-ld";
 import Heroes from "@/components/ui/bootstrap/heroes";
+import { fetchWithFallback } from "@/lib/fetch-with-fallback";
+import { fetchLaravel } from "@/lib/laravel";
+import { ExpertiseItem } from "@/types/customs/data-type";
+import ErrorToast from "@/components/home/error-toast";
+import { normalizeData } from "@/lib/normalize";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
-  title: "Ringkasan Kehalian",
+  title: "Ringkasan Keahlian",
   description:
     "Pelajari keahlian yang saya miliki beserta proyek yang terlibat",
 };
 
-export default function Expertise() {
+export default async function Expertise() {
+  const [expertiseResult] = await Promise.all([
+    fetchWithFallback<ExpertiseItem[]>(
+      fetchLaravel<ExpertiseItem[]>("api/expertises", {
+        next: { revalidate: 3600, tags: ["profile"] },
+        skipAuth: true,
+      }),
+      expertiseItems, // Static Fallback
+      "Gagal memuat data Keahlian terbaru.", // Error Message
+      (data) => Array.isArray(data), // Relaxed Validator
+    ),
+  ]);
+
+  const fetchErrorMessage = expertiseResult.error;
+
   // Items of button for modal
   const modalButtonItems: ModalButtonItem[] = [
     {
@@ -29,6 +52,24 @@ export default function Expertise() {
       dismiss: true,
     },
   ];
+
+  // Map expertise items to include button configuration
+  const expertiseItemsWithButton: FeatureItem[] = normalizeData<FeatureItem>(
+    expertiseResult.data,
+    {
+      // Using the new explicit transform rule for the complex button object
+      button: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        transform: (item: any) => ({
+          label: "Dibuktikan dalam proyek...",
+          dataToggle: "modal",
+          dataTarget: item.id,
+          href: "#",
+        }),
+      },
+    },
+    { icon: "patch-check" }, // Provide default icon via the new defaults parameter
+  );
 
   // Item of Next Page Navigation (Heroes)
   const nextPageHeroesButtonItem: HeroesButtonItem[] = [
@@ -55,7 +96,7 @@ export default function Expertise() {
     url: "https://afrizahanif.com/expertise",
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: expertiseItems.map((item, index) => ({
+      itemListElement: expertiseResult.data.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,
         name: item.title,
@@ -70,26 +111,33 @@ export default function Expertise() {
 
       {/* Jumbotron */}
       <JumbotronTitle
-        title="Ringkasan Kehalian"
+        title="Ringkasan Keahlian"
         description="Saya mengubah ide kompleks menjadi solusi web yang fungsional, intuitif, dan berbasis data."
         backgroundImg={jumbotronImage.src}
         className="my-3"
       />
 
       {/* List of Expertise */}
-      {/* Feature */}
-      <section aria-label="Daftar Keahlian">
-        <Feature
-          items={expertiseItems}
-          id="expertise"
-          type="columns"
-          itemPerRow={2}
-          chevron
-        />
-      </section>
+      {expertiseResult.data.length > 0 ? (
+        <section aria-label="Daftar Keahlian">
+          <Feature
+            items={expertiseItemsWithButton}
+            id="expertise"
+            type="columns"
+            itemPerRow={2}
+            iconType="bi"
+            chevron
+          />
+        </section>
+      ) : (
+        <div className="text-center py-5">
+          <p className="lead">Informasi keahlian belum tersedia.</p>
+        </div>
+      )}
+
       {/* Modal */}
-      {expertiseItems
-        .filter((item) => item.dataTarget)
+      {expertiseResult.data
+        .filter((item) => item.id)
         .map((item) => {
           const linkedProjects = item.projects
             ? portfolioItems.filter((project) =>
@@ -99,8 +147,8 @@ export default function Expertise() {
 
           return (
             <Modal
-              key={item.key}
-              id={item.dataTarget!}
+              key={item.id}
+              id={item.id}
               buttonItems={modalButtonItems}
               title={item.title}
               size="lg"
@@ -151,6 +199,8 @@ export default function Expertise() {
           proyek-proyek yang telah saya kerjakan, atau hubungi saya
         </Heroes>
       </section>
+
+      <ErrorToast message={fetchErrorMessage} />
     </AppLayout>
   );
 }

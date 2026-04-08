@@ -1,5 +1,5 @@
 import React from "react";
-import { DataFeatureItem } from "@/lib/customs/data-types";
+import { DataFeatureItem } from "@/lib/customs/resume-feature-types";
 import { formatMonthYear } from "@/lib/utils";
 
 interface ResumeDataItemProps {
