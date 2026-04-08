@@ -41,6 +41,7 @@ jobs:
           [ -n "${{ secrets.FTP_HOST }}" ] && echo "  ✓ FTP_HOST is loaded" || echo "  ✗ FTP_HOST is MISSING"
           [ -n "${{ secrets.SSH_PRIVATE_KEY }}" ] && echo "  ✓ SSH_PRIVATE_KEY is loaded" || echo "  ✗ SSH_PRIVATE_KEY is MISSING"
           [ -n "${{ secrets.FTP_PASSWORD }}" ] && echo "  ✓ FTP_PASSWORD is loaded" || echo "  ✗ FTP_PASSWORD is MISSING"
+          [ -n "${{ secrets.HOSTINGER_DEPLOY_WEBHOOK_URL }}" ] && echo "  ✓ HOSTINGER_DEPLOY_WEBHOOK_URL is loaded" || echo "  ✗ HOSTINGER_DEPLOY_WEBHOOK_URL is MISSING"
 
       - name: Setup SSH Keys
         uses: webfactory/ssh-agent@v0.9.0
