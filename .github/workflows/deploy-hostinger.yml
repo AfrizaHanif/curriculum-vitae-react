@@ -61,8 +61,9 @@ jobs:
             set net:timeout 10; 
             set net:max-retries 2; 
             set ssl:verify-certificate no; 
-            put public/maintenance.html -o ${{ vars.REMOTE_PATH }}/maintenance.html; 
-            put public/.htaccess.maintenance -o ${{ vars.REMOTE_PATH }}/.htaccess; 
+            cd "${{ vars.REMOTE_PATH }}";
+            put public/maintenance.html -o maintenance.html;
+            put public/.htaccess.maintenance -o .htaccess;
             quit" || (echo "✗ Failed to enable maintenance mode"; exit 1)
           echo "✓ Maintenance mode enabled"
 
@@ -85,7 +86,8 @@ jobs:
             set net:timeout 10; 
             set net:max-retries 2; 
             set ssl:verify-certificate no; 
-            mirror -R --verbose --delete --parallel=5 --exclude=.htaccess* --exclude=maintenance.html --exclude-glob .* --exclude-glob domains/ out/ ${{ vars.REMOTE_PATH }}/; 
+            cd "${{ vars.REMOTE_PATH }}";
+            mirror -R --verbose --delete --parallel=5 --exclude=.htaccess* --exclude=maintenance.html --exclude-glob .* --exclude-glob domains/ out/ ./;
             quit" || (echo "✗ Deployment failed"; exit 1)
           echo "✓ Deployment completed"
 
@@ -101,7 +103,8 @@ jobs:
             set net:timeout 10; 
             set net:max-retries 2; 
             set ssl:verify-certificate no; 
-            rm -f ${{ vars.REMOTE_PATH }}/maintenance.html; 
-            put public/.htaccess -o ${{ vars.REMOTE_PATH }}/.htaccess; 
+            cd "${{ vars.REMOTE_PATH }}";
+            rm -f maintenance.html;
+            put public/.htaccess -o .htaccess;
             quit" || (echo "✗ Failed to disable maintenance mode"; exit 1)
           echo "✓ Maintenance mode disabled - Site is live"
