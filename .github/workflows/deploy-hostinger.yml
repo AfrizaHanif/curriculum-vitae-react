@@ -41,7 +41,9 @@ jobs:
           [ -n "${{ secrets.FTP_HOST }}" ] && echo "  ✓ FTP_HOST is loaded" || echo "  ✗ FTP_HOST is MISSING"
           [ -n "${{ secrets.SSH_PRIVATE_KEY }}" ] && echo "  ✓ SSH_PRIVATE_KEY is loaded" || echo "  ✗ SSH_PRIVATE_KEY is MISSING"
           [ -n "${{ secrets.FTP_PASSWORD }}" ] && echo "  ✓ FTP_PASSWORD is loaded" || echo "  ✗ FTP_PASSWORD is MISSING"
-          [ -n "${{ secrets.HOSTINGER_DEPLOY_WEBHOOK_URL }}" ] && echo "  ✓ HOSTINGER_DEPLOY_WEBHOOK_URL is loaded" || echo "  ✗ HOSTINGER_DEPLOY_WEBHOOK_URL is MISSING"
+          [ -n "${{ secrets.FTP_USERNAME }}" ] && echo "  ✓ FTP_USERNAME is loaded" || echo "  ✗ FTP_USERNAME is MISSING"
+          [ -n "${{ secrets.SSH_HOST_KEY }}" ] && echo "  ✓ SSH_HOST_KEY is loaded" || echo "  ✗ SSH_HOST_KEY is MISSING"
+          [ -n "${{ secrets.MAINTENANCE_BYPASS_TOKEN }}" ] && echo "  ✓ MAINTENANCE_BYPASS_TOKEN is loaded" || echo "  ✗ MAINTENANCE_BYPASS_TOKEN is MISSING"
 
       - name: Setup SSH Keys
         uses: webfactory/ssh-agent@v0.9.0
@@ -386,36 +388,5 @@ jobs:
                 rm -f maintenance.html;
                 put public/.htaccess -o .htaccess;
                 quit" || (echo "✗ Failed to rollback maintenance mode"; exit 1)
-            }
-          echo "✓ Rollback complete - Site is back online (previous version)"
-
-      - name: Disable Maintenance Mode
-        if: success()
-        env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
-        run: |
-          echo "Attempting Disable Maintenance Mode via SSH Key (timeout 60s)..."
-          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            set cmd:fail-exit on;
-            set net:timeout 5; 
-            set net:max-retries 1; 
-            mkdir -p "${{ vars.REMOTE_PATH }}"; cd "${{ vars.REMOTE_PATH }}";
-            rm -f maintenance.html;
-            put public/.htaccess -o .htaccess;
-            quit" || {
-              echo "⚠️ SSH Key failed, falling back to SFTP Password..."
-              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-                set sftp:auto-confirm yes;
-                set cmd:fail-exit on;
-                set net:timeout 10; 
-                set net:max-retries 2; 
-                cd "${{ vars.REMOTE_PATH }}";
-                rm -f maintenance.html;
-                put public/.htaccess -o .htaccess;
-                quit" || (echo "✗ Failed to disable maintenance mode even with password"; exit 1)
             }
           echo "✓ Maintenance mode disabled - Site is live"
