@@ -8,6 +8,11 @@ on:
         required: true
         type: boolean
         default: false
+      force_reset:
+        description: "Perform a clean sync? (Deletes old Next.js files, but ALWAYS preserves subdomain folders like /api)"
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   build-and-deploy:
@@ -105,6 +110,67 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
+      - name: Prepare Exclude Flags
+        run: |
+          # Start with mandatory protected folders (subdomains)
+          FLAGS='--exclude=api/ --exclude=staging-api/'
+
+          # Append dynamic folders from GitHub Variable (space separated)
+          RAW_EXTRA="${{ vars.EXTRA_EXCLUDES }}"
+          for item in $RAW_EXTRA; do
+            FLAGS="$FLAGS --exclude=$item"
+          done
+          echo "DYNAMIC_EXCLUDES=$FLAGS" >> $GITHUB_ENV
+
+      - name: Fetch Remote Exclude List
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
+          REMOTE_WEB_ROOT: ${{ vars.REMOTE_PATH }}
+        run: |
+          # 1. Initialize with the local file from the repository as a fallback
+          if [ -f .deploy-ignore ]; then
+            cp .deploy-ignore .remote-ignore
+            echo "✓ Initialized with local .deploy-ignore as fallback."
+          else
+            touch .remote-ignore
+            echo "⚠️ No local .deploy-ignore found in repository root."
+          fi
+
+          # 2. Attempt to fetch the remote version
+          echo "Attempting to fetch remote .deploy-ignore from $REMOTE_WEB_ROOT..."
+
+          # We use a subshell to try the download. If it fails, we handle the error strictly.
+          if ! lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
+            set sftp:auto-confirm yes;
+            cd \"$REMOTE_WEB_ROOT\" || quit;
+            get .deploy-ignore -o .remote-ignore;
+            quit"; then
+              echo "⚠️ SSH fetch failed, trying password fallback..."
+              lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
+                set sftp:auto-confirm yes;
+                cd \"$REMOTE_WEB_ROOT\" || exit 1;
+                get .deploy-ignore -o .remote-ignore;
+                quit" || echo "Remote fetch failed."
+          fi
+
+          # 3. Final safety check: Fail if the resulting file is empty (meaning neither remote nor local existed)
+          if [ ! -s .remote-ignore ]; then
+            echo "❌ Critical Error: .deploy-ignore is missing on the server and no local fallback exists."
+            echo "To prevent accidental deletion of your subdomains, the workflow will now stop."
+            exit 1
+          fi
+
+          echo "--- START OF REMOTE IGNORE LIST ---"
+          if [ -s .remote-ignore ]; then
+            cat .remote-ignore
+          else
+            echo "(File is empty or was not found on server)"
+          fi
+          echo "--- END OF REMOTE IGNORE LIST ---"
+
       - name: Create Remote Backup
         id: create_remote_backup
         env:
@@ -120,17 +186,17 @@ jobs:
             set cmd:fail-exit on;
             set net:timeout 10;
             set net:max-retries 1;
-            mkdir -p \"$BACKUP_PATH\";
-            mirror -R --delete \"${{ vars.REMOTE_PATH }}\" \"$BACKUP_PATH\";
+            mkdir -p "$BACKUP_PATH"; 
+            mirror -R $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore "${{ vars.REMOTE_PATH }}" "$BACKUP_PATH";
             quit" || {
               echo "⚠️ SSH Key failed for backup, falling back to SFTP Password..."
               timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
                 set sftp:auto-confirm yes;
                 set cmd:fail-exit on;
-                set net:timeout 30;
+                set net:timeout 30; 
                 set net:max-retries 5;
                 mkdir -p \"$BACKUP_PATH\";
-                mirror -R --delete \"${{ vars.REMOTE_PATH }}\" \"$BACKUP_PATH\";
+                mirror -R $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore "${{ vars.REMOTE_PATH }}" "$BACKUP_PATH";
                 quit" || (echo "✗ Failed to create remote backup even with password"; exit 1)
             }
           echo "✓ Remote backup created successfully at $BACKUP_PATH"
@@ -234,14 +300,17 @@ jobs:
           SFTP_PORT: 65002
           BACKUP_PATH: "${{ vars.REMOTE_PATH }}_backup_${{ github.run_id }}"
         run: |
-          echo "Syncing build output to server..."
+          echo "Syncing build output to server (Force Reset: ${{ github.event.inputs.force_reset }})..."
+          # Construct the delete flag based on user input
+          DELETE_FLAG="${{ github.event.inputs.force_reset == 'true' && '--delete' || '' }}"
+
           # We exclude .htaccess here so we don't overwrite the maintenance mode lock
           timeout 600 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
             set sftp:auto-confirm yes;
             set cmd:fail-exit on;
             set net:timeout 15;
             set net:max-retries 3;
-            mirror -R --delete --parallel=10 --exclude .htaccess out/ ${{ vars.REMOTE_PATH }};
+            mirror -R $DELETE_FLAG --verbose=3 --parallel=10 --exclude=".htaccess" $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore out/ ${{ vars.REMOTE_PATH }};
             quit" || {
               echo "⚠️ SSH Key failed for sync, falling back to SFTP Password..."
               timeout 1200 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
@@ -249,7 +318,7 @@ jobs:
                 set cmd:fail-exit on;
                 set net:timeout 30;
                 set net:max-retries 5;
-                mirror -R --delete --parallel=10 --exclude .htaccess out/ ${{ vars.REMOTE_PATH }};
+                mirror -R $DELETE_FLAG --verbose=3 --parallel=10 --exclude=".htaccess" $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore out/ ${{ vars.REMOTE_PATH }};
                 quit" || (echo "✗ Sync failed even with password"; exit 1)
             }
           echo "✓ Files synced successfully"
@@ -298,16 +367,16 @@ jobs:
             set cmd:fail-exit on;
             set net:timeout 5;
             set net:max-retries 1;
-            mirror -R --delete \"$BACKUP_PATH\" \"${{ vars.REMOTE_PATH }}\";
+            mirror -R $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore "$BACKUP_PATH" "${{ vars.REMOTE_PATH }}";
             rm -rf \"$BACKUP_PATH\"; # Clean up backup after restore
             quit" || {
               echo "⚠️ SSH Key failed for rollback, falling back to SFTP Password..."
               timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
                 set sftp:auto-confirm yes;
                 set cmd:fail-exit on;
-                set net:timeout 10;
+                set net:timeout 10; 
                 set net:max-retries 2;
-                mirror -R --delete \"$BACKUP_PATH\" \"${{ vars.REMOTE_PATH }}\";
+                mirror -R $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore "$BACKUP_PATH" "${{ vars.REMOTE_PATH }}";
                 rm -rf \"$BACKUP_PATH\"; # Clean up backup after restore
                 quit" || (echo "✗ Failed to restore from backup even with password"; exit 1)
             }

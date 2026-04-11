@@ -1,0 +1,4 @@
+# NOTE: All subdomain's folders inside of public_html must be added (even after creating a subdomain). This will ignore every subdomain's folders during force reset
+
+api/
+staging-api/
