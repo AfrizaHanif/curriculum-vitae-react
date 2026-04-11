@@ -110,218 +110,53 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      - name: Prepare Exclude Flags
-        run: |
-          # Start with mandatory protected folders (subdomains)
-          FLAGS='--exclude=api/ --exclude=staging-api/'
-
-          # Append dynamic folders from GitHub Variable (space separated)
-          RAW_EXTRA="${{ vars.EXTRA_EXCLUDES }}"
-          for item in $RAW_EXTRA; do
-            FLAGS="$FLAGS --exclude=$item"
-          done
-          echo "DYNAMIC_EXCLUDES=$FLAGS" >> $GITHUB_ENV
-
-      - name: Fetch Remote Exclude List
-        env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
-          REMOTE_WEB_ROOT: ${{ vars.REMOTE_PATH }}
-        run: |
-          # 1. Initialize with the local file from the repository as a fallback
-          if [ -f .deploy-ignore ]; then
-            cp .deploy-ignore .remote-ignore
-            echo "✓ Initialized with local .deploy-ignore as fallback."
-          else
-            touch .remote-ignore
-            echo "⚠️ No local .deploy-ignore found in repository root."
-          fi
-
-          # 2. Attempt to fetch the remote version
-          echo "Attempting to fetch remote .deploy-ignore from $REMOTE_WEB_ROOT..."
-
-          # We use a subshell to try the download. If it fails, we handle the error strictly.
-          if ! lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            cd \"$REMOTE_WEB_ROOT\" || quit;
-            get .deploy-ignore -o .remote-ignore;
-            quit"; then
-              echo "⚠️ SSH fetch failed, trying password fallback..."
-              lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-                set sftp:auto-confirm yes;
-                cd \"$REMOTE_WEB_ROOT\" || exit 1;
-                get .deploy-ignore -o .remote-ignore;
-                quit" || echo "Remote fetch failed."
-          fi
-
-          # 3. Final safety check: Fail if the resulting file is empty (meaning neither remote nor local existed)
-          if [ ! -s .remote-ignore ]; then
-            echo "❌ Critical Error: .deploy-ignore is missing on the server and no local fallback exists."
-            echo "To prevent accidental deletion of your subdomains, the workflow will now stop."
-            exit 1
-          fi
-
-          echo "--- START OF REMOTE IGNORE LIST ---"
-          if [ -s .remote-ignore ]; then
-            cat .remote-ignore
-          else
-            echo "(File is empty or was not found on server)"
-          fi
-          echo "--- END OF REMOTE IGNORE LIST ---"
-
-      - name: Create Remote Backup
-        id: create_remote_backup
-        env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
-          BACKUP_PATH: "${{ vars.REMOTE_PATH }}_backup_${{ github.run_id }}" # Unique backup path per run
-        run: |
-          echo "Creating remote backup of ${{ vars.REMOTE_PATH }} to $BACKUP_PATH..."
-          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            set cmd:fail-exit on;
-            set net:timeout 10;
-            set net:max-retries 1;
-            mkdir -p "$BACKUP_PATH"; 
-            mirror -R $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore "${{ vars.REMOTE_PATH }}" "$BACKUP_PATH";
-            quit" || {
-              echo "⚠️ SSH Key failed for backup, falling back to SFTP Password..."
-              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-                set sftp:auto-confirm yes;
-                set cmd:fail-exit on;
-                set net:timeout 30; 
-                set net:max-retries 5;
-                mkdir -p \"$BACKUP_PATH\";
-                mirror -R $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore "${{ vars.REMOTE_PATH }}" "$BACKUP_PATH";
-                quit" || (echo "✗ Failed to create remote backup even with password"; exit 1)
-            }
-          echo "✓ Remote backup created successfully at $BACKUP_PATH"
-
-      - name: Store Backup Path for Rollback
-        run: |
-          echo "BACKUP_PATH=${{ vars.REMOTE_PATH }}_backup_${{ github.run_id }}" >> "$GITHUB_ENV"
-
-      - name: Check SSH Key Status
-        id: check_ssh_key
-        env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
-          # Ensure BACKUP_PATH is available for this step if needed, though not directly used here.
-          # It's primarily for the rollback and cleanup steps.
-          BACKUP_PATH: "${{ vars.REMOTE_PATH }}_backup_${{ github.run_id }}"
-        run: |
-          echo "Attempting a test SSH connection to verify key status..."
-          # BatchMode prevents password prompts. We removed StrictHostKeyChecking=no because we trusted the key above.
-          if ssh -o BatchMode=yes -o ConnectionAttempts=1 -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" exit; then
-            echo "SSH key is already working on the server."
-            echo "ssh_key_working=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "SSH key is NOT working or not authorized. Bootstrap needed."
-            echo "ssh_key_working=false" >> "$GITHUB_OUTPUT"
-          fi
-        # Allow this step to fail without stopping the workflow, as its purpose is to determine if a fallback is needed.
-        continue-on-error: true
-
-      - name: Authorize SSH Key (Bootstrap)
-        if: steps.check_ssh_key.outputs.ssh_key_working == 'false' # Only run if the SSH key check failed
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
-          BACKUP_PATH: "${{ vars.REMOTE_PATH }}_backup_${{ github.run_id }}"
-        run: |
-          echo "Restoring SSH Public Key to server using password..."
-          # Extract public key from the private key secret
-          echo "$SSH_PRIVATE_KEY" > temp_key
-          chmod 600 temp_key
-          ssh-keygen -y -f temp_key > id_rsa.pub
-
-          # Use SFTP Password to ensure ~/.ssh exists and contains the key
-          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            set net:timeout 10;
-            set net:max-retries 1;
-            mkdir -p .ssh;
-            put id_rsa.pub -o .ssh/authorized_keys;
-            chmod 700 .ssh;
-            chmod 600 .ssh/authorized_keys;
-            quit"
-          rm temp_key id_rsa.pub
-          echo "✓ SSH key restored and authorized"
-
-      - name: Enable Maintenance Mode
-        id: enable_maintenance
-        env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
-          BACKUP_PATH: "${{ vars.REMOTE_PATH }}_backup_${{ github.run_id }}"
-          MAINTENANCE_BYPASS_TOKEN: ${{ secrets.MAINTENANCE_BYPASS_TOKEN }}
-        run: |
-          echo "Attempting Enable Maintenance Mode via SSH Key (timeout 60s)..."
-          # Inject secret into maintenance htaccess before uploading
-          sed -i "s/BYPASS_TOKEN_PLACEHOLDER/$MAINTENANCE_BYPASS_TOKEN/g" public/.htaccess.maintenance
-          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            set cmd:fail-exit on;
-            set net:timeout 5; 
-            set net:max-retries 1; 
-            mkdir -p "${{ vars.REMOTE_PATH }}"; cd "${{ vars.REMOTE_PATH }}";
-            put public/maintenance.html -o maintenance.html;
-            put public/.htaccess.maintenance -o .htaccess;
-            quit" || {
-              echo "⚠️ SSH Key failed, falling back to SFTP Password..."
-              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-                set sftp:auto-confirm yes;
-                set cmd:fail-exit on;
-                set net:timeout 10; 
-                set net:max-retries 2; 
-                cd "${{ vars.REMOTE_PATH }}";
-                put public/maintenance.html -o maintenance.html;
-                put public/.htaccess.maintenance -o .htaccess;
-                quit" || (echo "✗ Failed to enable maintenance mode even with password"; exit 1)
-            }
-          echo "✓ Maintenance mode enabled"
-
-      - name: Sync Files via lftp
+      - name: Upload Release via lftp
         id: deploy_files
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
           SFTP_PORT: 65002
-          BACKUP_PATH: "${{ vars.REMOTE_PATH }}_backup_${{ github.run_id }}"
+          RELEASE_PATH: "${{ vars.REMOTE_PATH }}/releases/${{ github.run_id }}"
         run: |
-          echo "Syncing build output to server (Force Reset: ${{ github.event.inputs.force_reset }})..."
-          # Construct the delete flag based on user input
-          DELETE_FLAG="${{ github.event.inputs.force_reset == 'true' && '--delete' || '' }}"
-
-          # We exclude .htaccess here so we don't overwrite the maintenance mode lock
+          echo "Creating release directory: $RELEASE_PATH"
           timeout 600 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
             set sftp:auto-confirm yes;
             set cmd:fail-exit on;
             set net:timeout 15;
             set net:max-retries 3;
-            mirror -R $DELETE_FLAG --verbose=3 --parallel=10 --exclude=".htaccess" $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore out/ ${{ vars.REMOTE_PATH }};
+            mkdir -p $RELEASE_PATH;
+            mirror -R --verbose=3 --parallel=10 out/ $RELEASE_PATH;
             quit" || {
-              echo "⚠️ SSH Key failed for sync, falling back to SFTP Password..."
+              echo "⚠️ SSH Key failed, falling back to SFTP Password..."
               timeout 1200 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
                 set sftp:auto-confirm yes;
                 set cmd:fail-exit on;
                 set net:timeout 30;
                 set net:max-retries 5;
-                mirror -R $DELETE_FLAG --verbose=3 --parallel=10 --exclude=".htaccess" $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore out/ ${{ vars.REMOTE_PATH }};
+                mkdir -p $RELEASE_PATH;
+                mirror -R --verbose=3 --parallel=10 out/ $RELEASE_PATH;
                 quit" || (echo "✗ Sync failed even with password"; exit 1)
             }
-          echo "✓ Files synced successfully"
+          echo "✓ Files uploaded to release folder"
+
+      - name: Atomic Switch (Update Symlink)
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
+          PROJECT_ROOT: ${{ vars.REMOTE_PATH }}
+          RELEASE_ID: ${{ github.run_id }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" "
+            cd $PROJECT_ROOT && \
+            # Symlink protected subdirectories into the new release
+            [ -d api ] && ln -sfn ../../api releases/$RELEASE_ID/api; \
+            [ -d staging-api ] && ln -sfn ../../staging-api releases/$RELEASE_ID/staging-api; \
+            # Atomic switch: link 'current' to the new release
+            ln -sfn releases/$RELEASE_ID current
+          "
+          echo "✓ Atomic switch complete: 'current' now points to release $RELEASE_ID"
 
       - name: Verify Deployment (Smoke Test)
         id: smoke_test
@@ -351,120 +186,41 @@ jobs:
           echo "✗ Server failed to respond correctly after 60 seconds."
           exit 1
 
-      - name: Rollback - Disable Maintenance Mode on Failure
-        if: failure() && steps.enable_maintenance.outcome == 'success'
+      - name: Rollback on Failure
+        if: failure() && steps.deploy_files.outcome == 'success'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
           SFTP_PORT: 65002
-          BACKUP_PATH: "${{ env.BACKUP_PATH }}" # Use the stored backup path
+          PROJECT_ROOT: ${{ vars.REMOTE_PATH }}
         run: |
-          echo "🚨 Deployment or Webhook failed! Rolling back maintenance mode to keep the old site live..."
-          echo "Restoring site from backup: $BACKUP_PATH to ${{ vars.REMOTE_PATH }}..."
-          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            set cmd:fail-exit on;
-            set net:timeout 5;
-            set net:max-retries 1;
-            mirror -R $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore "$BACKUP_PATH" "${{ vars.REMOTE_PATH }}";
-            rm -rf \"$BACKUP_PATH\"; # Clean up backup after restore
-            quit" || {
-              echo "⚠️ SSH Key failed for rollback, falling back to SFTP Password..."
-              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-                set sftp:auto-confirm yes;
-                set cmd:fail-exit on;
-                set net:timeout 10; 
-                set net:max-retries 2;
-                mirror -R $DYNAMIC_EXCLUDES --exclude-glob-from=.remote-ignore "$BACKUP_PATH" "${{ vars.REMOTE_PATH }}";
-                rm -rf \"$BACKUP_PATH\"; # Clean up backup after restore
-                quit" || (echo "✗ Failed to restore from backup even with password"; exit 1)
-            }
-          echo "✓ Site restored from backup."
+          echo "🚨 Deployment failed! Attempting to revert symlink to previous release..."
+          ssh -o StrictHostKeyChecking=no -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" "
+            cd $PROJECT_ROOT && \
+            # Point back to the second most recent release (the previous live one)
+            PREV_RELEASE=\$(ls -dt releases/* | sed -n '2p')
+            if [ -n \"\$PREV_RELEASE\" ]; then
+              ln -sfn \$PREV_RELEASE current
+              echo \"Reverted to \$PREV_RELEASE\"
+            fi
+          "
 
-          echo "Disabling maintenance mode..."
-          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            # Ensure the original .htaccess is put back, not the maintenance one
-            # This assumes public/.htaccess exists and is the correct original one.
-            # If public/.htaccess.original was used, adjust here.
-            put public/.htaccess -o .htaccess;
-            set cmd:fail-exit on;
-            set net:timeout 5; 
-            set net:max-retries 1; 
-            mkdir -p "${{ vars.REMOTE_PATH }}"; cd "${{ vars.REMOTE_PATH }}";
-            rm -f maintenance.html;
-            put public/.htaccess -o .htaccess;
-            quit" || {
-              echo "⚠️ SSH Key failed, falling back to SFTP Password..."
-              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-                set sftp:auto-confirm yes;
-                put public/.htaccess -o .htaccess;
-                set cmd:fail-exit on;
-                set net:timeout 10; 
-                set net:max-retries 2; 
-                cd "${{ vars.REMOTE_PATH }}";
-                rm -f maintenance.html;
-                put public/.htaccess -o .htaccess;
-                quit" || (echo "✗ Failed to rollback maintenance mode"; exit 1)
-            }
-          echo "✓ Rollback complete - Site is back online (previous version)"
-
-      - name: Clean Up Remote Backup (on Success)
+      - name: Clean Up Old Releases
         if: success()
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
           SFTP_PORT: 65002
-          BACKUP_PATH: "${{ env.BACKUP_PATH }}" # Use the stored backup path
+          PROJECT_ROOT: ${{ vars.REMOTE_PATH }}
         run: |
-          echo "Cleaning up remote backup directory: $BACKUP_PATH..."
-          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            set cmd:fail-exit on;
-            set net:timeout 5;
-            set net:max-retries 1;
-            rm -rf \"$BACKUP_PATH\";
-            quit" || {
-              echo "⚠️ SSH Key failed for backup cleanup, falling back to SFTP Password..."
-              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-                set sftp:auto-confirm yes;
-                set cmd:fail-exit on;
-                set net:timeout 10;
-                set net:max-retries 2;
-                rm -rf \"$BACKUP_PATH\";
-                quit" || (echo "✗ Failed to clean up remote backup even with password"; exit 1)
-            }
-          echo "✓ Remote backup cleaned up."
-
-      - name: Disable Maintenance Mode
-        if: success()
-        env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
-        run: |
-          echo "Attempting Disable Maintenance Mode via SSH Key (timeout 60s)..."
-          timeout 60 lftp -u "$FTP_USERNAME," sftp://$FTP_HOST:$SFTP_PORT -e "
-            set sftp:auto-confirm yes;
-            set cmd:fail-exit on;
-            set net:timeout 5; 
-            set net:max-retries 1; 
-            mkdir -p "${{ vars.REMOTE_PATH }}"; cd "${{ vars.REMOTE_PATH }}";
-            rm -f maintenance.html;
-            put public/.htaccess -o .htaccess;
-            quit" || {
-              echo "⚠️ SSH Key failed, falling back to SFTP Password..."
-              timeout 300 lftp -u "$FTP_USERNAME,$FTP_PASSWORD" sftp://$FTP_HOST:$SFTP_PORT -e "
-                set sftp:auto-confirm yes;
-                set cmd:fail-exit on;
-                set net:timeout 10; 
-                set net:max-retries 2; 
-                cd "${{ vars.REMOTE_PATH }}";
-                rm -f maintenance.html;
-                put public/.htaccess -o .htaccess;
-                quit" || (echo "✗ Failed to rollback maintenance mode"; exit 1)
-            }
-          echo "✓ Maintenance mode disabled - Site is live"
+          echo "Automating cleanup of old releases (keeping last 3 for safety)..."
+          ssh -o StrictHostKeyChecking=no -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" "
+            if [ -d \"$PROJECT_ROOT/releases\" ]; then
+              cd \"$PROJECT_ROOT/releases\" && \
+              # List directories by time (oldest first), exclude the last 3, and delete them
+              ls -1tr | head -n -3 | xargs -r rm -rf --
+            else
+              echo 'Releases directory not found, skipping cleanup.'
+            fi
+          "
+          echo "✓ Old releases cleaned up."
