@@ -91,6 +91,15 @@ jobs:
           echo "{\"sha\": \"${{ github.sha }}\"}" > public/version.json
           npm run build
 
+      - name: Verify Inlined Environment Variables
+        run: |
+          echo "🔍 Searching for inlined variables in 'out/' directory..."
+          # Check for Backend URL
+          grep -r "${{ vars.NEXT_PUBLIC_BACKEND_URL }}" out/_next/static/chunks/ || (echo "❌ Error: NEXT_PUBLIC_BACKEND_URL not found in JS chunks!"; exit 1)
+          # Check for App URL
+          grep -r "${{ vars.NEXT_PUBLIC_APP_URL }}" out/_next/static/chunks/ || (echo "❌ Error: NEXT_PUBLIC_APP_URL not found in JS chunks!"; exit 1)
+          echo "✓ Success: Variables found in build output."
+
       - name: Install lftp
         run: |
           sudo apt-get update
