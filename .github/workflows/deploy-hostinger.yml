@@ -122,7 +122,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" "
             cd $PROJECT_ROOT && \
             # Find the path currently pointed to by the symlink
-            CURRENT_VAL=\$(readlink current) && \
+            CURRENT_VAL=\$(readlink -f current | sed \"s|.*/releases/|releases/|\") && \
             # Delete everything in releases except the currently active one
             find releases/* -maxdepth 0 ! -path \"\$CURRENT_VAL\" -exec rm -rf {} +
           "
