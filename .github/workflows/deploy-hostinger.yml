@@ -110,6 +110,24 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
+      - name: Force Reset (Clean Sync)
+        if: github.event.inputs.force_reset == 'true'
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
+          PROJECT_ROOT: ${{ vars.REMOTE_PATH }}
+        run: |
+          echo "⚠️ Zero-Downtime Force Reset requested..."
+          ssh -o StrictHostKeyChecking=no -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" "
+            cd $PROJECT_ROOT && \
+            # Find the path currently pointed to by the symlink
+            CURRENT_VAL=\$(readlink current) && \
+            # Delete everything in releases except the currently active one
+            find releases/* -maxdepth 0 ! -path \"\$CURRENT_VAL\" -exec rm -rf {} +
+          "
+          echo "✓ Non-active releases cleared. Active release preserved for zero-downtime."
+
       - name: Upload Release via lftp
         id: deploy_files
         env:
