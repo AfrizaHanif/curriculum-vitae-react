@@ -118,13 +118,15 @@ jobs:
           SFTP_PORT: 65002
           PROJECT_ROOT: ${{ vars.REMOTE_PATH }}
         run: |
-          echo "⚠️ Zero-Downtime Force Reset requested..."
+          echo "⚠️ Zero-Downtime Force Reset requested: Clearing old releases..."
           ssh -o StrictHostKeyChecking=no -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" "
             cd $PROJECT_ROOT && \
+            mkdir -p releases && \
             # Find the path currently pointed to by the symlink
-            CURRENT_VAL=\$(readlink -f current | sed \"s|.*/releases/|releases/|\") && \
+            CURRENT_VAL=\$(readlink -f current 2>/dev/null | sed \"s|.*/releases/|releases/|\") && \
             # Delete everything in releases except the currently active one
-            find releases/* -maxdepth 0 ! -path \"\$CURRENT_VAL\" -exec rm -rf {} +
+            # Using mindepth 1 on the directory itself prevents globbing errors
+            find releases -mindepth 1 -maxdepth 1 ! -path \"\$CURRENT_VAL\" -exec rm -rf {} +
           "
           echo "✓ Non-active releases cleared. Active release preserved for zero-downtime."
 
