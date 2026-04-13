@@ -1,4 +1,4 @@
-import { AllowedSize } from "@/types/common";
+import { AllowedSize } from "@/types/bootstrap-allowed";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 

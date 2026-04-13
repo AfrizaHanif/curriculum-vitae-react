@@ -1,33 +1,31 @@
+# This folder is managed by the root .htaccess
+
+# Local rules here are kept minimal to prevent redirect loops
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+# Safety net: If the browser hits the /current/ folder directly, push it back to the clean URL
+
+# This handles cases where Apache skips the root .htaccess rules
+
+# 1. Handle index.html cleanup (Root and Nested)
+
+# /current/index.html -> /  AND  /current/resume/index.html -> /resume/
+
+  RewriteCond %{THE_REQUEST} \ /current/index\.html [NC,OR]
+  RewriteCond %{THE_REQUEST} \ /current/(.+)/index\.html [NC]
+  RewriteRule ^ /%1 [R=301,L]
+
+# 2. Handle /current/ (empty) or /current/path -> /path
+
+# We use (\S*) instead of (\S+) to allow matching empty strings after /current/
+
+  RewriteCond %{THE_REQUEST} \ /current/(\S*) [NC]
+  RewriteRule ^ /%1 [R=301,L]
+
   RewriteBase /
 
-# 1. If the request is for an existing file (images, css, etc), serve it
-
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
-
-# 2. If the request is for a path that exists as a .html file, serve that file
-
-# This allows /about to serve about.html internally
-
-RewriteCond %{REQUEST_FILENAME}.html -f [OR]
-RewriteCond %{REQUEST_FILENAME}/index.html -f
-RewriteRule ^(.\*)$ $1.html [NC,L]
-
-# Handle 404 errors using the Next.js 404 page
-
-ErrorDocument 404 /404.html
 </IfModule>
-
-# Optimize caching for static assets
-
-<IfModule mod_headers.c>
-  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
-    Header set Cache-Control "public, max-age=31536000, immutable"
-  </FilesMatch>
-</IfModule>
-
-# Prevent directory listing (fixes 403 if a folder exists without index.html)
-
+DirectoryIndex index.html
 Options -Indexes

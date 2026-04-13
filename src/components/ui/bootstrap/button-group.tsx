@@ -1,4 +1,4 @@
-import { AllowedSizeButton } from "@/types/common";
+import { AllowedSizeButton } from "@/types/bootstrap-allowed";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 

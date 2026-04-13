@@ -13,7 +13,7 @@ import { FeatureProjectItem, ProjectItem } from "@/types/customs/data-type";
 import { featureProjectItems } from "@/lib/data/portfolioData";
 import { resolveAssetUrl } from "@/lib/assets";
 import ProgressBar from "@/components/ui/bootstrap/progress-bar";
-import { AllowedColors } from "@/types/common";
+import { AllowedColors } from "@/types/bootstrap-allowed";
 import { useFetchWithFallback } from "@/hooks/use-fetch-with-fallback";
 import { fetchLaravel } from "@/lib/laravel";
 

@@ -1,4 +1,4 @@
-import { AllowedColorsStatus } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/bootstrap-allowed";
 import clsx from "clsx";
 import Link from "next/link";
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";

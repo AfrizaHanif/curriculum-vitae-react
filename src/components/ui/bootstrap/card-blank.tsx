@@ -1,4 +1,4 @@
-import { AllowedColorsStatus } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/bootstrap-allowed";
 import clsx from "clsx";
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import NextImage from "../next/next-image";

@@ -1,0 +1,67 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+# 1. System & API Exclusions
+
+  RewriteRule ^\.well-known/ - [L]
+  RewriteRule ^(api|staging-api)(/|$) - [L,NC]
+
+# 2. External Canonical Redirects (Browser URL Cleanup)
+
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  
+## A. Handle index.html cleanup (Root and Nested)
+
+### Matches: /current/index.html, /index.html -> /
+
+### Matches: /current/resume/index.html, /resume/index.html -> /resume/
+
+  RewriteCond %{THE_REQUEST} \ /(?:current/)?index\.html [NC,OR]
+  RewriteCond %{THE_REQUEST} \ /(?:current/)?(.+)/index\.html [NC]
+  RewriteRule ^ /%1 [R=301,L]
+
+## B. Remove /current/ prefix
+
+### Changed (\S+) to (\S*) to catch "current/" with nothing after it
+
+  RewriteCond %{THE_REQUEST} \ /current/(\S*) [NC]
+  RewriteRule ^ /%1 [R=301,L]
+
+## C. Force Trailing Slash
+
+  RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{1,5}$
+  RewriteCond %{REQUEST_URI} !/$
+  RewriteRule ^(.+)$ /$1/ [R=301,L]
+
+# 3. Internal Routing (Serve from /current/ symlink)
+
+  RewriteRule ^$ current/index.html [L]
+
+## Serve Static Files
+
+  RewriteCond %{DOCUMENT_ROOT}/current/$1 -f
+  RewriteRule ^(.*)$ current/$1 [L]
+
+## Serve Next.js Pages
+
+  RewriteCond %{DOCUMENT_ROOT}/current/$1.html -f
+  RewriteRule ^(.+?)/?$ current/$1.html [L]
+
+## Serve Directory Indexes
+
+  RewriteCond %{DOCUMENT_ROOT}/current/$1/index.html -f
+  RewriteRule ^(.+?)/?$ current/$1/index.html [L]
+</IfModule>
+
+## Caching and Global Config
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+DirectoryIndex index.html
+ErrorDocument 404 /current/404.html
+Options -Indexes

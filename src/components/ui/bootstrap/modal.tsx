@@ -1,5 +1,5 @@
 import { ModalButtonItem } from "@/types/bootstrap-types";
-import { AllowedSizeModal } from "@/types/common";
+import { AllowedSizeModal } from "@/types/bootstrap-allowed";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 
 type ModalProps = ComponentPropsWithoutRef<"div"> & {

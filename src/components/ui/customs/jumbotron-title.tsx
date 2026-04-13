@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import Jumbotron from "../bootstrap/jumbotron";
-import { AllowedColors } from "@/types/common";
+import { AllowedColors } from "@/types/bootstrap-allowed";
 import Link from "next/link";
 import Button from "../bootstrap/button";
 import NextImage from "../next/next-image";

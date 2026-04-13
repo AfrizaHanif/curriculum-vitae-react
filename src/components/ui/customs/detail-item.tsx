@@ -4,7 +4,7 @@ import { formatDate, formatDateRange } from "@/lib/utils";
 import Dropdown from "../bootstrap/dropdown";
 import ShareButton from "./share-button";
 import { DropdownItem } from "@/types/bootstrap-types";
-import { AllowedColorsStatus } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/bootstrap-allowed";
 import Button from "../bootstrap/button";
 import Link from "next/link";
 

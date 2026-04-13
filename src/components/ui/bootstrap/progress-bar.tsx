@@ -1,4 +1,4 @@
-import { AllowedColors } from "@/types/common";
+import { AllowedColors } from "@/types/bootstrap-allowed";
 import { ComponentPropsWithoutRef, ElementType } from "react";
 
 type ProgressBarProps = ComponentPropsWithoutRef<"div"> & {

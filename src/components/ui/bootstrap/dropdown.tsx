@@ -1,6 +1,9 @@
 import clsx from "clsx";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import type { AllowedColorsStatus, AllowedSizeButton } from "@/types/common";
+import type {
+  AllowedColorsStatus,
+  AllowedSizeButton,
+} from "@/types/bootstrap-allowed";
 import type { DropdownItem } from "../../../types/bootstrap-types";
 import Button from "./button";
 import DropdownItemComponent from "./dropdown-items";

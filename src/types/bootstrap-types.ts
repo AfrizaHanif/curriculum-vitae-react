@@ -1,4 +1,4 @@
-import { AllowedColorsStatus } from "@/types/common";
+import { AllowedColorsStatus } from "@/types/bootstrap-allowed";
 import { ReactNode } from "react";
 
 // Accordion

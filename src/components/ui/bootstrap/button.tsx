@@ -3,7 +3,7 @@ import clsx from "clsx";
 import type {
   AllowedColorsStatus,
   AllowedSizeButton,
-} from "../../../types/common"; // Adjust the import path
+} from "../../../types/bootstrap-allowed"; // Adjust the import path
 
 type BaseButtonProps = {
   dataToggle?:

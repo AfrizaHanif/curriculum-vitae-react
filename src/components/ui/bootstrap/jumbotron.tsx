@@ -10,7 +10,7 @@ import {
 } from "react";
 import { Container } from "react-bootstrap";
 import Image from "next/image";
-import type { AllowedColors } from "@/types/common";
+import type { AllowedColors } from "@/types/bootstrap-allowed";
 import styles from "./jumbotron.module.css";
 import placeholderImage from "../../../assets/images/placeholder/placeholder-image.png";
 
