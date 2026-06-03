@@ -111,6 +111,14 @@ export async function fetchLaravel<T>(
         ...fetchOptions,
         headers,
       });
+
+      if (response.ok && typeof window !== "undefined") {
+        console.log(
+          `%c[Laravel API] Success: ${path}`,
+          "color: #00ff00; font-weight: bold;",
+          { url },
+        );
+      }
       break; // Success, exit loop
     } catch (err) {
       lastError = err;

@@ -67,9 +67,9 @@ export default function RootLayout({
               // Disable console logs and React DevTools in production
               if ("${process.env.NODE_ENV}" === "production") {
                 // Disable console logs
-                console.log = function() {};
-                console.debug = function() {};
-                console.info = function() {};
+                // console.log = function() {};
+                // console.debug = function() {};
+                // console.info = function() {};
 
                 // Disable React DevTools
                 if (typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object') {

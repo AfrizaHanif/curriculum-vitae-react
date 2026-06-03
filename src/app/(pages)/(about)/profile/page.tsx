@@ -35,7 +35,7 @@ export default async function Profile() {
   const [profileResult, skillResult, hobbyResult] = await Promise.all([
     fetchWithFallback<ProfileItem[]>(
       fetchLaravel<ProfileItem[]>("api/profiles", {
-        next: { revalidate: 3600, tags: ["profile"] },
+        next: { revalidate: 0, tags: ["profile"] },
         skipAuth: true,
       }),
       profileItem, // Static Fallback
@@ -44,7 +44,7 @@ export default async function Profile() {
     ),
     fetchWithFallback<SkillItem[]>(
       fetchLaravel<SkillItem[]>("api/skills", {
-        next: { revalidate: 3600, tags: ["skill"] },
+        next: { revalidate: 0, tags: ["skill"] },
         skipAuth: true,
       }),
       skillItems, // Static Fallback
@@ -53,7 +53,7 @@ export default async function Profile() {
     ),
     fetchWithFallback<HobbyItem[]>(
       fetchLaravel<HobbyItem[]>("api/hobbies", {
-        next: { revalidate: 3600, tags: ["hobby"] },
+        next: { revalidate: 0, tags: ["hobby"] },
         skipAuth: true,
       }),
       hobbyItems as unknown as HobbyItem[], // Static Fallback

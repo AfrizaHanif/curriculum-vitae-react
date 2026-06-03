@@ -15,7 +15,7 @@ import { useFetchWithFallback } from "@/hooks/use-fetch-with-fallback";
 export default function Footer() {
   const { data: userProfiles } = useFetchWithFallback<ProfileItem[]>(
     () =>
-      fetchLaravel<ProfileItem[]>("api/profiles", {
+      fetchLaravel<ProfileItem[]>(`api/profiles?t=${new Date().getTime()}`, {
         skipAuth: true,
         retries: 3,
       }),
@@ -26,7 +26,7 @@ export default function Footer() {
   const userProfile = (userProfiles ?? profileItem)[0];
   const { data: socialMedia } = useFetchWithFallback<SocialItem[]>(
     () =>
-      fetchLaravel<SocialItem[]>("api/socials", {
+      fetchLaravel<SocialItem[]>(`api/socials?t=${new Date().getTime()}`, {
         skipAuth: true,
         retries: 3,
       }),

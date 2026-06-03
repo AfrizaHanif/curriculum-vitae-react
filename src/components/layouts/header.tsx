@@ -24,7 +24,8 @@ export default function Header() {
   // Fetch Profile Data (Client-Side with Retry & Fallback)
   const { data: userProfiles } = useFetchWithFallback<ProfileItem[]>(
     () =>
-      fetchLaravel<ProfileItem[]>("api/profiles", {
+      // Adding a timestamp query param to bypass potential CDN/Proxy caches
+      fetchLaravel<ProfileItem[]>(`api/profiles?t=${new Date().getTime()}`, {
         skipAuth: true,
         retries: 3,
       }),
