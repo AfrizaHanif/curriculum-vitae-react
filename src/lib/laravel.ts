@@ -112,12 +112,16 @@ export async function fetchLaravel<T>(
         headers,
       });
 
-      if (response.ok && typeof window !== "undefined") {
-        console.log(
-          `%c[Laravel API] Success: ${path}`,
-          "color: #00ff00; font-weight: bold;",
-          { url },
-        );
+      if (response.ok) {
+        if (!isServer) {
+          console.log(
+            `%c[Laravel API] Success: ${path}`,
+            "color: #00ff00; font-weight: bold;",
+            { url },
+          );
+        } else {
+          console.log(`[Laravel API] Success (Server): ${path}`);
+        }
       }
       break; // Success, exit loop
     } catch (err) {

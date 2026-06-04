@@ -23,6 +23,7 @@ import { fetchLaravel } from "@/lib/laravel";
 import ErrorToast from "@/components/home/error-toast";
 import { normalizeData } from "@/lib/normalize";
 import { resolveAssetUrl } from "@/lib/assets";
+import AgeDisplay from "./age-display";
 
 // Title and Description of Page (Metadata)
 export const metadata: Metadata = {
@@ -81,30 +82,18 @@ export default async function Profile() {
   const fetchErrorMessage =
     profileResult.error || skillResult.error || hobbyResult.error;
 
-  // Birthday and Calculate Age Function
   const birthDate = new Date(userProfile.birthday); // Get data of birthday
-  const today = new Date(); // Get date of today
-  // Change format depend by local of format date
   const formattedBirthday = birthDate.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
-  let age = today.getFullYear() - birthDate.getFullYear(); // Substract between today and birthday's year
-  const monthDifference = today.getMonth() - birthDate.getMonth(); // Substract between today and birthday's month and year
-  // Check if difference abnormal (less than 0)
-  if (
-    monthDifference < 0 ||
-    (monthDifference === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age--; // Calculate if difference not abnormal
-  }
 
   // Details of profile for better formatting
   const profileDetails = {
     "Nama Lengkap": userProfile.fullname,
     "Tanggal Lahir": formattedBirthday,
-    Umur: `${age} tahun`,
+    Umur: <AgeDisplay birthday={userProfile.birthday} />,
     Alamat: `${userProfile.current_city}, ${userProfile.current_province}`,
     Email: userProfile.email,
     Telepon: userProfile.phone,
@@ -118,7 +107,7 @@ export default async function Profile() {
     {
       label: "Buka Resume",
       color: "primary",
-      href: `/resume`,
+      href: "/resume",
     },
   ];
 
