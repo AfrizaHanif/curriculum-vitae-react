@@ -79,11 +79,11 @@ jobs:
       - name: "Diagnostic: Test API Connectivity"
         run: |
           echo "Testing connection to API..."
-          curl -I -m 10 ${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/blogs || echo "⚠️ API is unreachable via curl"
+          curl -Iv -L -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -m 15 ${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/blogs || echo "⚠️ API is unreachable via curl"
           nslookup api.afrizahanif.com || echo "⚠️ DNS resolution failed"
 
       - name: Run Tests
-        run: npm test || echo "No tests specified"
+        run: npm test
 
       - name: Build
         env:

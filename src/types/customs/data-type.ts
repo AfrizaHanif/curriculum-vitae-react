@@ -23,7 +23,6 @@ export interface SkillItem {
   name: string;
   level: string;
   since: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // [key: string]: any;
 }
 
@@ -31,7 +30,6 @@ export interface HobbyItem {
   id: string;
   title: string;
   icon?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // [key: string]: any;
 }
 
@@ -114,7 +112,6 @@ export interface PortfolioItem {
   technology?: string[];
   repository?: string;
   repository_type?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // [key: string]: any;
 }
 
@@ -183,7 +180,6 @@ export interface ProjectItem {
   technology?: string[];
   source_code?: string;
   is_private?: boolean; // NEW
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // [key: string]: any;
 }
 
@@ -207,7 +203,6 @@ export interface BlogItem {
   image?: string;
   content: string;
   is_featured: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // [key: string]: any;
 }
 
