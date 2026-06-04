@@ -105,7 +105,27 @@ jobs:
         run: |
           # Verify actual API Data integrity before building
           echo "Verifying API Data integrity..."
-          PROFILE_CHECK=$(curl -s "${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/profiles")
+          CURL_TIMEOUT=15 # seconds for each curl attempt
+          CURL_RETRIES=3  # number of retries
+          PROFILE_CHECK=""
+
+          for i in $(seq 1 $CURL_RETRIES); do
+            echo "Attempt $i/$CURL_RETRIES: Fetching profile data from ${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/profiles (timeout: ${CURL_TIMEOUT}s)..."
+            # -sS: silent but show errors, -m: max time, -f: fail silently on HTTP errors (4xx/5xx)
+            FETCH_RESULT=$(curl -sS -m $CURL_TIMEOUT -f "${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/profiles")
+            CURL_EXIT_CODE=$?
+            if [ $CURL_EXIT_CODE -eq 0 ]; then
+              PROFILE_CHECK="$FETCH_RESULT"
+              echo "✓ API call successful."
+              break
+            elif [ $CURL_EXIT_CODE -eq 28 ]; then
+              echo "⚠️ Warning: API request timed out. Retrying..."
+            else
+              echo "❌ Error: API request failed with curl exit code $CURL_EXIT_CODE. Retrying..."
+            fi
+            sleep 5 # Wait before retrying
+          done
+
           if echo "$PROFILE_CHECK" | jq -e 'type == "array" and length > 0 and (.[0] | .fullname != null and .email != null)' > /dev/null; then
             echo "✓ API Data verified: Found valid profile for $(echo "$PROFILE_CHECK" | jq -r '.[0].fullname')"
           elif [ "${{ github.event.inputs.strict_api }}" == "true" ]; then
