@@ -31,8 +31,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.9.0" # Next.js requires Node >= 20.9.0
-          cache: "npm"
+          node-version: "20" # Tracks latest Node 20 LTS (must be >= 20.12.0 for styleText)
+          cache: "false" # Disable npm cache to ensure a fresh install
+
+      - name: "Debug: Verify Node.js styleText support"
+        run: |
+          echo "Node version: $(node -v)"
+          node -e 'const util = require("node:util"); console.log("styleText exists in CommonJS:", !!util.styleText);'
+          # Test ESM import as well since Rolldown uses ESM
+          node --input-type=module -e 'import { styleText } from "node:util"; console.log("styleText exists in ESM: " + (typeof styleText === "function"));'
 
       - name: Check Environment Configuration
         run: |
@@ -72,9 +79,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
-      - name: Install dependencies
-        # --prefer-offline uses the ~/.npm cache provided by setup-node@v4
-        run: npm ci --prefer-offline
+      - name: Install dependencies (clean install)
+        run: npm ci
 
       - name: "Diagnostic: Test API Connectivity"
         run: |
