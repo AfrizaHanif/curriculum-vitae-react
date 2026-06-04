@@ -89,7 +89,8 @@ jobs:
       - name: "Diagnostic: Test API Connectivity"
         run: |
           echo "Testing connection to API..."
-          curl -Iv -L -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -m 15 ${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/blogs || echo "⚠️ API is unreachable via curl"
+          BACKEND_URL="${{ vars.NEXT_PUBLIC_BACKEND_URL }}"
+          curl -Iv -L -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -m 15 "${BACKEND_URL%/}/api/blogs" || echo "⚠️ API is unreachable via curl"
           nslookup api.afrizahanif.com || echo "⚠️ DNS resolution failed"
 
       - name: Run Tests
@@ -105,14 +106,15 @@ jobs:
         run: |
           # Verify actual API Data integrity before building
           echo "Verifying API Data integrity..."
+          BACKEND_URL="${{ vars.NEXT_PUBLIC_BACKEND_URL }}"
           CURL_TIMEOUT=15 # seconds for each curl attempt
           CURL_RETRIES=3  # number of retries
           PROFILE_CHECK=""
 
           for i in $(seq 1 $CURL_RETRIES); do
-            echo "Attempt $i/$CURL_RETRIES: Fetching profile data from ${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/profiles (timeout: ${CURL_TIMEOUT}s)..."
+            echo "Attempt $i/$CURL_RETRIES: Fetching profile data from ${BACKEND_URL%/}/api/profiles (timeout: ${CURL_TIMEOUT}s)..."
             # -sS: silent but show errors, -m: max time, -f: fail silently on HTTP errors (4xx/5xx)
-            FETCH_RESULT=$(curl -sS -m $CURL_TIMEOUT -f "${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/profiles")
+            FETCH_RESULT=$(curl -sS -m $CURL_TIMEOUT -f "${BACKEND_URL%/}/api/profiles")
             CURL_EXIT_CODE=$?
             if [ $CURL_EXIT_CODE -eq 0 ]; then
               PROFILE_CHECK="$FETCH_RESULT"
@@ -224,9 +226,10 @@ jobs:
         run: |
           echo "Waiting for Hostinger to complete the pull and verify server response..."
           MAX_RETRIES=12
+          APP_URL="${{ vars.NEXT_PUBLIC_APP_URL }}"
           for i in $(seq 1 $MAX_RETRIES); do
             # Fetch version.json. -f fails on 4xx/5xx errors, -s is silent.
-            RESPONSE=$(curl -s -f -H "X-Maintenance-Bypass: ${{ secrets.MAINTENANCE_BYPASS_TOKEN }}" "${{ vars.NEXT_PUBLIC_APP_URL }}/version.json") || RESPONSE=""
+            RESPONSE=$(curl -s -f -H "X-Maintenance-Bypass: ${{ secrets.MAINTENANCE_BYPASS_TOKEN }}" "${APP_URL%/}/version.json") || RESPONSE=""
             
             # Use jq -e to check if the input is valid JSON and contains the .sha key
             if echo "$RESPONSE" | jq -e .sha >/dev/null 2>&1; then
