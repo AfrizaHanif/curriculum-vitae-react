@@ -102,7 +102,7 @@ export default async function SelectedPost({
     ),
     fetchWithFallback<BlogItem[]>(
       fetchLaravel<BlogItem[]>("api/blogs", {
-        next: { revalidate: 3600, tags: ["blog"] },
+        next: { tags: ["blog"] },
         skipAuth: true,
       }),
       blogItems,

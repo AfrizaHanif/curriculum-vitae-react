@@ -36,28 +36,28 @@ export default async function Profile() {
   const [profileResult, skillResult, hobbyResult] = await Promise.all([
     fetchWithFallback<ProfileItem[]>(
       fetchLaravel<ProfileItem[]>("api/profiles", {
-        next: { revalidate: 0, tags: ["profile"] },
+        next: { tags: ["profile"] },
         skipAuth: true,
       }),
-      profileItem, // Static Fallback
+      profileItem,
       "Gagal memuat data Profil terbaru.", // Error Message
       (data) => Array.isArray(data) && data.length > 0, // Validator
     ),
     fetchWithFallback<SkillItem[]>(
       fetchLaravel<SkillItem[]>("api/skills", {
-        next: { revalidate: 0, tags: ["skill"] },
+        next: { tags: ["skill"] },
         skipAuth: true,
       }),
-      skillItems, // Static Fallback
+      skillItems,
       "Gagal memuat data Skill terbaru.", // Error Message
       (data) => Array.isArray(data) && data.length > 0, // Validator
     ),
     fetchWithFallback<HobbyItem[]>(
       fetchLaravel<HobbyItem[]>("api/hobbies", {
-        next: { revalidate: 0, tags: ["hobby"] },
+        next: { tags: ["hobby"] },
         skipAuth: true,
       }),
-      hobbyItems as unknown as HobbyItem[], // Static Fallback
+      hobbyItems as unknown as HobbyItem[],
       "Gagal memuat data Hobi terbaru.", // Error Message
       (data) => Array.isArray(data) && data.length > 0, // Validator
     ),

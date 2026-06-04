@@ -101,9 +101,13 @@ export async function fetchLaravel<T>(
   // Retry loop for unstable connections
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      // Default to 'no-store' unless revalidate is specified to avoid Next.js warning
+      // Use 'no-store' in dev for freshness.
+      // In production (build time), allow caching so data is baked into static files.
       const cache =
-        fetchOptions.next?.revalidate !== undefined ? undefined : "no-store";
+        fetchOptions.next?.revalidate !== undefined ||
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : "no-store";
 
       response = await fetch(url, {
         credentials: "include", // Ensure cookies are sent on client-side requests

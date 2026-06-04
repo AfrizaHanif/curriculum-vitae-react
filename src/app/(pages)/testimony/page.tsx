@@ -25,7 +25,7 @@ export default async function Testimony() {
   const [testimonyResult] = await Promise.all([
     fetchWithFallback<TestimonyItem[]>(
       fetchLaravel<TestimonyItem[]>("api/testimonies", {
-        next: { revalidate: 3600, tags: ["profile"] },
+        next: { tags: ["profile"] },
         skipAuth: true,
       }),
       testimonyItems, // Static Fallback

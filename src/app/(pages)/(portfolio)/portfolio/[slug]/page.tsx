@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const [portfolioResult] = await Promise.all([
     fetchWithFallback<PortfolioItem>(
       fetchLaravel<PortfolioItem>(`api/portfolios/${slug}`, {
-        next: { revalidate: 3600, tags: ["portfolio", `portfolio-${slug}`] },
+        next: { tags: ["portfolio", `portfolio-${slug}`] },
         skipAuth: true,
       }),
       portfolioItems.find(
@@ -89,7 +89,7 @@ export default async function SelectedPortfolio({
   ] = await Promise.all([
     fetchWithFallback<PortfolioItem>(
       fetchLaravel<PortfolioItem>(`api/portfolios/${slug}`, {
-        next: { revalidate: 3600, tags: ["portfolio", `portfolio-${slug}`] },
+        next: { tags: ["portfolio", `portfolio-${slug}`] },
         skipAuth: true,
       }),
       portfolioItems.find(
@@ -100,7 +100,7 @@ export default async function SelectedPortfolio({
     ),
     fetchWithFallback<PortfolioItem[]>(
       fetchLaravel<PortfolioItem[]>("api/portfolios", {
-        next: { revalidate: 3600, tags: ["portfolio"] },
+        next: { tags: ["portfolio"] },
         skipAuth: true,
       }),
       portfolioItems,
@@ -110,7 +110,7 @@ export default async function SelectedPortfolio({
     // Fetch Related Repositories
     fetchWithFallback<RepositoryItem[]>(
       fetchLaravel<RepositoryItem[]>("api/repositories", {
-        next: { revalidate: 3600, tags: ["repository"] },
+        next: { tags: ["repository"] },
         skipAuth: true,
       }),
       repositoryItems,
@@ -120,7 +120,7 @@ export default async function SelectedPortfolio({
     // Fetch Related Features
     fetchWithFallback<FeatureItem[]>(
       fetchLaravel<FeatureItem[]>("api/features", {
-        next: { revalidate: 3600, tags: ["feature"] },
+        next: { tags: ["feature"] },
         skipAuth: true,
       }),
       featureItems,
@@ -130,7 +130,7 @@ export default async function SelectedPortfolio({
     // Fetch Related Case Studies
     fetchWithFallback<CaseStudyItem[]>(
       fetchLaravel<CaseStudyItem[]>("api/case-studies", {
-        next: { revalidate: 3600, tags: ["case-study"] },
+        next: { tags: ["case-study"] },
         skipAuth: true,
       }),
       caseStudyItems,

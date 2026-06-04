@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const [portfolioResult] = await Promise.all([
     fetchWithFallback<PortfolioItem>(
       fetchLaravel<PortfolioItem>(`api/portfolios/${slug}`, {
-        next: { revalidate: 3600, tags: ["portfolio", `portfolio-${slug}`] },
+        next: { tags: ["portfolio", `portfolio-${slug}`] },
         skipAuth: true,
       }),
       portfolioItems.find(
@@ -118,7 +118,7 @@ export default async function CaseStudy({
       ),
       fetchWithFallback<CaseStudyItem[]>(
         fetchLaravel<CaseStudyItem[]>("api/case-studies", {
-          next: { revalidate: 3600, tags: ["case-study"] },
+          next: { tags: ["case-study"] },
           skipAuth: true,
         }),
         caseStudyItems,
@@ -127,7 +127,7 @@ export default async function CaseStudy({
       ),
       fetchWithFallback<DiagramCSItem[]>(
         fetchLaravel<DiagramCSItem[]>("api/diagrams", {
-          next: { revalidate: 3600, tags: ["diagram"] },
+          next: { tags: ["diagram"] },
           skipAuth: true,
         }),
         diagramCSItems,
@@ -136,7 +136,7 @@ export default async function CaseStudy({
       ),
       fetchWithFallback<SolutionCSItem[]>(
         fetchLaravel<SolutionCSItem[]>("api/solutions", {
-          next: { revalidate: 3600, tags: ["solution"] },
+          next: { tags: ["solution"] },
           skipAuth: true,
         }),
         solutionCSItems,
@@ -174,7 +174,7 @@ export default async function CaseStudy({
   const diagram = diagramResult.data.find(
     (d) => d.case_study_id === caseStudy.id,
   );
-  const solution = (solutionResult.data).filter(
+  const solution = solutionResult.data.filter(
     (s) => s.case_study_id === caseStudy.id,
   );
 

@@ -15,7 +15,7 @@ export default async function Portfolio() {
   const [portfolioResult] = await Promise.all([
     fetchWithFallback<PortfolioItem[]>(
       fetchLaravel<PortfolioItem[]>("api/portfolios", {
-        next: { revalidate: 3600, tags: ["portfolio"] },
+        next: { tags: ["portfolio"] },
         skipAuth: true,
       }),
       portfolioItems, // Static Fallback

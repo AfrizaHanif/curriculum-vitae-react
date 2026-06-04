@@ -32,7 +32,7 @@ export default async function Expertise() {
   const [expertiseResult] = await Promise.all([
     fetchWithFallback<ExpertiseItem[]>(
       fetchLaravel<ExpertiseItem[]>("api/expertises", {
-        next: { revalidate: 3600, tags: ["profile"] },
+        next: { tags: ["profile"] },
         skipAuth: true,
       }),
       expertiseItems, // Static Fallback

@@ -24,7 +24,7 @@ export default async function Resume() {
   const [certResult, eduResult, expResult, profileResult] = await Promise.all([
     fetchWithFallback<CertificateItem[]>(
       fetchLaravel<CertificateItem[]>("api/certificates", {
-        next: { revalidate: 3600, tags: ["certificate"] },
+        next: { tags: ["certificate"] },
         skipAuth: true,
       }),
       certificateItems,
@@ -33,7 +33,7 @@ export default async function Resume() {
     ),
     fetchWithFallback<EducationItem[]>(
       fetchLaravel<EducationItem[]>("api/educations", {
-        next: { revalidate: 3600, tags: ["education"] },
+        next: { tags: ["education"] },
         skipAuth: true,
       }),
       educationItems,
@@ -42,7 +42,7 @@ export default async function Resume() {
     ),
     fetchWithFallback<ExperienceItem[]>(
       fetchLaravel<ExperienceItem[]>("api/experiences", {
-        next: { revalidate: 3600, tags: ["experience"] },
+        next: { tags: ["experience"] },
         skipAuth: true,
       }),
       experienceItems,
@@ -51,7 +51,7 @@ export default async function Resume() {
     ),
     fetchWithFallback<ProfileItem[]>(
       fetchLaravel<ProfileItem[]>("api/profiles", {
-        next: { revalidate: 3600, tags: ["profile"] },
+        next: { tags: ["profile"] },
         skipAuth: true,
       }),
       profileItem,

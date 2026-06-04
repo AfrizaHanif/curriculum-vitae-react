@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const [projectResult] = await Promise.all([
     fetchWithFallback<ProjectItem>(
       fetchLaravel<ProjectItem>(`api/projects/${slug}`, {
-        next: { revalidate: 3600, tags: ["project", `project-${slug}`] },
+        next: { tags: ["project", `project-${slug}`] },
         skipAuth: true,
       }),
       projectItems.find(
@@ -105,7 +105,7 @@ export default async function SelectedProject({
     ),
     fetchWithFallback<ProjectItem[]>(
       fetchLaravel<ProjectItem[]>("api/projects", {
-        next: { revalidate: 3600, tags: ["project"] },
+        next: { tags: ["project"] },
         skipAuth: true,
       }),
       projectItems,
@@ -114,7 +114,7 @@ export default async function SelectedProject({
     ),
     fetchWithFallback<FeatureProjectItem[]>(
       fetchLaravel<FeatureProjectItem[]>("api/feature-projects", {
-        next: { revalidate: 3600, tags: ["feature-project"] },
+        next: { tags: ["feature-project"] },
         skipAuth: true,
       }),
       featureProjectItems,

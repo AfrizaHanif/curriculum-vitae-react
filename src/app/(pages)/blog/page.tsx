@@ -17,7 +17,7 @@ export default async function Blog() {
   const [blogResult] = await Promise.all([
     fetchWithFallback<BlogItem[]>(
       fetchLaravel<BlogItem[]>("api/blogs", {
-        next: { revalidate: 3600, tags: ["blog"] },
+        next: { tags: ["blog"] },
         skipAuth: true,
       }),
       blogItems, // Static Fallback

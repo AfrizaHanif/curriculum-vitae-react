@@ -13,6 +13,11 @@ on:
         required: true
         type: boolean
         default: false
+      strict_api:
+        description: "Strict API Mode? (Fail build if API data is missing/invalid, avoids fallback data)"
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   build-and-deploy:
@@ -96,7 +101,18 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
           NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_STRICT_API: ${{ github.event.inputs.strict_api }}
         run: |
+          # Verify actual API Data integrity before building
+          echo "Verifying API Data integrity..."
+          PROFILE_CHECK=$(curl -s "${{ vars.NEXT_PUBLIC_BACKEND_URL }}/api/profiles")
+          if echo "$PROFILE_CHECK" | jq -e 'type == "array" and length > 0 and (.[0] | .fullname != null and .email != null)' > /dev/null; then
+            echo "✓ API Data verified: Found valid profile for $(echo "$PROFILE_CHECK" | jq -r '.[0].fullname')"
+          elif [ "${{ github.event.inputs.strict_api }}" == "true" ]; then
+            echo "❌ Error: API Data invalid and strict_api is enabled. Aborting build."
+            exit 1
+          fi
+
           # Generate version file to track which commit is live
           echo "{\"sha\": \"${{ github.sha }}\"}" > public/version.json
           npm run build

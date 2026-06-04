@@ -36,11 +36,19 @@ export async function fetchWithFallback<T>(
 
     // Run custom validator if provided (e.g., ensure array is not empty)
     if (validator && !validator(data)) {
-      throw new Error("Validation failed for fetched data");
+      //
+      throw new Error("Data validation failed for fetched data.");
     }
 
     return { data };
   } catch (err) {
+    const isStrictApiMode = process.env.NEXT_PUBLIC_STRICT_API === "true";
+
+    if (isStrictApiMode) {
+      console.error(`[Strict API Mode] Fetch failed for: ${errorMessage}`, err);
+      throw err; // Re-throw the error to fail the build/request in strict mode
+    }
+
     if (isDev) {
       console.warn(`Fetch failed (${errorMessage}). Using fallback.`);
       console.error(err);

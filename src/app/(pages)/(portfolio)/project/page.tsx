@@ -15,7 +15,7 @@ export default async function Project() {
   const [projectResult] = await Promise.all([
     fetchWithFallback<ProjectItem[]>(
       fetchLaravel<ProjectItem[]>("api/projects", {
-        next: { revalidate: 3600, tags: ["project"] },
+        next: { tags: ["project"] },
         skipAuth: true,
       }),
       projectItems, // Static Fallback

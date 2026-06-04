@@ -22,7 +22,7 @@ export default async function Contact() {
   const [profileResult, socialResult] = await Promise.all([
     fetchWithFallback<ProfileItem[]>(
       fetchLaravel<ProfileItem[]>("api/profiles", {
-        next: { revalidate: 3600, tags: ["profile"] },
+        next: { tags: ["profile"] },
         skipAuth: true,
       }),
       profileItem, // Static Fallback
@@ -31,7 +31,7 @@ export default async function Contact() {
     ),
     fetchWithFallback<SocialItem[]>(
       fetchLaravel<SocialItem[]>("api/socials", {
-        next: { revalidate: 3600, tags: ["social"] },
+        next: { tags: ["social"] },
         skipAuth: true,
       }),
       socialItems, // Static Fallback

@@ -24,7 +24,7 @@ export default async function Setup() {
   const [setupResult] = await Promise.all([
     fetchWithFallback<SetupItem[]>(
       fetchLaravel<SetupItem[]>("api/setups", {
-        next: { revalidate: 3600, tags: ["setup"] },
+        next: { tags: ["setup"] },
         skipAuth: true,
       }),
       setupItems, // Static Fallback

@@ -24,7 +24,7 @@ export default async function Home() {
   const [profileResult, portfolioResult] = await Promise.all([
     fetchWithFallback<ProfileItem[]>(
       fetchLaravel<ProfileItem[]>("api/profiles", {
-        next: { revalidate: 3600, tags: ["profile"] },
+        next: { tags: ["profile"] },
         skipAuth: true,
       }),
       profileItem, // Static Fallback
@@ -33,7 +33,7 @@ export default async function Home() {
     ),
     fetchWithFallback<PortfolioItem[]>(
       fetchLaravel<PortfolioItem[]>("api/portfolios", {
-        next: { revalidate: 3600, tags: ["portfolio"] },
+        next: { tags: ["portfolio"] },
         skipAuth: true,
       }),
       portfolioItems, // Static Fallback
