@@ -32,7 +32,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20" # Tracks latest Node 20 LTS (must be >= 20.12.0 for styleText)
-          cache: "false" # Disable npm cache to ensure a fresh install
 
       - name: "Debug: Verify Node.js styleText support"
         run: |
