@@ -44,29 +44,6 @@ jobs:
         with:
           node-version: "20" # Tracks latest Node 20 LTS (must be >= 20.12.0 for styleText)
 
-      - name: "Debug: Verify Node.js styleText support"
-        run: |
-          echo "Node version: $(node -v)"
-          node -e 'const util = require("node:util"); console.log("styleText exists in CommonJS:", !!util.styleText);'
-          # Test ESM import as well since Rolldown uses ESM
-          node --input-type=module -e 'import { styleText } from "node:util"; console.log("styleText exists in ESM: " + (typeof styleText === "function"));'
-
-      - name: Check Environment Configuration
-        run: |
-          echo "Deploying to: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && 'production' || 'staging' }}"
-          echo "Checking Variables (Publicly visible in logs if repo is public):"
-          [ -n "${{ vars.NEXT_PUBLIC_BACKEND_URL }}" ] && echo "  ✓ NEXT_PUBLIC_BACKEND_URL is set" || echo "  ✗ NEXT_PUBLIC_BACKEND_URL is MISSING"
-          [ -n "${{ vars.NEXT_PUBLIC_APP_URL }}" ] && echo "  ✓ NEXT_PUBLIC_APP_URL is set" || echo "  ✗ NEXT_PUBLIC_APP_URL is MISSING"
-          [ -n "${{ vars.REMOTE_PATH }}" ] && echo "  ✓ REMOTE_PATH is set" || echo "  ✗ REMOTE_PATH is MISSING"
-
-          echo "Checking Secrets (Confirmation only, no values printed):"
-          [ -n "${{ secrets.FTP_HOST }}" ] && echo "  ✓ FTP_HOST is loaded" || echo "  ✗ FTP_HOST is MISSING"
-          [ -n "${{ secrets.SSH_PRIVATE_KEY }}" ] && echo "  ✓ SSH_PRIVATE_KEY is loaded" || echo "  ✗ SSH_PRIVATE_KEY is MISSING"
-          [ -n "${{ secrets.FTP_PASSWORD }}" ] && echo "  ✓ FTP_PASSWORD is loaded" || echo "  ✗ FTP_PASSWORD is MISSING"
-          [ -n "${{ secrets.FTP_USERNAME }}" ] && echo "  ✓ FTP_USERNAME is loaded" || echo "  ✗ FTP_USERNAME is MISSING"
-          [ -n "${{ secrets.SSH_HOST_KEY }}" ] && echo "  ✓ SSH_HOST_KEY is loaded" || echo "  ✗ SSH_HOST_KEY is MISSING"
-          [ -n "${{ secrets.MAINTENANCE_BYPASS_TOKEN }}" ] && echo "  ✓ MAINTENANCE_BYPASS_TOKEN is loaded" || echo "  ✗ MAINTENANCE_BYPASS_TOKEN is MISSING"
-
       - name: Setup SSH Keys
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -91,21 +68,6 @@ jobs:
           echo "Certificate Details:"
           echo | openssl s_client -connect "${DOMAIN}:443" -servername "${DOMAIN}" 2>/dev/null | openssl x509 -noout -dates -issuer
 
-      - name: "Diagnostic: Inspect Server .htaccess"
-        env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          SFTP_PORT: 65002
-          PROJECT_ROOT: ${{ vars.REMOTE_PATH }}
-        run: |
-          echo "Fetching .htaccess files from $PROJECT_ROOT..."
-          ssh -o StrictHostKeyChecking=no -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" "
-            echo '--- Root .htaccess ---'
-            [ -f .htaccess ] && cat .htaccess || echo 'No root .htaccess found'
-            echo '--- Project Root .htaccess ---'
-            [ -f $PROJECT_ROOT/.htaccess ] && cat $PROJECT_ROOT/.htaccess || echo 'No project .htaccess found'
-          "
-
       - name: Cache Next.js build cache
         uses: actions/cache@v4
         with:
@@ -128,8 +90,8 @@ jobs:
           CURL_BASE_URL=$(echo "${BACKEND_URL}" | sed -E 's/^(http|https):\/\///')
           # Note the trailing slash before the query parameter to avoid 301 redirects
           CURL_TARGET_URL="https://${CURL_BASE_URL%/}/api/blogs/?cb=$(date +%s)"
-          # Added cache-busting headers and a timestamp query parameter to bypass Hostinger's edge cache (prevents stale 301 redirects)
-          curl -Iv -L \
+          # Head request only (-I), silent mode (-s) to avoid leaking server headers in public logs
+          curl -sI -L \
             -H "Cache-Control: no-cache" \
             -H "Pragma: no-cache" \
             -H "X-Maintenance-Bypass: $MAINTENANCE_BYPASS_TOKEN" \
@@ -182,7 +144,7 @@ jobs:
           done
 
           if echo "$PROFILE_CHECK" | jq -e 'type == "array" and length > 0 and (.[0] | .fullname != null and .email != null)' > /dev/null; then
-            echo "✓ API Data verified: Found valid profile for $(echo "$PROFILE_CHECK" | jq -r '.[0].fullname')"
+            echo "✓ API Data integrity verified."
           elif [ "${{ github.event.inputs.strict_api }}" == "true" ]; then
             echo "❌ Error: API Data invalid and strict_api is enabled. Aborting build."
             exit 1
