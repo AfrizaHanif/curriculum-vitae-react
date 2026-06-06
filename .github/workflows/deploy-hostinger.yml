@@ -1,8 +1,14 @@
 name: Build & Deploy to Hostinger
+run-name: "🚀 ${{ github.event.inputs.deployment_message || github.ref_name }} (@${{ github.actor }})"
 
 on:
   workflow_dispatch: # Allows manual triggering of the workflow
     inputs:
+      deployment_message:
+        description: "Optional message to include in deployment logs (e.g., 'Deploying new features' or 'Hotfix for issue #123')"
+        required: true
+        type: string
+        default: ""
       confirm_deployment:
         description: "Confirm deployment to Hostinger (This will put the site in maintenance mode temporarily)."
         required: true
