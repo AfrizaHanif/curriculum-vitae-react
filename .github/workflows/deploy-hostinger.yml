@@ -93,10 +93,18 @@ jobs:
         run: npm ci
 
       - name: "Diagnostic: Test API Connectivity"
+        env:
+          MAINTENANCE_BYPASS_TOKEN: ${{ secrets.MAINTENANCE_BYPASS_TOKEN }}
         run: |
           echo "Testing connection to API..."
           BACKEND_URL="${{ vars.NEXT_PUBLIC_BACKEND_URL }}"
-          curl -Iv -L -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -m 15 "${BACKEND_URL%/}/api/blogs" || echo "⚠️ API is unreachable via curl"
+          # Added cache-busting headers and a timestamp query parameter to bypass Hostinger's edge cache (prevents stale 301 redirects)
+          curl -Iv -L \
+            -H "Cache-Control: no-cache" \
+            -H "Pragma: no-cache" \
+            -H "X-Maintenance-Bypass: $MAINTENANCE_BYPASS_TOKEN" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            -m 15 "${BACKEND_URL%/}/api/blogs/?cb=$(date +%s)" || echo "⚠️ API is unreachable via curl"
           nslookup api.afrizahanif.com || echo "⚠️ DNS resolution failed"
 
       - name: Run Tests
@@ -109,6 +117,7 @@ jobs:
           NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_STRICT_API: ${{ github.event.inputs.strict_api }}
+          MAINTENANCE_BYPASS_TOKEN: ${{ secrets.MAINTENANCE_BYPASS_TOKEN }}
         run: |
           # Verify actual API Data integrity before building
           echo "Verifying API Data integrity..."
@@ -119,8 +128,12 @@ jobs:
 
           for i in $(seq 1 $CURL_RETRIES); do
             echo "Attempt $i/$CURL_RETRIES: Fetching profile data from ${BACKEND_URL%/}/api/profiles (timeout: ${CURL_TIMEOUT}s)..."
-            # -sS: silent but show errors, -m: max time, -f: fail silently on HTTP errors (4xx/5xx)
-            FETCH_RESULT=$(curl -sS -m $CURL_TIMEOUT -f "${BACKEND_URL%/}/api/profiles")
+            # Force fresh data with trailing slash to avoid 301 redirects and bypass edge cache
+            FETCH_RESULT=$(curl -sS -L -m $CURL_TIMEOUT -f \
+              -H "Cache-Control: no-cache" \
+              -H "Pragma: no-cache" \
+              -H "X-Maintenance-Bypass: $MAINTENANCE_BYPASS_TOKEN" \
+              "${BACKEND_URL%/}/api/profiles/?cb=$(date +%s)")
             CURL_EXIT_CODE=$?
             if [ $CURL_EXIT_CODE -eq 0 ]; then
               PROFILE_CHECK="$FETCH_RESULT"
