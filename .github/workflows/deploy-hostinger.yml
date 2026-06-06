@@ -136,7 +136,7 @@ jobs:
           fi
 
           # Generate version file to track which commit is live
-          echo "{\"sha\": \"${{ github.sha }}\"}" > public/version.json
+          echo "{\"sha\": \"${{ github.sha }}\", \"buildTime\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"}" > public/version.json
           npm run build
 
       - name: Verify Inlined Environment Variables
@@ -242,7 +242,26 @@ jobs:
             
             if [ "$REMOTE_SHA" == "${{ github.sha }}" ]; then
               echo "✓ Deployment verified! Remote SHA matches: $REMOTE_SHA"
-              exit 0
+
+              # Verify buildTime is recent (within 30 minutes)
+              REMOTE_TIME=$(echo "$RESPONSE" | jq -r '.buildTime')
+              if [ "$REMOTE_TIME" != "null" ]; then
+                BUILD_TS=$(date -d "$REMOTE_TIME" +%s)
+                NOW_TS=$(date -u +%s)
+                DIFF=$((NOW_TS - BUILD_TS))
+                THRESHOLD=1800 # 30 minutes in seconds
+                
+                if [ "$DIFF" -lt 0 ]; then
+                  echo "❌ Error: buildTime is in the future ($(( -DIFF )) seconds ahead). This indicates clock skew between the runner and the server or a time-sync issue. Failing."
+                  exit 1
+                elif [ "$DIFF" -le "$THRESHOLD" ]; then
+                  echo "✓ Build time verified! Build is $DIFF seconds old."
+                  exit 0
+                else
+                  echo "❌ Error: SHA matches but buildTime is too old ($DIFF seconds ago). This indicates a stale cache or failed file update. Failing immediately."
+                  exit 1
+                fi
+              fi
             fi
             echo "Attempt $i/$MAX_RETRIES: Expected SHA ${{ github.sha }} but got '$REMOTE_SHA'. Retrying in 5s..."
             sleep 5
