@@ -80,6 +80,32 @@ jobs:
           echo "$SSH_HOST_KEY" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
+      - name: "Diagnostic: Validate SSL Certificate"
+        run: |
+          BACKEND_URL="${{ vars.NEXT_PUBLIC_BACKEND_URL }}"
+          DOMAIN=$(echo "${BACKEND_URL}" | sed -E 's/^(http|https):\/\///' | sed 's/\/.*//')
+          echo "Checking SSL for $DOMAIN..."
+          # Check if the certificate is valid and not expired
+          openssl s_client -connect "${DOMAIN}:443" -servername "${DOMAIN}" -verify_return_error -quiet </dev/null || { echo "❌ SSL Certificate Validation Failed"; exit 1; }
+          # Print expiry date for logs
+          echo "Certificate Details:"
+          echo | openssl s_client -connect "${DOMAIN}:443" -servername "${DOMAIN}" 2>/dev/null | openssl x509 -noout -dates -issuer
+
+      - name: "Diagnostic: Inspect Server .htaccess"
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          SFTP_PORT: 65002
+          PROJECT_ROOT: ${{ vars.REMOTE_PATH }}
+        run: |
+          echo "Fetching .htaccess files from $PROJECT_ROOT..."
+          ssh -o StrictHostKeyChecking=no -p "$SFTP_PORT" "$FTP_USERNAME@$FTP_HOST" "
+            echo '--- Root .htaccess ---'
+            [ -f .htaccess ] && cat .htaccess || echo 'No root .htaccess found'
+            echo '--- Project Root .htaccess ---'
+            [ -f $PROJECT_ROOT/.htaccess ] && cat $PROJECT_ROOT/.htaccess || echo 'No project .htaccess found'
+          "
+
       - name: Cache Next.js build cache
         uses: actions/cache@v4
         with:
@@ -98,13 +124,17 @@ jobs:
         run: |
           echo "Testing connection to API..."
           BACKEND_URL="${{ vars.NEXT_PUBLIC_BACKEND_URL }}"
+          # Ensure the URL is always HTTPS for curl, stripping any existing scheme
+          CURL_BASE_URL=$(echo "${BACKEND_URL}" | sed -E 's/^(http|https):\/\///')
+          # Note the trailing slash before the query parameter to avoid 301 redirects
+          CURL_TARGET_URL="https://${CURL_BASE_URL%/}/api/blogs/?cb=$(date +%s)"
           # Added cache-busting headers and a timestamp query parameter to bypass Hostinger's edge cache (prevents stale 301 redirects)
           curl -Iv -L \
             -H "Cache-Control: no-cache" \
             -H "Pragma: no-cache" \
             -H "X-Maintenance-Bypass: $MAINTENANCE_BYPASS_TOKEN" \
             -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-            -m 15 "${BACKEND_URL%/}/api/blogs/?cb=$(date +%s)" || echo "⚠️ API is unreachable via curl"
+            -m 15 "$CURL_TARGET_URL" || echo "⚠️ API is unreachable via curl"
           nslookup api.afrizahanif.com || echo "⚠️ DNS resolution failed"
 
       - name: Run Tests
@@ -125,15 +155,19 @@ jobs:
           CURL_TIMEOUT=15 # seconds for each curl attempt
           CURL_RETRIES=3  # number of retries
           PROFILE_CHECK=""
+          # Ensure the URL is always HTTPS for curl, stripping any existing scheme
+          CURL_BASE_URL=$(echo "${BACKEND_URL}" | sed -E 's/^(http|https):\/\///')
+          # Added trailing slash before '?' to satisfy Hostinger's directory requirements
+          CURL_TARGET_URL="https://${CURL_BASE_URL%/}/api/profiles/?cb=$(date +%s)"
 
           for i in $(seq 1 $CURL_RETRIES); do
-            echo "Attempt $i/$CURL_RETRIES: Fetching profile data from ${BACKEND_URL%/}/api/profiles (timeout: ${CURL_TIMEOUT}s)..."
+            echo "Attempt $i/$CURL_RETRIES: Fetching profile data from $CURL_TARGET_URL (timeout: ${CURL_TIMEOUT}s)..."
             # Force fresh data with trailing slash to avoid 301 redirects and bypass edge cache
             FETCH_RESULT=$(curl -sS -L -m $CURL_TIMEOUT -f \
               -H "Cache-Control: no-cache" \
               -H "Pragma: no-cache" \
               -H "X-Maintenance-Bypass: $MAINTENANCE_BYPASS_TOKEN" \
-              "${BACKEND_URL%/}/api/profiles/?cb=$(date +%s)")
+              "$CURL_TARGET_URL")
             CURL_EXIT_CODE=$?
             if [ $CURL_EXIT_CODE -eq 0 ]; then
               PROFILE_CHECK="$FETCH_RESULT"
