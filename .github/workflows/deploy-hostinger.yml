@@ -24,10 +24,15 @@ on:
         required: true
         type: boolean
         default: false
+      dry_run:
+        description: "Dry Run? (Build and test, but DO NOT upload or change files on the server)"
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   build-and-deploy:
-    if: github.event.inputs.confirm_deployment == 'true' # Only run if confirmation is true
+    if: github.event.inputs.confirm_deployment == 'true' || github.event.inputs.dry_run == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -169,7 +174,7 @@ jobs:
           sudo apt-get install -y lftp
 
       - name: Force Reset (Clean Sync)
-        if: github.event.inputs.force_reset == 'true'
+        if: github.event.inputs.force_reset == 'true' && github.event.inputs.dry_run != 'true'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
@@ -189,6 +194,7 @@ jobs:
           echo "✓ Non-active releases cleared. Active release preserved for zero-downtime."
 
       - name: Upload Release via lftp
+        if: github.event.inputs.dry_run != 'true'
         id: deploy_files
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -219,6 +225,7 @@ jobs:
           echo "✓ Files uploaded to release folder"
 
       - name: Atomic Switch (Update Symlink)
+        if: github.event.inputs.dry_run != 'true'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
@@ -237,6 +244,7 @@ jobs:
           echo "✓ Atomic switch complete: 'current' now points to release $RELEASE_ID"
 
       - name: Verify Deployment (Smoke Test)
+        if: github.event.inputs.dry_run != 'true'
         id: smoke_test
         run: |
           echo "Waiting for Hostinger to complete the pull and verify server response..."
@@ -285,7 +293,7 @@ jobs:
           exit 1
 
       - name: Rollback on Failure
-        if: failure() && steps.deploy_files.outcome == 'success'
+        if: failure() && steps.deploy_files.outcome == 'success' && github.event.inputs.dry_run != 'true'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
@@ -304,7 +312,7 @@ jobs:
           "
 
       - name: Clean Up Old Releases
-        if: success()
+        if: success() && github.event.inputs.dry_run != 'true'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
