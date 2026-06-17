@@ -9,6 +9,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import NextTopLoader from "nextjs-toploader";
 import GoogleAnalytics from "@/components/google-analytics";
 import InitialLoader from "@/components/initial-loader";
+import { fetchLaravel } from "@/lib/laravel";
 import siteConfig from "../../public/site-config.json";
 
 // Title and Description of Page (Metadata)
@@ -36,11 +37,31 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Visitor Count Trigger
+  // We check if it's production OR if we are explicitly targeting a local API for testing
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // Replace 'NEXT_PUBLIC_API_URL' with your actual env variable name used for Laravel
+  const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+  const isLocalApi =
+    apiUrl.includes("localhost") ||
+    apiUrl.includes("127.0.0.1") ||
+    apiUrl.includes("192.168.");
+
+  if (isProduction || (isLocalApi && process.env.NODE_ENV === "development")) {
+    // We trigger the API without awaiting to avoid blocking the initial page render.
+    // Adjust the endpoint path to match your Laravel route.
+    fetchLaravel("api/visitors", {
+      method: "POST",
+      skipAuth: true,
+    }).catch((err) => console.error("Visitor count failed:", err));
+  }
+
   return (
     <html
       lang="id"
