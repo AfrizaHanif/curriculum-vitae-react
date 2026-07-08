@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { ValidationError } from "@formspree/react";
@@ -11,15 +10,22 @@ import FormSelect from "@/components/ui/form/form-select";
 import { CheckItem, SelectItem } from "@/types/bootstrap-types";
 import FormCheck from "@/components/ui/form/form-check";
 import Toast from "@/components/ui/bootstrap/toast";
+import { SubmissionError } from "@formspree/core";
 
 interface Props {
   siteKey: string;
   formId: string;
 }
 
+interface FormspreeServerError {
+  code?: string;
+  field?: string;
+  message: string;
+}
+
 export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
   // const [state, handleSubmit] = useForm(formId);
-  const [serverErrors, setServerErrors] = useState<any>(null);
+  const [serverErrors, setServerErrors] = useState<SubmissionError | null>(null);
   const [recaptchaToken, setRecaptchaToken] = useState<string>("");
   const [messageLength, setMessageLength] = useState<number>(0);
   const [showToast, setShowToast] = useState<boolean>(false);
@@ -32,8 +38,8 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
     isLoading,
     submit,
     reset: resetSubmission,
-  } = useFormSubmission(
-    async (data: any) => {
+  } = useFormSubmission<unknown, Record<string, FormDataEntryValue>>(
+    async (data) => {
       const response = await fetch(`https://formspree.io/f/${formId}`, {
         method: "POST",
         body: JSON.stringify(data),
@@ -53,9 +59,10 @@ export default function ContactFormWithFormspree({ siteKey, formId }: Props) {
         setShowToast(true);
         handleReset();
       },
-      onError: (err: any) => {
-        if (err && err.errors) {
-          setServerErrors(err.errors);
+      onError: (err: unknown) => {
+        if (err && typeof err === "object" && "errors" in err) {
+          const errorPayload = err as { errors: FormspreeServerError[] };
+          setServerErrors(new SubmissionError(...(errorPayload.errors as unknown as ConstructorParameters<typeof SubmissionError>)));
         }
       },
     },

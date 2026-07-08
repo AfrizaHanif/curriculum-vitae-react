@@ -49,8 +49,7 @@ interface SortConfig<T> {
   nullPrimaryDateValue?: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function sortItems<T extends Record<string, any>>(
+export function sortItems<T>(
   items: readonly T[],
   config: SortConfig<T>,
 ): T[] {
@@ -73,16 +72,16 @@ export function sortItems<T extends Record<string, any>>(
 
     // Date sorting
     const valA = a[primaryDateKey]
-      ? new Date(a[primaryDateKey]).getTime()
+      ? new Date(a[primaryDateKey] as string | number | Date).getTime()
       : nullPrimaryDateValue;
     const valB = b[primaryDateKey]
-      ? new Date(b[primaryDateKey]).getTime()
+      ? new Date(b[primaryDateKey] as string | number | Date).getTime()
       : nullPrimaryDateValue;
 
     const tieBreaker = () => {
       if (secondaryDateKey) {
-        const secondaryA = new Date(a[secondaryDateKey]).getTime();
-        const secondaryB = new Date(b[secondaryDateKey]).getTime();
+        const secondaryA = new Date(a[secondaryDateKey] as string | number | Date).getTime();
+        const secondaryB = new Date(b[secondaryDateKey] as string | number | Date).getTime();
         return sortOrder === "oldest"
           ? secondaryA - secondaryB
           : secondaryB - secondaryA;

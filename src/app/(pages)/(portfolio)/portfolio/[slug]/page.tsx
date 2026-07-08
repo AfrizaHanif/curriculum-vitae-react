@@ -170,9 +170,7 @@ export default async function SelectedPortfolio({
   );
 
   // Resolve image for JSON-LD and Metadata consistency
-  const resolvedImage =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (item.image as any)?.src || (item.image ? resolveAssetUrl(item.image) : "");
+  const resolvedImage = resolveAssetUrl(item.image);
 
   // JSON-LD Structured Data
   const jsonLd = {

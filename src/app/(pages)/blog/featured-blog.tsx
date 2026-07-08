@@ -16,9 +16,10 @@ export default function FeaturedBlog({ items }: FeaturedBlogProps) {
 
   useEffect(() => {
     // Randomize on the client side after mount
-    const randomIndex = Math.floor(Math.random() * items.length);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFeaturedPost(items[randomIndex]);
+    Promise.resolve().then(() => {
+      const randomIndex = Math.floor(Math.random() * items.length);
+      setFeaturedPost(items[randomIndex]);
+    });
   }, [items]);
 
   // Item of Featured Post (Heroes)

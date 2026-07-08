@@ -8,10 +8,20 @@ import JsonLd from "@/components/json-ld";
 import SlugNavigation from "@/components/ui/customs/slug-navigation";
 import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/types/bootstrap-types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDateRange } from "@/lib/utils";
 import { fetchLaravel } from "@/lib/laravel";
-import { FeatureProjectItem, ProjectItem } from "@/types/customs/data-type";
-import { featureProjectItems, projectItems } from "@/lib/data/portfolioData";
+import {
+  FeatureProjectItem,
+  ProjectItem,
+  PortfolioItem,
+} from "@/types/customs/data-type";
+import {
+  featureProjectItems,
+  projectItems,
+  portfolioItems,
+} from "@/lib/data/portfolioData";
+import Link from "next/link";
+import NextImage from "@/components/ui/next/next-image";
 import ErrorToast from "@/components/home/error-toast";
 import { resolveAssetUrl } from "@/lib/assets";
 import ProjectGallery from "@/components/ui/customs/project-gallery";
@@ -86,47 +96,61 @@ export default async function SelectedProject({
 }) {
   const resolvedParams = await params;
 
-  const [projectResult, listResult, featureResult] = await Promise.all([
-    fetchWithFallback<ProjectItem>(
-      fetchLaravel<ProjectItem>(`api/projects/${resolvedParams.slug}`, {
-        next: {
-          revalidate: 3600,
-          tags: ["project", `project-${resolvedParams.slug}`],
-        },
-        skipAuth: true,
-      }),
-      projectItems.find(
-        (p) =>
-          p.slug === resolvedParams.slug ||
-          String(p.id) === resolvedParams.slug,
-      ) as ProjectItem,
-      "Gagal memuat detail Proyek terbaru.",
-      (data) => !!data && typeof data === "object" && "slug" in data,
-    ),
-    fetchWithFallback<ProjectItem[]>(
-      fetchLaravel<ProjectItem[]>("api/projects", {
-        next: { tags: ["project"] },
-        skipAuth: true,
-      }),
-      projectItems,
-      "Gagal memuat daftar Proyek.",
-      (data) => Array.isArray(data),
-    ),
-    fetchWithFallback<FeatureProjectItem[]>(
-      fetchLaravel<FeatureProjectItem[]>("api/feature-projects", {
-        next: { tags: ["feature-project"] },
-        skipAuth: true,
-      }),
-      featureProjectItems,
-      "Gagal memuat data Fitur.",
-      (data) => Array.isArray(data),
-    ),
-  ]);
+  const [projectResult, listResult, featureResult, portfolioResult] =
+    await Promise.all([
+      fetchWithFallback<ProjectItem>(
+        fetchLaravel<ProjectItem>(`api/projects/${resolvedParams.slug}`, {
+          next: {
+            revalidate: 3600,
+            tags: ["project", `project-${resolvedParams.slug}`],
+          },
+          skipAuth: true,
+        }),
+        projectItems.find(
+          (p) =>
+            p.slug === resolvedParams.slug ||
+            String(p.id) === resolvedParams.slug,
+        ) as ProjectItem,
+        "Gagal memuat detail Proyek terbaru.",
+        (data) => !!data && typeof data === "object" && "slug" in data,
+      ),
+      fetchWithFallback<ProjectItem[]>(
+        fetchLaravel<ProjectItem[]>("api/projects", {
+          next: { tags: ["project"] },
+          skipAuth: true,
+        }),
+        projectItems,
+        "Gagal memuat daftar Proyek.",
+        (data) => Array.isArray(data),
+      ),
+      fetchWithFallback<FeatureProjectItem[]>(
+        fetchLaravel<FeatureProjectItem[]>("api/feature-projects", {
+          next: { tags: ["feature-project"] },
+          skipAuth: true,
+        }),
+        featureProjectItems,
+        "Gagal memuat data Fitur.",
+        (data) => Array.isArray(data),
+      ),
+      fetchWithFallback<PortfolioItem[]>(
+        fetchLaravel<PortfolioItem[]>("api/portfolios", {
+          next: { tags: ["portfolio"] },
+          skipAuth: true,
+        }),
+        portfolioItems,
+        "Gagal memuat daftar Portofolio.",
+        (data) => Array.isArray(data),
+      ),
+    ]);
 
   const item = projectResult.data;
   const projectList = listResult.data;
+  const portfolios = portfolioResult.data;
   const fetchErrorMessage =
-    projectResult.error || listResult.error || featureResult.error;
+    projectResult.error ||
+    listResult.error ||
+    featureResult.error ||
+    portfolioResult.error;
 
   if (!item) return notFound();
 
@@ -154,10 +178,14 @@ export default async function SelectedProject({
     (feature) => feature.project_id === item.id,
   );
 
+  // Resolve Related Portfolio
+  const relatedPortfolio =
+    item.portfolio_id && portfolios
+      ? portfolios.find((p) => p.id === item.portfolio_id)
+      : undefined;
+
   // Resolve image for JSON-LD and Metadata consistency
-  const resolvedImage =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (item.image as any)?.src || (item.image ? resolveAssetUrl(item.image) : "");
+  const resolvedImage = resolveAssetUrl(item.image);
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -361,6 +389,95 @@ export default async function SelectedProject({
                   </Card>
                 ))}
               </CardGroup>
+            </section>
+          )}
+
+          {/* Related Portfolio */}
+          {item.portfolio_id && relatedPortfolio && (
+            <section id="related-portfolio" className="mt-4">
+              <h3 className="h4 mb-3">Portofolio Terkait</h3>
+              <Card className="border-0 shadow-sm overflow-hidden bg-body-tertiary rounded-4">
+                <div className="row g-0">
+                  <div className="col-12 col-md-5 position-relative related-portfolio-img-container overflow-hidden rounded-3">
+                    <NextImage
+                      src={resolveAssetUrl(relatedPortfolio.image)}
+                      alt={relatedPortfolio.title}
+                      fill
+                      style={{
+                        objectFit: "cover",
+                        objectPosition: "top",
+                      }}
+                    />
+                  </div>
+                  <div className="col-12 col-md-7 d-flex flex-column">
+                    <div className="card-body d-flex flex-column h-100">
+                      <div className="mb-2 d-flex flex-wrap gap-2">
+                        <span
+                          className="badge bg-primary-subtle text-primary border border-primary-subtle text-uppercase px-2 py-1"
+                          style={{
+                            fontSize: "0.75rem",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
+                          {relatedPortfolio.category}
+                        </span>
+                        <span
+                          className="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"
+                          style={{ fontSize: "0.75rem" }}
+                        >
+                          {relatedPortfolio.type}
+                        </span>
+                      </div>
+                      <h4 className="card-title h5 fw-bold mb-3 mt-1">
+                        <Link
+                          href={`/portfolio/${relatedPortfolio.slug}`}
+                          className="text-decoration-none text-body stretched-link"
+                        >
+                          {relatedPortfolio.title}
+                        </Link>
+                      </h4>
+                      <p
+                        className="card-text text-muted small mb-4 flex-grow-1"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          lineHeight: "1.6",
+                        }}
+                      >
+                        {relatedPortfolio.description}
+                      </p>
+                      <div className="d-flex flex-wrap gap-2 mb-4">
+                        {relatedPortfolio.technology
+                          ?.slice(0, 5)
+                          .map((tech) => (
+                            <span
+                              key={tech}
+                              className="badge bg-light text-dark border px-2 py-1"
+                              style={{ fontSize: "0.7rem", fontWeight: "500" }}
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                      </div>
+                      <div className="mt-auto d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle">
+                        <small className="text-muted fw-medium d-inline-flex align-items-center gap-2">
+                          <i className="bi bi-calendar3 text-primary"></i>
+                          {formatDateRange(
+                            relatedPortfolio.start_period,
+                            relatedPortfolio.finish_period,
+                          )}
+                        </small>
+                        <span className="text-primary fw-semibold small d-inline-flex align-items-center gap-1">
+                          Lihat Selengkapnya{" "}
+                          <i className="bi bi-arrow-right"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </section>
           )}
         </article>

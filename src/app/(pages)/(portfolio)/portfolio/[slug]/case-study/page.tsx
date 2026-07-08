@@ -78,8 +78,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const item = portfolioResult.data;
   if (!item) return { title: "Portfolio Item Not Found" };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const imageUrl = (item.image as any)?.src || resolveAssetUrl(item.image);
+  const imageUrl = resolveAssetUrl(item.image);
 
   return {
     title: { absolute: `Studi Kasus (${item.title}) | Muhammad Afriza Hanif` },
@@ -315,9 +314,7 @@ export default async function CaseStudy({
   ];
 
   // Resolve image for JSON-LD and Metadata consistency
-  const resolvedImage =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (item.image as any)?.src || (item.image ? resolveAssetUrl(item.image) : "");
+  const resolvedImage = resolveAssetUrl(item.image);
 
   // JSON-LD Structured Data
   const jsonLd = {

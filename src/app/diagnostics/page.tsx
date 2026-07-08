@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,7 +10,7 @@ export default function DiagnosticsPage() {
     csrfTokenFound: boolean;
     connectionStatus: "pending" | "success" | "error";
     errorMessage: string;
-    apiData: any;
+    apiData: unknown;
   }>({
     envLoaded: false,
     backendUrl: "",
@@ -30,7 +29,7 @@ export default function DiagnosticsPage() {
     try {
       // 2. Attempt to fetch a simple endpoint (CORS Check)
       // We use a relative path as fetchLaravel prepends the backend URL
-      const data = await fetchLaravel<any>("api/profiles", {
+      const data = await fetchLaravel<unknown>("api/profiles", {
         cache: "no-store",
       });
 
@@ -42,9 +41,10 @@ export default function DiagnosticsPage() {
         errorMessage: "",
         apiData: data,
       });
-    } catch (err: any) {
-      let msg = err.message;
-      if (err.message.includes("Failed to fetch")) {
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      let msg = errorMsg;
+      if (errorMsg.includes("Failed to fetch")) {
         msg = "CORS Error or Backend Offline. Check Laravel's CORS config.";
       }
 
@@ -60,8 +60,9 @@ export default function DiagnosticsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    runDiagnostics();
+    Promise.resolve().then(() => {
+      runDiagnostics();
+    });
   }, []);
 
   return (
@@ -118,7 +119,7 @@ export default function DiagnosticsPage() {
         </div>
       )}
 
-      {results.apiData && (
+      {!!results.apiData && (
         <div style={{ marginTop: "1rem" }}>
           <strong>Received Data Preview:</strong>
           <pre style={{ background: "#f4f4f4", padding: "1rem" }}>

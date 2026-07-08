@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import type ScrollSpyClass from "bootstrap/js/dist/scrollspy";
 
 interface ScrollSpyProps {
   targetId: string;
@@ -17,8 +18,7 @@ export default function ScrollSpy({
     // Ensure code runs only on client
     if (typeof document === "undefined") return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let scrollSpyInstance: any = null;
+    let scrollSpyInstance: ScrollSpyClass | null = null;
     let ignore = false;
 
     const handleResize = () => {
@@ -29,9 +29,8 @@ export default function ScrollSpy({
 
     const init = async () => {
       // Dynamically import bootstrap to avoid SSR issues with 'window'
-      const { default: ScrollSpy } =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (await import("bootstrap/js/dist/scrollspy")) as any;
+      const { default: ScrollSpyConstructor } =
+        await import("bootstrap/js/dist/scrollspy");
       if (ignore) return;
 
       const targetElement = document.getElementById(targetId);
@@ -44,7 +43,7 @@ export default function ScrollSpy({
       const scrollElement = document.body;
 
       // Initialize ScrollSpy
-      scrollSpyInstance = ScrollSpy.getOrCreateInstance(scrollElement, {
+      scrollSpyInstance = ScrollSpyConstructor.getOrCreateInstance(scrollElement, {
         target: `#${targetId}`,
         rootMargin: rootMargin,
         smoothScroll: smoothScroll,

@@ -5,8 +5,6 @@ import ButtonGroup from "../bootstrap/button-group";
 
 type NavigationItem = {
   slug: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // [key: string]: any;
 };
 
 type SlugNavigationProps = ComponentPropsWithoutRef<"div"> & {

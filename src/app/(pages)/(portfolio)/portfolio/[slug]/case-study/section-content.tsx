@@ -32,8 +32,7 @@ interface SectionContentProps {
 }
 
 // WARNING: This must match with id of ScrollSpy Nav
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const sectionComponents: { [key: string]: React.ComponentType<any> } = {
+const sectionComponents: { [key: string]: React.ComponentType<SectionContentProps> } = {
   overview: OverviewSection,
   role: RoleSection,
   problem: ProblemSection,

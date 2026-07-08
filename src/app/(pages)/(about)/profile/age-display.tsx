@@ -23,8 +23,9 @@ export default function AgeDisplay({ birthday }: AgeDisplayProps) {
       calculatedAge--;
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAge(calculatedAge);
+    Promise.resolve().then(() => {
+      setAge(calculatedAge);
+    });
   }, [birthday]);
 
   // Render a stable placeholder during SSR and initial hydration

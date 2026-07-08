@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Heroes from "@/components/ui/bootstrap/heroes";
 import { HeroesButtonItem } from "@/types/bootstrap-types";
+import { PortfolioItem } from "@/types/customs/data-type";
 
 // Helper function to truncate text
 const truncateText = (text: string, maxLength: number) => {
@@ -13,8 +14,7 @@ const truncateText = (text: string, maxLength: number) => {
 };
 
 interface FeaturedHeroesInteractiveProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  items: any[]; // Using any[] to match your data structure flexibly
+  items: PortfolioItem[];
 }
 
 export default function FeaturedHeroesInteractive({

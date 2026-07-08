@@ -7,8 +7,7 @@ import {
 } from "react";
 
 interface UseImageLoadingProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  src: any;
+  src: unknown;
   onLoad?: (e: SyntheticEvent<HTMLImageElement, Event>) => void;
   onError?: (e: SyntheticEvent<HTMLImageElement, Event>) => void;
   maxRetries?: number;

@@ -66,14 +66,13 @@ export default async function Profile() {
   const userProfile = profileResult.data[0];
 
   // Normalize Skills Data: Ensure 'name' property exists (handling API 'title' vs 'name' mismatch)
-  const formattedSkillItems = normalizeData(skillResult.data, {
+  const formattedSkillItems = normalizeData<SkillItem, SkillItem>(skillResult.data, {
     name: ["name", "title"], // Try 'name' first (API), fallback to 'title' (Static)
   });
 
   // The API returns 'name', but the Feature component expects 'title' and a non-optional 'icon'.
-  const formattedHobbyItems: FeatureItem[] = normalizeData<FeatureItem>(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    hobbyResult.data as any,
+  const formattedHobbyItems = normalizeData<FeatureItem, HobbyItem>(
+    hobbyResult.data,
     { title: ["name", "title"] },
     { icon: "star" }, // Provide default icon to satisfy FeatureItem interface via defaults parameter
   );

@@ -27,12 +27,17 @@ interface FetchLaravelOptions extends RequestInit {
   };
 }
 
+export interface LaravelResponseErrorData {
+  message?: string;
+  errors?: Record<string, string[]>;
+  [key: string]: unknown;
+}
+
 export class LaravelError extends Error {
   constructor(
     public message: string,
     public status: number,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public data?: any,
+    public data?: LaravelResponseErrorData,
   ) {
     super(message);
     this.name = "LaravelError";

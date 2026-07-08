@@ -1,14 +1,13 @@
 import { useState } from "react";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface UseFormSubmissionOptions<TResponse, TData> {
+interface UseFormSubmissionOptions<TResponse> {
   onSuccess?: (response: TResponse) => void;
   onError?: (error: unknown) => void;
 }
 
 export function useFormSubmission<TResponse, TData = unknown>(
   submitFn: (data: TData) => Promise<TResponse>,
-  options?: UseFormSubmissionOptions<TResponse, TData>,
+  options?: UseFormSubmissionOptions<TResponse>,
 ) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

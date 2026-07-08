@@ -40,8 +40,7 @@ export default function InitialLoader({
       window.removeEventListener("load", handleLoad);
       clearTimeout(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loader]);
 
   return (
     <>

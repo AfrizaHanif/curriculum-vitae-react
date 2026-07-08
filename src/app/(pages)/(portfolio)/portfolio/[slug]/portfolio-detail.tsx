@@ -9,15 +9,14 @@ import CardGroup from "@/components/ui/bootstrap/card-group";
 import Card from "@/components/ui/bootstrap/card";
 import { techIcons } from "@/lib/data/techIcons";
 import { DropdownItem, HeroesButtonItem } from "@/types/bootstrap-types";
-import { PortfolioItem } from "@/types/customs/data-type";
+import { PortfolioItem, FeatureItem } from "@/types/customs/data-type";
 
 interface PortfolioDetailProps {
   item: PortfolioItem;
   allItems: PortfolioItem[];
   repositoryItems: DropdownItem[];
   hasCaseStudy: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  features: any[];
+  features: FeatureItem[];
 }
 
 export default function PortfolioDetail({

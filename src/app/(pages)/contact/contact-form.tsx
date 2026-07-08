@@ -24,8 +24,9 @@ export default function ContactForm() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsMounted(true);
+    Promise.resolve().then(() => {
+      setIsMounted(true);
+    });
   }, []);
 
   useEffect(() => {

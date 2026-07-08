@@ -23,14 +23,12 @@ export interface SkillItem {
   name: string;
   level: string;
   since: number;
-  // [key: string]: any;
 }
 
 export interface HobbyItem {
   id: string;
   title: string;
   icon?: string;
-  // [key: string]: any;
 }
 
 export interface SocialItem {
@@ -112,7 +110,6 @@ export interface PortfolioItem {
   technology?: string[];
   repository?: string;
   repository_type?: string;
-  // [key: string]: any;
 }
 
 export interface RepositoryItem {
@@ -163,6 +160,7 @@ export interface SolutionCSItem {
 
 export interface ProjectItem {
   id: string;
+  portfolio_id?: string;
   title: string;
   slug: string;
   category: string;
@@ -180,7 +178,6 @@ export interface ProjectItem {
   technology?: string[];
   source_code?: string;
   is_private?: boolean; // NEW
-  // [key: string]: any;
 }
 
 export interface FeatureProjectItem {
@@ -203,7 +200,6 @@ export interface BlogItem {
   image?: string;
   content: string;
   is_featured: boolean;
-  // [key: string]: any;
 }
 
 export interface TestimonyItem {

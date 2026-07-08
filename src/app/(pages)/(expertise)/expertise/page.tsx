@@ -54,13 +54,12 @@ export default async function Expertise() {
   ];
 
   // Map expertise items to include button configuration
-  const expertiseItemsWithButton: FeatureItem[] = normalizeData<FeatureItem>(
+  const expertiseItemsWithButton = normalizeData<FeatureItem, ExpertiseItem>(
     expertiseResult.data,
     {
       // Using the new explicit transform rule for the complex button object
       button: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        transform: (item: any) => ({
+        transform: (item) => ({
           label: "Dibuktikan dalam proyek...",
           dataToggle: "modal",
           dataTarget: item.id,

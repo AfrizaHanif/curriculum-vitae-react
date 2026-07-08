@@ -1,6 +1,7 @@
 "use client";
 
 import { ComponentPropsWithoutRef, useEffect, useRef, useState } from "react";
+import type Tooltip from "bootstrap/js/dist/tooltip";
 
 type ColorModeToggleProps = ComponentPropsWithoutRef<"button"> & {
   disableTooltip?: boolean;
@@ -20,14 +21,13 @@ export default function ColorModeToggle({
     const button = buttonRef.current; // Get current value of button
     if (!button) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let tooltip: any;
+    let tooltip: Tooltip | null = null;
     let isMounted = true;
 
     // IMPORTANT: Do not remove this tooltip function
-    import("bootstrap/js/dist/tooltip").then(({ default: Tooltip }) => {
+    import("bootstrap/js/dist/tooltip").then(({ default: TooltipClass }) => {
       if (!isMounted) return;
-      tooltip = new Tooltip(button, {
+      tooltip = new TooltipClass(button, {
         title: `Mode warna saat ini: ${
           theme.charAt(0).toUpperCase() + theme.slice(1)
         }`,

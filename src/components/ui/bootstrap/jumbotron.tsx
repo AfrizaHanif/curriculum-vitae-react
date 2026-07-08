@@ -6,7 +6,6 @@ import {
   ElementType,
   ReactNode,
   useState,
-  useEffect,
 } from "react";
 import { Container } from "react-bootstrap";
 import Image from "next/image";
@@ -78,11 +77,14 @@ export default function Jumbotron({
   ...props
 }: JumbotronProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [prevImg, setPrevImg] = useState(img);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (img) setIsLoaded(false);
-  }, [img]);
+  if (img !== prevImg) {
+    setPrevImg(img);
+    if (img) {
+      setIsLoaded(false);
+    }
+  }
 
   const commonClasses = `p-5 ${img ? `` : `bg-body-${backgroundColor}`} ${
     textColor ? `text-bg-${textColor}` : undefined

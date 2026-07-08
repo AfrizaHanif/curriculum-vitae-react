@@ -18,8 +18,9 @@ export default function ShareButton({
   const [isSupported, setIsSupported] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsSupported(typeof navigator !== "undefined" && "share" in navigator);
+    Promise.resolve().then(() => {
+      setIsSupported(typeof navigator !== "undefined" && "share" in navigator);
+    });
   }, []);
 
   const handleShare = async () => {

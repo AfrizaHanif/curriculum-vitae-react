@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import dynamic from "next/dynamic";
@@ -180,39 +179,42 @@ export default function ResumeContent({
     items: (ExperienceItem | EducationItem)[],
     icon: string,
   ): FeatureItem[] => {
-    return normalizeData<FeatureItem>(
-      items as any,
+    return normalizeData<FeatureItem, ExperienceItem | EducationItem>(
+      items,
       {
-        title: (item: any) => item.title || item.location,
-        button: (item: any) => ({
+        title: (item) => ("title" in item ? item.title : item.location),
+        button: (item) => ({
           label: "Lihat Detail",
           dataToggle: "modal",
           dataTarget: item.id,
         }),
-        description: (item: any) => (
-          <>
-            <h3 className="fs-2 text-body-emphasis d-flex align-items-center gap-2 flex-wrap">
-              <span
-                className={`badge fs-6 fw-medium ${getStatusBadgeClass(item.status)}`}
-              >
-                {getStatusName(item.status)}
-              </span>
-            </h3>
-            <p className="mb-1">
-              {item.degree ? `${item.degree} ${item.major}` : item.location}
-            </p>
-            <p className="mb-1">
-              <small className="text-body-secondary">
-                {formatDateRange(item.start_period, item.finish_period)}
-              </small>
-            </p>
-            {item.gpa && (
+        description: (item) => {
+          const isEducation = "degree" in item;
+          return (
+            <>
+              <h3 className="fs-2 text-body-emphasis d-flex align-items-center gap-2 flex-wrap">
+                <span
+                  className={`badge fs-6 fw-medium ${getStatusBadgeClass(item.status)}`}
+                >
+                  {getStatusName(item.status)}
+                </span>
+              </h3>
               <p className="mb-1">
-                <strong>IPK:</strong> {item.gpa}
+                {isEducation ? `${item.degree} ${item.major}` : item.location}
               </p>
-            )}
-          </>
-        ),
+              <p className="mb-1">
+                <small className="text-body-secondary">
+                  {formatDateRange(item.start_period, item.finish_period)}
+                </small>
+              </p>
+              {isEducation && item.gpa && (
+                <p className="mb-1">
+                  <strong>IPK:</strong> {item.gpa}
+                </p>
+              )}
+            </>
+          );
+        },
       },
       { icon }, // Apply the icon to all items via the new defaults parameter
     );

@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable jsx-a11y/alt-text */
 import Image from "next/image";
-import { ComponentProps, useEffect, useState, useId, ElementType } from "react";
+import { ComponentProps, useState, useId, ElementType } from "react";
 import placeholderImage from "../../../assets/images/placeholder/placeholder-image.png";
 import Modal from "../bootstrap/modal";
 
@@ -31,6 +31,7 @@ export default function NextImageModal({
   ...props
 }: NextImageModalProps) {
   const [imgSrc, setImgSrc] = useState(src || FALLBACK_SRC);
+  const [prevSrc, setPrevSrc] = useState(src);
   const uniqueId = useId();
   // Generate a safe ID if one isn't provided. We remove colons because they can interfere with Bootstrap's query selectors.
   const modalTargetId = modalId
@@ -45,10 +46,10 @@ export default function NextImageModal({
     className || ""
   }`.trim();
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  if (src !== prevSrc) {
+    setPrevSrc(src);
     setImgSrc(src || FALLBACK_SRC);
-  }, [src]);
+  }
 
   return (
     <Tag>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/ui/customs/VanillaMap.tsx
 "use client";
 
@@ -39,7 +38,8 @@ const VanillaMap = ({
     if (mapContainerRef.current && !mapInstanceRef.current) {
       // Fix for default icon paths in Next.js
       // This part is crucial to make marker icons appear correctly.
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })
+        ._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: iconRetinaUrl.src,
         iconUrl: iconUrl.src,
@@ -74,7 +74,7 @@ const VanillaMap = ({
         mapInstanceRef.current = null;
       }
     };
-  }, []); // The empty dependency array ensures this effect runs only once.
+  }); // The empty dependency array ensures this effect runs only once.
 
   // This div is the container where the Leaflet map will be rendered.
   return (

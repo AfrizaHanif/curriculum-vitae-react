@@ -111,8 +111,7 @@ export default function Dropdown({
       )}
       <ul className={dropdownMenuClasses}>
         {items.map((item, index) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if ((item as any).type === "divider") {
+          if (item.type === "divider") {
             return (
               <li key={`divider-${index}`}>
                 <hr className="dropdown-divider" />
