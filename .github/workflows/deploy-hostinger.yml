@@ -29,10 +29,15 @@ on:
         required: true
         type: boolean
         default: false
+      validate_only:
+        description: "Validate Only? (Run checks/tests/build, but DO NOT deploy to the server)"
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   build-and-deploy:
-    if: github.event.inputs.confirm_deployment == 'true' || github.event.inputs.dry_run == 'true'
+    if: github.event.inputs.confirm_deployment == 'true' || github.event.inputs.dry_run == 'true' || github.event.inputs.validate_only == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -50,11 +55,13 @@ jobs:
           node-version: "20" # Tracks latest Node 20 LTS (must be >= 20.12.0 for styleText)
 
       - name: Setup SSH Keys
+        if: github.event.inputs.validate_only != 'true'
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Trust Hostinger SSH Key
+        if: github.event.inputs.validate_only != 'true'
         env:
           SSH_HOST_KEY: ${{ secrets.SSH_HOST_KEY }}
         run: |
@@ -169,12 +176,13 @@ jobs:
           echo "✓ Success: Variables found in build output."
 
       - name: Install lftp
+        if: github.event.inputs.validate_only != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
       - name: Force Reset (Clean Sync)
-        if: github.event.inputs.force_reset == 'true' && github.event.inputs.dry_run != 'true'
+        if: github.event.inputs.force_reset == 'true' && github.event.inputs.dry_run != 'true' && github.event.inputs.validate_only != 'true'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
@@ -194,7 +202,7 @@ jobs:
           echo "✓ Non-active releases cleared. Active release preserved for zero-downtime."
 
       - name: Upload Release via lftp
-        if: github.event.inputs.dry_run != 'true'
+        if: github.event.inputs.dry_run != 'true' && github.event.inputs.validate_only != 'true'
         id: deploy_files
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -225,7 +233,7 @@ jobs:
           echo "✓ Files uploaded to release folder"
 
       - name: Atomic Switch (Update Symlink)
-        if: github.event.inputs.dry_run != 'true'
+        if: github.event.inputs.dry_run != 'true' && github.event.inputs.validate_only != 'true'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
@@ -244,7 +252,7 @@ jobs:
           echo "✓ Atomic switch complete: 'current' now points to release $RELEASE_ID"
 
       - name: Verify Deployment (Smoke Test)
-        if: github.event.inputs.dry_run != 'true'
+        if: github.event.inputs.dry_run != 'true' && github.event.inputs.validate_only != 'true'
         id: smoke_test
         run: |
           echo "Waiting for Hostinger to complete the pull and verify server response..."
@@ -293,7 +301,7 @@ jobs:
           exit 1
 
       - name: Rollback on Failure
-        if: failure() && steps.deploy_files.outcome == 'success' && github.event.inputs.dry_run != 'true'
+        if: failure() && steps.deploy_files.outcome == 'success' && github.event.inputs.dry_run != 'true' && github.event.inputs.validate_only != 'true'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
@@ -312,7 +320,7 @@ jobs:
           "
 
       - name: Clean Up Old Releases
-        if: success() && github.event.inputs.dry_run != 'true'
+        if: success() && github.event.inputs.dry_run != 'true' && github.event.inputs.validate_only != 'true'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_HOST: ${{ secrets.FTP_HOST }}
