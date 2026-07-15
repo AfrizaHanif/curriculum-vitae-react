@@ -34,6 +34,12 @@ on:
         required: true
         type: boolean
         default: false
+      triggered_by_email:
+        description: "The email of the user who triggered the deployment"
+        required: false
+        type: string
+        default: ""
+
 
 jobs:
   build-and-deploy:
