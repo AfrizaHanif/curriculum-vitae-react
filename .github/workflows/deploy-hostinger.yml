@@ -52,6 +52,17 @@ jobs:
       name: ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && 'production' || 'staging' }}
 
     steps:
+      - name: "Diagnostic: Log Triggered Inputs"
+        run: |
+          echo "=== Workflow Inputs ==="
+          echo "Deployment Message:  ${{ github.event.inputs.deployment_message }}"
+          echo "Confirm Deployment:  ${{ github.event.inputs.confirm_deployment }}"
+          echo "Force Reset:         ${{ github.event.inputs.force_reset }}"
+          echo "Strict API:          ${{ github.event.inputs.strict_api }}"
+          echo "Dry Run:             ${{ github.event.inputs.dry_run }}"
+          echo "Validate Only:       ${{ github.event.inputs.validate_only }}"
+          echo "======================="
+
       - name: Checkout
         uses: actions/checkout@v4
 
