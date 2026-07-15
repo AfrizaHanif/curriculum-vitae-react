@@ -65,6 +65,11 @@ export async function fetchLaravel<T>(
   const isServer = typeof window === "undefined";
 
   if (isServer) {
+    // Bypass edge cache (Cloudflare/LiteSpeed) during server-side/build fetching
+    headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+    headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
+
     // Required for Sanctum to authorize the request origin (server-to-server)
     headers.set(
       "Referer",
@@ -96,7 +101,13 @@ export async function fetchLaravel<T>(
 
   // Construct full URL
   const endpoint = path.startsWith("/") ? path : `/${path}`;
-  const url = `${getBackendUrl()}${endpoint}`;
+  let url = `${getBackendUrl()}${endpoint}`;
+
+  // Apply cache-busting query parameter during build/server fetches to bypass CDN and Next.js build cache
+  if (isServer) {
+    const separator = url.includes("?") ? "&" : "?";
+    url = `${url}${separator}cb=${Date.now()}`;
+  }
 
   // console.log(`[Laravel] ${method} ${url}`);
 
