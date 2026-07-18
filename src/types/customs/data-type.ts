@@ -108,8 +108,8 @@ export interface PortfolioItem {
   description: string;
   tags?: string[];
   technology?: string[];
-  repository?: string;
-  repository_type?: string;
+  // repository?: string;
+  // repository_type?: string;
 }
 
 export interface RepositoryItem {

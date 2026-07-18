@@ -42,8 +42,8 @@ export const portfolioItems: PortfolioItem[] = [
       "Saya mengembangkan aplikasi manajemen perpustakaan digital untuk BPS Provinsi Jawa Timur menggunakan PHP dan Laravel. Fokus utama proyek ini adalah mentransformasi proses pelayanan manual menjadi sistem yang terintegrasi untuk meningkatkan efisiensi kerja pegawai dan kecepatan layanan konsumen.",
     tags: ["Kerja Praktik", "Aplikasi Web", "BPS", "Perpustakaan"],
     technology: ["Laravel", "PHP", "Bootstrap"],
-    repository: "https://repository.dinamika.ac.id/id/eprint/7167/",
-    repository_type: "Document",
+    // repository: "https://repository.dinamika.ac.id/id/eprint/7167/",
+    // repository_type: "Document",
   },
   {
     id: "POR-002",
@@ -80,8 +80,8 @@ export const portfolioItems: PortfolioItem[] = [
       "Sistem Pendukung Keputusan",
     ],
     technology: ["Laravel", "PHP", "Bootstrap"],
-    repository: "https://repository.dinamika.ac.id/id/eprint/7908/",
-    repository_type: "Document",
+    // repository: "https://repository.dinamika.ac.id/id/eprint/7908/",
+    // repository_type: "Document",
   },
 ];
 export const repositoryItems: RepositoryItem[] = [
