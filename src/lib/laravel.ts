@@ -44,6 +44,9 @@ export class LaravelError extends Error {
   }
 }
 
+// Per-build-session cache-busting timestamp to bypass CDN while enabling Next.js build-time request deduplication
+const BUILD_CB = Date.now();
+
 /**
  * Helper to fetch data from Laravel API in Server Components.
  * Automatically forwards cookies for Sanctum authentication.
@@ -106,7 +109,7 @@ export async function fetchLaravel<T>(
   // Apply cache-busting query parameter during build/server fetches to bypass CDN and Next.js build cache
   if (isServer) {
     const separator = url.includes("?") ? "&" : "?";
-    url = `${url}${separator}cb=${Date.now()}`;
+    url = `${url}${separator}cb=${BUILD_CB}`;
   }
 
   // console.log(`[Laravel] ${method} ${url}`);
