@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "./pdf-thumbnail.css";
 import NextImage from "../next/next-image";
@@ -27,15 +27,19 @@ export default function PdfThumbnail({
   pageNumber = 1,
 }: PdfThumbnailProps) {
   const cacheKey = `${file}-${pageNumber}`;
+  const [prevCacheKey, setPrevCacheKey] = useState(cacheKey);
   const [isVisible, setIsVisible] = useState(false);
-  const [cachedSrc, setCachedSrc] = useState<string | undefined>(
+  const [hasError, setHasError] = useState(false);
+  const [cachedSrc, setCachedSrc] = useState<string | undefined>(() =>
     thumbnailCache.get(cacheKey),
   );
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  if (prevCacheKey !== cacheKey) {
+    setPrevCacheKey(cacheKey);
     setCachedSrc(thumbnailCache.get(cacheKey));
-  }, [cacheKey]);
+    setHasError(false);
+  }
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -59,29 +63,54 @@ export default function PdfThumbnail({
     };
   }, []);
 
-  const handleRenderSuccess = () => {
+  const handleRenderSuccess = useCallback(() => {
     if (containerRef.current) {
       const canvas = containerRef.current.querySelector("canvas");
       if (canvas) {
         try {
           const dataUrl = canvas.toDataURL();
           thumbnailCache.set(cacheKey, dataUrl);
+          setCachedSrc(dataUrl);
         } catch (e) {
           console.warn("Error caching PDF thumbnail:", e);
         }
       }
     }
-  };
+  }, [cacheKey]);
+
+  const handleLoadError = useCallback(
+    (error: Error) => {
+      if (!error.message.includes("worker")) {
+        console.error(
+          `Error while loading PDF preview (${file}): ${error.message}`,
+        );
+      }
+      setHasError(true);
+    },
+    [file],
+  );
+
+  const fallbackErrorUI = useMemo(
+    () => (
+      <div className="d-flex align-items-center justify-content-center w-100 h-100">
+        <i className="bi bi-file-earmark-pdf display-1 text-body-secondary"></i>
+      </div>
+    ),
+    [],
+  );
+
+  const loadingUI = useMemo(
+    () => (
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading thumbnail...</span>
+      </div>
+    ),
+    [],
+  );
 
   if (cachedSrc) {
     return (
       <div className={className} style={{ overflow: "hidden" }}>
-        {/* <img
-          src={cachedSrc}
-          alt={alt}
-          className="w-100 h-100"
-          style={{ objectFit: "cover", objectPosition: "top" }}
-        /> */}
         <NextImage
           src={cachedSrc}
           alt={alt}
@@ -90,6 +119,14 @@ export default function PdfThumbnail({
           width={100}
           height={100}
         />
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className={className} style={{ overflow: "hidden" }}>
+        {fallbackErrorUI}
       </div>
     );
   }
@@ -105,24 +142,9 @@ export default function PdfThumbnail({
       {isVisible ? (
         <Document
           file={file}
-          onLoadError={(error) => {
-            // We can ignore worker errors since we are showing a fallback icon.
-            if (!error.message.includes("worker")) {
-              console.error(
-                `Error while loading PDF preview: ${error.message}`,
-              );
-            }
-          }}
-          loading={
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading thumbnail...</span>
-            </div>
-          }
-          error={
-            <div className="d-flex align-items-center justify-content-center w-100 h-100">
-              <i className="bi bi-file-earmark-pdf display-1 text-body-secondary"></i>
-            </div>
-          }
+          onLoadError={handleLoadError}
+          loading={loadingUI}
+          error={fallbackErrorUI}
         >
           <Page
             pageNumber={pageNumber}
@@ -135,11 +157,10 @@ export default function PdfThumbnail({
         </Document>
       ) : (
         <div className="d-flex justify-content-center align-items-center w-100 h-100">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading thumbnail...</span>
-          </div>
+          {loadingUI}
         </div>
       )}
     </div>
   );
 }
+

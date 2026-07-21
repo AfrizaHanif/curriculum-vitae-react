@@ -92,10 +92,12 @@ export default async function RootLayout({
                 console.debug = function() {};
                 console.info = function() {};
 
-                // Disable React DevTools
+                // Disable React DevTools safely without corrupting data structures like rendererInterfaces
                 if (typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'object') {
-                  for (const method in window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
-                    window.__REACT_DEVTOOLS_GLOBAL_HOOK__[method] = function() {};
+                  for (const prop in window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+                    if (typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__[prop] === 'function') {
+                      window.__REACT_DEVTOOLS_GLOBAL_HOOK__[prop] = function() {};
+                    }
                   }
                 }
               }
