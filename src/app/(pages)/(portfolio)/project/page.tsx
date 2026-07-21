@@ -14,7 +14,7 @@ import ErrorToast from "@/components/home/error-toast";
 export default async function Project() {
   const [projectResult] = await Promise.all([
     fetchWithFallback<ProjectItem[]>(
-      fetchLaravel<ProjectItem[]>("api/projects", {
+      fetchLaravel<ProjectItem[]>("api/projects?per_page=100", {
         next: { tags: ["project"] },
         skipAuth: true,
       }),

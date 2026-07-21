@@ -87,7 +87,7 @@ export default function ResumeContent({
   const renderCards = (items: CertificateItem[]) => (
     <PaginatedList
       items={items}
-      itemsPerPage={9}
+      itemsPerPage={8}
       cardsPerRow={4}
       renderItem={(item) => {
         const fileUrl = resolveAssetUrl(item.file);

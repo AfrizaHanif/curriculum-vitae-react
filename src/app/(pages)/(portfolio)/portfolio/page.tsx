@@ -14,7 +14,7 @@ import ErrorToast from "@/components/home/error-toast";
 export default async function Portfolio() {
   const [portfolioResult] = await Promise.all([
     fetchWithFallback<PortfolioItem[]>(
-      fetchLaravel<PortfolioItem[]>("api/portfolios", {
+      fetchLaravel<PortfolioItem[]>("api/portfolios?per_page=100", {
         next: { tags: ["portfolio"] },
         skipAuth: true,
       }),

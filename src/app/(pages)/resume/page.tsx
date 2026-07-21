@@ -23,7 +23,7 @@ import {
 export default async function Resume() {
   const [certResult, eduResult, expResult, profileResult] = await Promise.all([
     fetchWithFallback<CertificateItem[]>(
-      fetchLaravel<CertificateItem[]>("api/certificates", {
+      fetchLaravel<CertificateItem[]>("api/certificates?per_page=100", {
         next: { tags: ["certificate"] },
         skipAuth: true,
       }),
@@ -32,7 +32,7 @@ export default async function Resume() {
       (data) => Array.isArray(data) && data.length > 0,
     ),
     fetchWithFallback<EducationItem[]>(
-      fetchLaravel<EducationItem[]>("api/educations", {
+      fetchLaravel<EducationItem[]>("api/educations?per_page=100", {
         next: { tags: ["education"] },
         skipAuth: true,
       }),
@@ -41,7 +41,7 @@ export default async function Resume() {
       (data) => Array.isArray(data) && data.length > 0,
     ),
     fetchWithFallback<ExperienceItem[]>(
-      fetchLaravel<ExperienceItem[]>("api/experiences", {
+      fetchLaravel<ExperienceItem[]>("api/experiences?per_page=100", {
         next: { tags: ["experience"] },
         skipAuth: true,
       }),

@@ -16,7 +16,7 @@ import ErrorToast from "@/components/home/error-toast";
 export default async function Blog() {
   const [blogResult] = await Promise.all([
     fetchWithFallback<BlogItem[]>(
-      fetchLaravel<BlogItem[]>("api/blogs", {
+      fetchLaravel<BlogItem[]>("api/blogs?per_page=100", {
         next: { tags: ["blog"] },
         skipAuth: true,
       }),
