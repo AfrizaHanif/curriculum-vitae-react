@@ -157,6 +157,7 @@ jobs:
             FETCH_RESULT=$(curl -sS -L -m $CURL_TIMEOUT -f \
               -H "Cache-Control: no-cache" \
               -H "Pragma: no-cache" \
+              -H "Accept: application/json" \
               -H "X-Maintenance-Bypass: $MAINTENANCE_BYPASS_TOKEN" \
               "$CURL_TARGET_URL")
             CURL_EXIT_CODE=$?
@@ -172,7 +173,7 @@ jobs:
             sleep 5 # Wait before retrying
           done
 
-          if echo "$PROFILE_CHECK" | jq -e 'type == "array" and length > 0 and (.[0] | .fullname != null and .email != null)' > /dev/null; then
+          if echo "$PROFILE_CHECK" | jq -e '(.data // .) | type == "array" and length > 0 and (.[0] | .fullname != null and .email != null)' > /dev/null; then
             echo "✓ API Data integrity verified."
           elif [ "${{ github.event.inputs.strict_api }}" == "true" ]; then
             echo "❌ Error: API Data invalid and strict_api is enabled. Aborting build."
