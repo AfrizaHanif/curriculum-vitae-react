@@ -142,8 +142,15 @@ export async function fetchLaravel<T>(
         } else {
           console.log(`[Laravel API] Success (Server): ${path}`);
         }
+        break; // Success, exit loop
       }
-      break; // Success, exit loop
+
+      if (attempt < retries) {
+        console.warn(
+          `[Laravel API] Request ${path} returned status ${response.status}. Retrying (${attempt + 1}/${retries})...`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      }
     } catch (err) {
       lastError = err;
       if (attempt < retries) {
