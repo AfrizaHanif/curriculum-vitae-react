@@ -146,15 +146,19 @@ export async function fetchLaravel<T>(
       }
 
       if (attempt < retries) {
+        const jitter = Math.floor(Math.random() * 500);
+        const delay = retryDelay * Math.pow(2, attempt) + jitter;
         console.warn(
-          `[Laravel API] Request ${path} returned status ${response.status}. Retrying (${attempt + 1}/${retries})...`,
+          `[Laravel API] Request ${path} returned status ${response.status}. Retrying in ${Math.round(delay)}ms (${attempt + 1}/${retries})...`,
         );
-        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     } catch (err) {
       lastError = err;
       if (attempt < retries) {
-        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+        const jitter = Math.floor(Math.random() * 500);
+        const delay = retryDelay * Math.pow(2, attempt) + jitter;
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
   }
